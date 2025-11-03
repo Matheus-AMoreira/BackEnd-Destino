@@ -10,12 +10,17 @@ import com.destino.projeto_destino.model.UsuarioUtils.UserRole;
 import com.destino.projeto_destino.model.Usuario;
 import com.destino.projeto_destino.repository.UserRepository;
 import com.destino.projeto_destino.validar.SenhaValidator;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 public class AuthenticationService {
@@ -78,19 +83,37 @@ public class AuthenticationService {
         }
     }
 
-    public LoginResponseDto authenticate(LoginUsuarioDto user) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        user.email(),
-                        user.senha()
-                )
-        );
+    public ResponseEntity<LoginResponseDto> authenticate(
+            LoginUsuarioDto user,
+            HttpServletResponse response
+    ) {
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            user.email(),
+                            user.senha()
+                    )
+            );
+        } catch (AuthenticationException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+                    new LoginResponseDto(true, "Credenciais inválidas: e-mail ou senha incorretos.", Optional.empty())
+            );
+        }
 
         Usuario authenticatedUser = userRepository.findByEmail(new Email(user.email()))
                 .orElseThrow();
 
         String jwtToken = jwtService.generateToken(authenticatedUser);
 
-        return new LoginResponseDto("Bearer " + jwtToken, jwtService.getExpirationTime());
+        Cookie cookie = new Cookie("jwt", jwtToken);
+
+        cookie.setHttpOnly(true);
+        cookie.setSecure(true);
+        cookie.setPath("/");
+        cookie.setMaxAge((int) (jwtService.getExpirationTime() / 1000));
+
+        response.addCookie(cookie);
+
+        return ResponseEntity.ok(new LoginResponseDto(false,"Login realizado com sucesso.", Optional.of(new LoginResponseDto.UserInfo(authenticatedUser.getId().toString(), authenticatedUser.nome()))));
     }
 }

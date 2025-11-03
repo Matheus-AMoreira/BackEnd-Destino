@@ -8,6 +8,7 @@ import com.destino.projeto_destino.model.UsuarioUtils.Telefone.Telefone;
 import com.destino.projeto_destino.model.UsuarioUtils.Telefone.TelefoneConverter;
 import com.destino.projeto_destino.model.UsuarioUtils.UserRole;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.security.core.GrantedAuthority;
@@ -32,15 +33,15 @@ public class Usuario implements UserDetails {
     @Convert(converter = CpfConverter.class)
     private Cpf cpf;
 
-    @Column(nullable = false, name = "USU_EMAIL", unique = true)
+    @Column(nullable = false, name = "USU_EMAIL", unique = true, length = 100)
     @Convert(converter = EmailConverter.class)
     private Email email;
 
-    @Column(nullable = false, name = "USU_TELEFONE")
+    @Column(nullable = false, name = "USU_TELEFONE", length = 11)
     @Convert(converter = TelefoneConverter.class)
     private Telefone telefone;
 
-    @Column(nullable = false, name = "USU_SENHA")
+    @Column(nullable = false, name = "USU_SENHA", length = 100)
     private String senha;
 
     @Column(nullable = false, name = "USU_PERFIL")
@@ -110,6 +111,10 @@ public class Usuario implements UserDetails {
 
     public UUID getId() {
         return id;
+    }
+
+    public String nome() {
+        return this.nome;
     }
 
     public String getCpf() {

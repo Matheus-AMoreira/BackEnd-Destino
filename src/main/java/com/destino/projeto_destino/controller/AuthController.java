@@ -4,9 +4,9 @@ import com.destino.projeto_destino.dto.LoginResponseDto;
 import com.destino.projeto_destino.dto.LoginUsuarioDto;
 import com.destino.projeto_destino.dto.RegistrationResponseDto;
 import com.destino.projeto_destino.dto.RegistroDto;
-import com.destino.projeto_destino.model.Usuario;
 import com.destino.projeto_destino.services.AuthenticationService;
 import com.destino.projeto_destino.services.JwtService;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -22,7 +22,7 @@ public class AuthController {
 
     private final AuthenticationService authenticationService;
 
-    public AuthController(JwtService jwtService, AuthenticationService authenticationService) {
+    public AuthController(JwtService jwtService, AuthenticationService authenticationService, HttpServletResponse httpServletResponse) {
         this.authenticationService = authenticationService;
     }
 
@@ -32,8 +32,10 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponseDto> authenticate(@Valid @RequestBody LoginUsuarioDto loginUserDto) {
-        LoginResponseDto loginResponse = authenticationService.authenticate(loginUserDto);
-        return ResponseEntity.ok(loginResponse);
+    public ResponseEntity<LoginResponseDto> authenticate(
+            @Valid @RequestBody LoginUsuarioDto loginUserDto,
+            HttpServletResponse response
+    ) {
+        return authenticationService.authenticate(loginUserDto, response);
     }
 }

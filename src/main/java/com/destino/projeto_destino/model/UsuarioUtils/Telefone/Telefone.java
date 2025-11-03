@@ -1,9 +1,12 @@
 package com.destino.projeto_destino.model.UsuarioUtils.Telefone;
 
+import jakarta.validation.constraints.Size;
+
 import java.io.Serializable;
 
 public class Telefone implements Serializable {
 
+    @Size(min=10, max=11, message="Número de telefone é fixo ou movel com 10 ou 11 digitos")
     private final String numeroPuro;
 
     public Telefone(String telefonePuro) {
