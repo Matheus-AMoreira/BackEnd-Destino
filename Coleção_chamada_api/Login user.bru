@@ -1,0 +1,23 @@
+meta {
+  name: Login user
+  type: http
+  seq: 3
+}
+
+post {
+  url: http://localhost:8080/api/auth/login
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+      "email": "bruna_tereza_dapaz@cartovale.com.br",
+    "senha": "Senha@Forte123"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

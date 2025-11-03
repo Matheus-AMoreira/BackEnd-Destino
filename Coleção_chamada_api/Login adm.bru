@@ -1,0 +1,23 @@
+meta {
+  name: Login adm
+  type: http
+  seq: 4
+}
+
+post {
+  url: http://localhost:8080/api/auth/login
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "email": "admin@destino.com",
+    "senha": "Admin@#123"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

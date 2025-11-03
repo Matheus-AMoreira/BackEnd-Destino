@@ -1,0 +1,20 @@
+meta {
+  name: Private usuário
+  type: http
+  seq: 6
+}
+
+get {
+  url: http://localhost:8080/api/privado/usuario
+  body: none
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJicnVuYV90ZXJlemFfZGFwYXpAY2FydG92YWxlLmNvbS5iciIsImlhdCI6MTc2MjEyOTU2NiwiZXhwIjoxNzYyMTMzMTY2fQ.PZxp8DUzrO2dn8-X3_2eF0hskodNos9_hzHwOCMvHH4
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

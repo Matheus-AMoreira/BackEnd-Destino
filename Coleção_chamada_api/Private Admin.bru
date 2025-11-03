@@ -1,0 +1,20 @@
+meta {
+  name: Private Admin
+  type: http
+  seq: 8
+}
+
+get {
+  url: http://localhost:8080/api/privado/admin
+  body: none
+  auth: inherit
+}
+
+headers {
+  Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkBkZXN0aW5vLmNvbSIsImlhdCI6MTc2MjEyNTQwNiwiZXhwIjoxNzYyMTI5MDA2fQ.QDBMNsAaRtCJ4GzykXVoUPNVOEAToaU-bzfM2FHgIwU
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

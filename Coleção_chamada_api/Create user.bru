@@ -1,0 +1,26 @@
+meta {
+  name: Create user
+  type: http
+  seq: 2
+}
+
+post {
+  url: http://localhost:8080/api/auth/register
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "nome": "Bruna Tereza da Paz",
+    "cpf": "59424064055",
+    "email": "bruna_tereza_dapaz@cartovale.com.br",
+    "telefone": "11987654321",
+    "senha": "Senha@Forte123"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
