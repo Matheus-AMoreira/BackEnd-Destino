@@ -1,4 +1,4 @@
-package com.destino.projeto_destino.model.UsuarioUtils.Email;
+package com.destino.projeto_destino.model.usuarioUtils.Email;
 
 import java.io.Serializable;
 import java.util.regex.Pattern;

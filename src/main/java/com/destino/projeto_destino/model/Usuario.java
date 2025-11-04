@@ -1,14 +1,13 @@
 package com.destino.projeto_destino.model;
 
-import com.destino.projeto_destino.model.UsuarioUtils.Cpf.Cpf;
-import com.destino.projeto_destino.model.UsuarioUtils.Cpf.CpfConverter;
-import com.destino.projeto_destino.model.UsuarioUtils.Email.Email;
-import com.destino.projeto_destino.model.UsuarioUtils.Email.EmailConverter;
-import com.destino.projeto_destino.model.UsuarioUtils.Telefone.Telefone;
-import com.destino.projeto_destino.model.UsuarioUtils.Telefone.TelefoneConverter;
-import com.destino.projeto_destino.model.UsuarioUtils.UserRole;
+import com.destino.projeto_destino.model.usuarioUtils.Cpf.Cpf;
+import com.destino.projeto_destino.model.usuarioUtils.Cpf.CpfConverter;
+import com.destino.projeto_destino.model.usuarioUtils.Email.Email;
+import com.destino.projeto_destino.model.usuarioUtils.Email.EmailConverter;
+import com.destino.projeto_destino.model.usuarioUtils.Telefone.Telefone;
+import com.destino.projeto_destino.model.usuarioUtils.Telefone.TelefoneConverter;
+import com.destino.projeto_destino.model.usuarioUtils.UserRole;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Size;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.security.core.GrantedAuthority;

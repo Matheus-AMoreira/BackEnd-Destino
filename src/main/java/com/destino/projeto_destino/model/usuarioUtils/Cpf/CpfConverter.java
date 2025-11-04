@@ -1,4 +1,4 @@
-package com.destino.projeto_destino.model.UsuarioUtils.Cpf;
+package com.destino.projeto_destino.model.usuarioUtils.Cpf;
 
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;

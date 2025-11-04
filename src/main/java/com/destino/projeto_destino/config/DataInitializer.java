@@ -1,10 +1,10 @@
 package com.destino.projeto_destino.config;
 
 import com.destino.projeto_destino.model.Usuario;
-import com.destino.projeto_destino.model.UsuarioUtils.Cpf.Cpf;
-import com.destino.projeto_destino.model.UsuarioUtils.Email.Email;
-import com.destino.projeto_destino.model.UsuarioUtils.Telefone.Telefone;
-import com.destino.projeto_destino.model.UsuarioUtils.UserRole;
+import com.destino.projeto_destino.model.usuarioUtils.Cpf.Cpf;
+import com.destino.projeto_destino.model.usuarioUtils.Email.Email;
+import com.destino.projeto_destino.model.usuarioUtils.Telefone.Telefone;
+import com.destino.projeto_destino.model.usuarioUtils.UserRole;
 import com.destino.projeto_destino.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

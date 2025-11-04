@@ -1,4 +1,4 @@
-package com.destino.projeto_destino.model.UsuarioUtils.Email;
+package com.destino.projeto_destino.model.usuarioUtils.Email;
 
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;

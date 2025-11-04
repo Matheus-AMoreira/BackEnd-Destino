@@ -1,4 +1,4 @@
-package com.destino.projeto_destino.model.UsuarioUtils.Telefone;
+package com.destino.projeto_destino.model.usuarioUtils.Telefone;
 
 import jakarta.validation.constraints.Size;
 

@@ -1,8 +1,8 @@
 package com.destino.projeto_destino.repository;
 
 import com.destino.projeto_destino.model.Usuario;
-import com.destino.projeto_destino.model.UsuarioUtils.Cpf.Cpf;
-import com.destino.projeto_destino.model.UsuarioUtils.Email.Email;
+import com.destino.projeto_destino.model.usuarioUtils.Cpf.Cpf;
+import com.destino.projeto_destino.model.usuarioUtils.Email.Email;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.Optional;
