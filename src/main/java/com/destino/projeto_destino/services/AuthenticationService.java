@@ -10,8 +10,10 @@ import com.destino.projeto_destino.model.usuarioUtils.UserRole;
 import com.destino.projeto_destino.model.Usuario;
 import com.destino.projeto_destino.repository.UserRepository;
 import com.destino.projeto_destino.validar.SenhaValidator;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.transaction.Transactional;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -20,7 +22,9 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class AuthenticationService {
@@ -115,5 +119,20 @@ public class AuthenticationService {
         response.addCookie(cookie);
 
         return ResponseEntity.ok(new LoginResponseDto(false,"Login realizado com sucesso.", Optional.of(new LoginResponseDto.UserInfo(authenticatedUser.getId().toString(), authenticatedUser.nome()))));
+    }
+
+    public ResponseEntity<List<Usuario>> inValidUsers(){
+        return ResponseEntity.ok().body(userRepository.findByValidoFalse());
+    }
+
+    @Transactional
+    public ResponseEntity<String> validar(UUID id){
+        int linhasAfetadas = userRepository.validarUsuario(id);
+
+        if(linhasAfetadas == 0){
+            throw new EntityNotFoundException("Não existe usuario com id: " + id);
+        }
+
+        return ResponseEntity.ok().body("Usuário atualizado com sucesso!");
     }
 }
