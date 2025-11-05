@@ -1,0 +1,16 @@
+meta {
+  name: Validar user
+  type: http
+  seq: 6
+}
+
+patch {
+  url: http://localhost:8080/api/auth/usuarios/validar/7894eb4c-4329-4c7f-977e-a4cf834e04b3
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
