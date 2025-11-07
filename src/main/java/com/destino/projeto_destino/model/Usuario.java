@@ -25,14 +25,17 @@ public class Usuario implements UserDetails {
     @Column(nullable = false, name = "USU_ID")
     private UUID id;
 
-    @Column(nullable = false, name = "USU_NOME", length = 100)
+    @Column(nullable = false, name = "USU_NOME", length = 20)
     private String nome;
+
+    @Column(nullable = false, name = "USU_SOBRENOME", length = 20)
+    private String sobreNome;
 
     @Column(nullable = false, name = "USU_CPF", unique = true, length = 11)
     @Convert(converter = CpfConverter.class)
     private Cpf cpf;
 
-    @Column(nullable = false, name = "USU_EMAIL", unique = true, length = 100)
+    @Column(nullable = false, name = "USU_EMAIL", unique = true, length = 50)
     @Convert(converter = EmailConverter.class)
     private Email email;
 
@@ -58,16 +61,19 @@ public class Usuario implements UserDetails {
     @Column(nullable = false, name = "USU_DATA_CADASTRO")
     private Date cadastro;
 
-    public Usuario(){}
-
-    public Usuario(String nome, Cpf cpf,  Email email, Telefone telefone, String senha, UserRole perfil, Boolean valido) {
+    public Usuario(String nome, String sobreNome, Cpf cpf, Email email, Telefone telefone, String senha, UserRole perfil, Boolean valido) {
         this.nome = nome;
+        this.sobreNome = sobreNome;
         this.cpf = cpf;
         this.email = email;
         this.telefone = telefone;
         this.senha = senha;
         this.perfil = perfil;
         this.valido = valido;
+    }
+
+    public Usuario() {
+
     }
 
     // Métodos de UserDetails
@@ -112,8 +118,12 @@ public class Usuario implements UserDetails {
         return id;
     }
 
-    public String nome() {
+    public String getNome() {
         return this.nome;
+    }
+
+    public String getSobreNome() {
+        return this.sobreNome;
     }
 
     public String getCpf() {
@@ -136,9 +146,9 @@ public class Usuario implements UserDetails {
         return this.valido;
     }
 
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
+    public void setNome(String nome) {this.nome = nome;}
+
+    public void setSobreNome(String sobreNome){this.sobreNome = sobreNome;}
 
     public void setCpf(String cpf) { this.cpf = new Cpf(cpf);}
 

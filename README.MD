@@ -2,6 +2,26 @@
 
 Este documento descreve os endpoints da API para o "Projeto Destino", detalhando as rotas de autenticação e as rotas de teste protegidas.
 
+# 🔒 Configurando HTTPS Local no Spring Boot com JDK (keytool)
+
+Este guia detalha como gerar um certificado autoassinado usando o `keytool` do JDK, configurar sua aplicação Spring Boot para usar HTTPS e instalar o certificado no Windows para remover os avisos de segurança do navegador (Chrome, Edge, etc.).
+
+## 1. Pré-requisitos
+
+* **Java Development Kit (JDK):** O `keytool` faz parte do JDK.
+* **Variável PATH:** Para executar o `keytool` diretamente, certifique-se de que o diretório `bin` do seu JDK (`C:\Program Files\Java\jdk-<versão>\bin`) esteja adicionado à variável de ambiente **`PATH`** do Windows.
+
+## 2. Geração do Certificado (`keystore.p12`)
+
+Navegue até o diretório `src/main/resources` do seu projeto Spring Boot e execute o comando abaixo. Ele gera um par de chaves e o armazena no arquivo `keystore.p12`.
+
+O comando é totalmente **não interativo** e inclui o crucial **`Subject Alternative Name (SAN)`** para compatibilidade com navegadores modernos.
+
+# Execute no diretório src/main/resources
+- Esse comando cria o certificado, depois é so clicar nele e seguir as instruções só lembre de colocar no repositório "Autoridades de Certificação Raiz Confiáveis"
+- **Importante:** Substitua `minha_senha_segura` por uma senha forte de sua escolha.
+> keytool -genkeypair -alias springboot -keyalg RSA -keysize 2048 -dname "CN=localhost, OU=TI, O=MinhaEmpresa, L=SaoPaulo, ST=SP, C=BR" -storetype PKCS12 -keystore keystore.p12 -storepass minha_senha_segura -keypass minha_senha_segura -validity 3650 -ext "SAN=dns:localhost,ip:127.0.0.1,ip:::1"
+
 ## Informações Gerais
 
 ### Autenticação
@@ -125,6 +145,12 @@ Authentica o usuário.
 
 ---
 
+### 1.5 Logout
+Limpa os cookies do usuário
+
+- **Endpoint:** `Patch /api/auth/usuarios/logout`
+- **Resposta de Sucesso (200 OK):** Logout realizado!
+- 
 ## 2. Endpoints de Teste (Protegidos)
 
 Controlador: `TestController.java`

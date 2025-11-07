@@ -11,10 +11,11 @@ import com.destino.projeto_destino.model.Usuario;
 import com.destino.projeto_destino.repository.UserRepository;
 import com.destino.projeto_destino.validar.SenhaValidator;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -69,6 +70,7 @@ public class AuthenticationService {
 
             Usuario user = new Usuario();
             user.setNome(registrationRequest.nome());
+            user.setSobreNome(registrationRequest.sobreNome());
             user.setCpf(registrationRequest.cpf());
             user.setEmail(registrationRequest.email());
             user.setTelefone(registrationRequest.telefone());
@@ -86,6 +88,8 @@ public class AuthenticationService {
                     new RegistrationResponseDto(true, "Falha na validação dos dados: " + e.getMessage()));
         }
     }
+
+
 
     public ResponseEntity<LoginResponseDto> authenticate(
             LoginUsuarioDto user,
@@ -109,20 +113,32 @@ public class AuthenticationService {
 
         String jwtToken = jwtService.generateToken(authenticatedUser);
 
-        Cookie cookie = new Cookie("jwt", jwtToken);
+        ResponseCookie cookie = ResponseCookie.from("jwt", jwtToken)
+                .httpOnly(true)
+                .secure(false)
+                .path("/")
+                .sameSite("Lax")
+                .maxAge(jwtService.getExpirationTime() / 1000)
+                .build();
 
-        cookie.setHttpOnly(true);
-        cookie.setSecure(true);
-        cookie.setPath("/");
-        cookie.setMaxAge((int) (jwtService.getExpirationTime() / 1000));
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
 
-        response.addCookie(cookie);
-
-        return ResponseEntity.ok(new LoginResponseDto(false,"Login realizado com sucesso.", Optional.of(new LoginResponseDto.UserInfo(authenticatedUser.getId().toString(), authenticatedUser.nome()))));
+        return ResponseEntity.ok(new LoginResponseDto(false,"Login realizado com sucesso.", Optional.of(new LoginResponseDto.UserInfo(authenticatedUser.getId().toString(), authenticatedUser.getNome()))));
     }
 
     public ResponseEntity<List<Usuario>> inValidUsers(){
         return ResponseEntity.ok().body(userRepository.findByValidoFalse());
+    }
+
+    public void logout(HttpServletResponse response){
+        ResponseCookie cookie = ResponseCookie.from("jwt", null)
+                .httpOnly(true)
+                .secure(false)
+                .path("/")
+                .maxAge(0)
+                .build();
+
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
     }
 
     @Transactional

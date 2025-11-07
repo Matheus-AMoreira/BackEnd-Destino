@@ -1,14 +1,10 @@
-FROM ubuntu AS build
+FROM openjdk:25-rc-jdk-slim
 
-RUN apt-get update
-run apt-get install openjdk-25-jdk -y
 COPY . .
 
+RUN apt-get update
 RUN apt-get install maven -y
+RUN rm -rf /var/lib/apt/lists/*
 RUN mvn clean install -DskipTests
 
-FROM openjdk:25-jdk-slim
-
-COPY --from=build /target/projeto-destino-0.0.1-SNAPSHOT.jar app.jar
-
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-jar", "/target/projeto-destino-0.0.1-SNAPSHOT.jar"]

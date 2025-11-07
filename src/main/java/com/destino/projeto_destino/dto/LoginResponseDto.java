@@ -4,7 +4,7 @@ import java.util.Optional;
 
 public record LoginResponseDto(
         Boolean error,
-        String message,
+        String mensagem,
         Optional<UserInfo> userInfo
 ) {
     public record UserInfo(

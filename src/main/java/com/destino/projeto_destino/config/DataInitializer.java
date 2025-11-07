@@ -34,6 +34,7 @@ public class DataInitializer implements CommandLineRunner {
         // 1. Administrador
         criarUsuarioSeNaoExistir(
                 "Aministrador",
+                "Silva",
                 "16506961082",
                 "administrador@destino.com",
                 "4438858699",
@@ -45,6 +46,7 @@ public class DataInitializer implements CommandLineRunner {
         // 2. Funcionário
         criarUsuarioSeNaoExistir(
                 "Funcionário",
+                "Silva",
                 "71827029080",
                 "funcionario@destino.com",
                 "44981811400",
@@ -56,6 +58,7 @@ public class DataInitializer implements CommandLineRunner {
         // 3. Usuário
         criarUsuarioSeNaoExistir(
                 "Usuário",
+                "Silva",
                 "25625316554",
                 "usuario@destino.com",
                 "44981811400",
@@ -67,7 +70,7 @@ public class DataInitializer implements CommandLineRunner {
         logger.info("Verificação de dados iniciais concluída.");
     }
 
-    private void criarUsuarioSeNaoExistir(String nome, String cpf, String email,
+    private void criarUsuarioSeNaoExistir(String nome, String sobreNome,String cpf, String email,
                                           String telefone, String senhaPlana,
                                           UserRole perfil, boolean valido) {
         try {
@@ -82,6 +85,7 @@ public class DataInitializer implements CommandLineRunner {
 
                 Usuario novoUsuario = new Usuario(
                         nome,
+                        sobreNome,
                         cpfObj,
                         emailObj,
                         telObj,

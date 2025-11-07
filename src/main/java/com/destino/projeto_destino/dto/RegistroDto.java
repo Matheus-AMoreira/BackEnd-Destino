@@ -4,6 +4,7 @@ import jakarta.validation.constraints.Size;
 
 public record RegistroDto(
         String nome,
+        String sobreNome,
         String cpf,
         String email,
         String telefone,

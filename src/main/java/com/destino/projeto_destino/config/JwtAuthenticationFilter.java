@@ -37,6 +37,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     @Override
+    protected boolean shouldNotFilter(@NonNull HttpServletRequest request) throws ServletException {
+        // 🚨 CORREÇÃO: Ignorar o filtro se for a URL de LOGIN ou CADASTRO
+        return request.getServletPath().startsWith("/api/auth/login") ||
+                request.getServletPath().startsWith("/api/auth/singup");
+    }
+
+    @Override
     protected void doFilterInternal(
             @NonNull HttpServletRequest request,
             @NonNull HttpServletResponse response,

@@ -9,6 +9,8 @@ import com.destino.projeto_destino.services.AuthenticationService;
 import com.destino.projeto_destino.services.JwtService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -39,6 +41,14 @@ public class AuthController {
             HttpServletResponse response
     ) {
         return authenticationService.authenticate(loginUserDto, response);
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<String> userLogout(
+            HttpServletResponse response
+    ) {
+        authenticationService.logout(response);
+        return ResponseEntity.ok().body("Logout realizado!");
     }
 
     @GetMapping("/usuarios/invalidos")
