@@ -1,16 +1,11 @@
 package com.destino.projeto_destino.controller;
 
-import com.destino.projeto_destino.dto.LoginResponseDto;
-import com.destino.projeto_destino.dto.LoginUsuarioDto;
-import com.destino.projeto_destino.dto.RegistrationResponseDto;
-import com.destino.projeto_destino.dto.RegistroDto;
-import com.destino.projeto_destino.model.Usuario;
+import com.destino.projeto_destino.dto.*;
+import com.destino.projeto_destino.dto.auth.*;
 import com.destino.projeto_destino.services.AuthenticationService;
 import com.destino.projeto_destino.services.JwtService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -53,13 +48,13 @@ public class AuthController {
 
     @GetMapping("/usuarios/invalidos")
     @PreAuthorize("hasRole('ROLE_ADMINISTRADOR')")
-    public ResponseEntity<List<Usuario>> inValiduser(){
+    public ResponseEntity<List<UsuarioDTO>> inValiduser(){
         return authenticationService.inValidUsers();
     }
 
     @PatchMapping("/usuarios/validar/{id}")
     @PreAuthorize("hasRole('ROLE_ADMINISTRADOR')")
-    public ResponseEntity<String> validUser(@PathVariable UUID id){
+    public ResponseEntity<ValidarResponseDTO> validUser(@PathVariable UUID id){
         return authenticationService.validar(id);
     }
 }

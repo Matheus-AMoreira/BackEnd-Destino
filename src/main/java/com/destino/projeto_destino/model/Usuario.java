@@ -146,6 +146,14 @@ public class Usuario implements UserDetails {
         return this.valido;
     }
 
+    public Date getAtualizacao() {
+        return atualizacao;
+    }
+
+    public Date getCadastro() {
+        return cadastro;
+    }
+
     public void setNome(String nome) {this.nome = nome;}
 
     public void setSobreNome(String sobreNome){this.sobreNome = sobreNome;}
@@ -168,5 +176,13 @@ public class Usuario implements UserDetails {
 
     public void setValido(Boolean valido) {
         this.valido = valido;
+    }
+
+    public void setAtualizacao(Date atualizacao) {
+        this.atualizacao = atualizacao;
+    }
+
+    public void setCadastro(Date cadastro) {
+        this.cadastro = cadastro;
     }
 }

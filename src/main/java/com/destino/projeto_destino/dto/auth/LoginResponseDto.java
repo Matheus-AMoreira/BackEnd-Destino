@@ -1,4 +1,4 @@
-package com.destino.projeto_destino.dto;
+package com.destino.projeto_destino.dto.auth;
 
 import java.util.Optional;
 

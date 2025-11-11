@@ -1,9 +1,7 @@
 package com.destino.projeto_destino.services;
 
-import com.destino.projeto_destino.dto.LoginResponseDto;
-import com.destino.projeto_destino.dto.LoginUsuarioDto;
-import com.destino.projeto_destino.dto.RegistrationResponseDto;
-import com.destino.projeto_destino.dto.RegistroDto;
+import com.destino.projeto_destino.dto.*;
+import com.destino.projeto_destino.dto.auth.*;
 import com.destino.projeto_destino.model.usuarioUtils.Cpf.Cpf;
 import com.destino.projeto_destino.model.usuarioUtils.Email.Email;
 import com.destino.projeto_destino.model.usuarioUtils.UserRole;
@@ -26,6 +24,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class AuthenticationService {
@@ -126,8 +125,21 @@ public class AuthenticationService {
         return ResponseEntity.ok(new LoginResponseDto(false,"Login realizado com sucesso.", Optional.of(new LoginResponseDto.UserInfo(authenticatedUser.getId().toString(), authenticatedUser.getNome()))));
     }
 
-    public ResponseEntity<List<Usuario>> inValidUsers(){
-        return ResponseEntity.ok().body(userRepository.findByValidoFalse());
+    public ResponseEntity<List<UsuarioDTO>> inValidUsers(){
+        List<Usuario> usuarios = userRepository.findByValidoFalse();
+
+        List<UsuarioDTO> usuariosDTO = usuarios.stream().map(usuario -> new UsuarioDTO(
+                usuario.getId(),
+                usuario.getNome()+" "+usuario.getSobreNome(),
+                usuario.getCpf(),
+                usuario.getEmail(),
+                usuario.getTelefone(),
+                usuario.getPerfil(),
+                usuario.getValido(),
+                usuario.getCadastro(),
+                usuario.getCadastro())).collect(Collectors.toList());
+
+        return ResponseEntity.ok().body(usuariosDTO);
     }
 
     public void logout(HttpServletResponse response){
@@ -142,13 +154,13 @@ public class AuthenticationService {
     }
 
     @Transactional
-    public ResponseEntity<String> validar(UUID id){
+    public ResponseEntity<ValidarResponseDTO> validar(UUID id){
         int linhasAfetadas = userRepository.validarUsuario(id);
 
         if(linhasAfetadas == 0){
-            throw new EntityNotFoundException("Não existe usuario com id: " + id);
+            return ResponseEntity.ok().body(new ValidarResponseDTO(true, "Não existe usuario com id: " + id));
         }
 
-        return ResponseEntity.ok().body("Usuário atualizado com sucesso!");
+        return ResponseEntity.ok().body(new ValidarResponseDTO(false, "Usuário atualizado com sucesso!"));
     }
 }
