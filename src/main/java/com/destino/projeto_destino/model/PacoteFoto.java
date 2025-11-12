@@ -14,11 +14,11 @@ public class PacoteFoto {
     // Relacionamentos
 
     @ManyToOne
-    @JoinColumn(name = "PCF_ID_PACOTE", referencedColumnName = "PAC_ID", nullable = false)
+    @JoinColumn(name = "PAC_ID", referencedColumnName = "PAC_ID", nullable = false)
     private Pacote pacote;
 
     @ManyToOne
-    @JoinColumn(name = "PCF_ID_FOTO", referencedColumnName = "FOT_ID", nullable = false)
+    @JoinColumn(name = "FOT_ID", referencedColumnName = "FOT_ID", nullable = false)
     private Foto foto;
 
     // Getters e Setters (omitidos para brevidade)

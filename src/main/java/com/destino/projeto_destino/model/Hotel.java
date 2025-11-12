@@ -13,11 +13,14 @@ public class Hotel {
     @Column(name = "HOT_ID", nullable = false)
     private int id;
 
-    @Column(name = "HOT_NOME", length = 150, nullable = false)
+    @Column(name = "HOT_NOME", length = 50, nullable = false)
     private String nome;
 
-    @Column(name = "HOT_LOCAL", length = 200, nullable = false)
-    private String local;
+    @Column(name = "HOT_CIDADE", length = 100, nullable = false)
+    private String cidade;
+
+    @Column(name = "HOT_ENDERECO", length = 100, nullable = false)
+    private String endereco;
 
     // Getters e Setters (omitidos para brevidade)
 }

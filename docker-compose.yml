@@ -7,9 +7,15 @@ services:
       MYSQL_ROOT_PASSWORD: seudestino
       MYSQL_DATABASE: destino
     ports:
-      - "3306:3306"
+      - "3307:3306"
     volumes:
       - db-data:/var/lib/mysql
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-pseudestino" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
   backend:
     container_name: backend
@@ -19,7 +25,8 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
 
 volumes:
   db-data: 

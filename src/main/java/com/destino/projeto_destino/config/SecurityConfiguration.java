@@ -44,13 +44,12 @@ public class SecurityConfiguration {
                 //AuthController
                 .requestMatchers("/api/auth/singup").anonymous()
                 .requestMatchers("/api/auth/login").anonymous()
-                .requestMatchers("/api/auth/login").authenticated()
                 .requestMatchers("/api/auth/usuarios/invalidos").authenticated()
                 .requestMatchers("/api/auth/usuarios/validar/{id}").authenticated()
 
                 //TestController
-                .requestMatchers("/api/publico/**").permitAll()
-                .requestMatchers("/api/privado/**").authenticated()
+                .requestMatchers("/api/test/publico/**").permitAll()
+                .requestMatchers("/api/test/privado/**").authenticated()
                 .anyRequest().authenticated()
                 )
                 .sessionManagement(sess -> sess

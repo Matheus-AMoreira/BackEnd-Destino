@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.destino</groupId>
 	<artifactId>projeto-destino</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>SNAPSHOT</version>
 	<name>projeto-destino</name>
 	<description>API desenvolvida para atender necessidade do projeto integrador do 4 ADS</description>
 	<url/>

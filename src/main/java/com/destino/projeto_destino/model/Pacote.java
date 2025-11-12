@@ -1,5 +1,6 @@
 package com.destino.projeto_destino.model;
 
+import com.destino.projeto_destino.model.pacoteUtils.Transporte;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
@@ -15,7 +16,13 @@ public class Pacote {
     @Column(name = "PAC_ID", nullable = false)
     private int id;
 
-    @Column(name = "PAC_DESCRICAO", length = 255, nullable = false)
+    @Column(name = "PAC_NOME", length = 100, nullable = false)
+    private String nome;
+
+    @Column(name = "PAC_LOCAL", length = 100, nullable = false)
+    private String local;
+
+    @Column(name = "PAC_DESCRICAO", nullable = false, columnDefinition = "TEXT")
     private String descricao;
 
     @Column(name = "PAC_PRECO", precision = 10, scale = 2, nullable = false)
@@ -30,6 +37,10 @@ public class Pacote {
     @Column(name = "PAC_STATUS", length = 50, nullable = false)
     private String status;
 
+    @Column(name = "PAC_TRANSPORTE",nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Transporte transporte;
+
     // Relacionamento N:M com Foto. TODAS as fotos são gerenciadas por aqui.
     @OneToMany(mappedBy = "pacote", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<PacoteFoto> fotosDoPacote;
@@ -37,20 +48,12 @@ public class Pacote {
     // Chaves Estrangeiras (Objetos)
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "PAC_ID_ADMIN", referencedColumnName = "USU_ID", nullable = false)
+    @JoinColumn(name = "USU_ID", referencedColumnName = "USU_ID", nullable = false)
     private Usuario admin;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "PAC_ID_VIAGEM", referencedColumnName = "VIA_ID", nullable = false)
-    private Viagem viagem;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "PAC_ID_HOTEL", referencedColumnName = "HOT_ID", nullable = false)
+    @JoinColumn(name = "HOT_ID", referencedColumnName = "HOT_ID", nullable = false)
     private Hotel hotel;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "PAC_ID_TRANSPORTE", referencedColumnName = "TRA_ID", nullable = false)
-    private Transporte transporte;
 
     // Getters e Setters (omitidos para brevidade)
 }

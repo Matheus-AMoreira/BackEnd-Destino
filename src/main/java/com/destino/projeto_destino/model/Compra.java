@@ -25,15 +25,15 @@ public class Compra {
     // Chaves Estrangeiras (Objetos)
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "COM_ID_USUARIO", referencedColumnName = "USU_ID", nullable = false)
+    @JoinColumn(name = "USU_ID", referencedColumnName = "USU_ID", nullable = false)
     private Usuario usuario;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "COM_ID_PACOTE", referencedColumnName = "PAC_ID", nullable = false)
+    @JoinColumn(name = "PAC_ID", referencedColumnName = "PAC_ID", nullable = false)
     private Pacote pacote;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "COM_ID_PAGAMENTO", referencedColumnName = "PAG_ID", nullable = false)
+    @JoinColumn(name = "PAG_ID", referencedColumnName = "PAG_ID", nullable = false)
     private Pagamento pagamento;
 
     // Construtores, Getters e Setters (Omitidos para brevidade)

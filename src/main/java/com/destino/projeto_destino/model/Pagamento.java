@@ -6,7 +6,6 @@ import com.destino.projeto_destino.model.pagamentoUtils.Processamento;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
-import java.util.UUID;
 
 @Entity
 @Table(name = "pag_pagamento")
