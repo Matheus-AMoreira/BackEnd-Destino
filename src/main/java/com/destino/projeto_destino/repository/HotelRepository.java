@@ -1,0 +1,7 @@
+package com.destino.projeto_destino.repository;
+
+import com.destino.projeto_destino.model.Hotel;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface HotelRepository extends JpaRepository<Hotel, Integer> {
+}

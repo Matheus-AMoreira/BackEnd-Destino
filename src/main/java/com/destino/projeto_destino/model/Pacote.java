@@ -1,10 +1,12 @@
 package com.destino.projeto_destino.model;
 
 import com.destino.projeto_destino.model.pacoteUtils.Status;
+import com.destino.projeto_destino.model.pacoteUtils.StringListConverter;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -21,6 +23,10 @@ public class Pacote {
 
     @Column(name = "PAC_DESCRICAO", nullable = false, columnDefinition = "TEXT")
     private String descricao;
+
+    @Column(name = "PAC_ITENS")
+    @Convert(converter = StringListConverter.class)
+    private List<String> tags;
 
     @Column(name = "PAC_PRECO", precision = 10, scale = 2, nullable = false)
     private BigDecimal preco;
@@ -48,20 +54,20 @@ public class Pacote {
     private Set<PacoteFoto> fotosDoPacote;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "LOC_ID", referencedColumnName = "LOC_ID", nullable = false)
-    private Local local;
-
-    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "USU_ID", referencedColumnName = "USU_ID", nullable = false)
-    private Usuario admin;
+    private Usuario funcionarion;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "HOT_ID", referencedColumnName = "HOT_ID", nullable = false)
     private Hotel hotel;
 
-    public Pacote(String nome, String descricao, BigDecimal preco, Date inicio, Date fim, int disponibilidade, Status status, Transporte transporte, Set<PacoteFoto> fotosDoPacote, Local local, Usuario admin, Hotel hotel) {
+    public Pacote() {
+    }
+
+    public Pacote(String nome, String descricao, List<String> tags, BigDecimal preco, Date inicio, Date fim, int disponibilidade, Status status, Transporte transporte, Set<PacoteFoto> fotosDoPacote, Usuario funcionarion, Hotel hotel) {
         this.nome = nome;
         this.descricao = descricao;
+        this.tags = tags;
         this.preco = preco;
         this.inicio = inicio;
         this.fim = fim;
@@ -69,8 +75,7 @@ public class Pacote {
         this.status = status;
         this.transporte = transporte;
         this.fotosDoPacote = fotosDoPacote;
-        this.local = local;
-        this.admin = admin;
+        this.funcionarion = funcionarion;
         this.hotel = hotel;
     }
 
@@ -88,6 +93,15 @@ public class Pacote {
 
     public void setDescricao(String descricao) {
         this.descricao = descricao;
+    }
+
+    public void setTags(List<String> tags) {
+        this.tags = tags;
+    }
+
+    // Exemplo de getter (não precisa de lógica de conversão aqui)
+    public List<String> getTags() {
+        return this.tags;
     }
 
     public String getPreco() {
@@ -146,20 +160,12 @@ public class Pacote {
         this.fotosDoPacote = fotosDoPacote;
     }
 
-    public Local getLocal() {
-        return local;
-    }
-
-    public void setLocal(Local local) {
-        this.local = local;
-    }
-
     public Usuario getAdmin() {
-        return admin;
+        return funcionarion;
     }
 
-    public void setAdmin(Usuario admin) {
-        this.admin = admin;
+    public void setAdmin(Usuario funcionarion) {
+        this.funcionarion = funcionarion;
     }
 
     public Hotel getHotel() {

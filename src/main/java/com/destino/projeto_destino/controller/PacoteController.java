@@ -1,15 +1,25 @@
 package com.destino.projeto_destino.controller;
 
+import com.destino.projeto_destino.dto.hotel.HotelRegistroDTO;
+import com.destino.projeto_destino.model.Hotel;
+import com.destino.projeto_destino.services.PacoteService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/pacote")
 @EnableMethodSecurity(prePostEnabled = true)
 public class PacoteController {
+
+    private final PacoteService pacoteService;
+
+    public PacoteController(PacoteService pacoteService) {
+        this.pacoteService = pacoteService;
+    }
 
     @GetMapping()
     public int getPacotes(){
@@ -31,9 +41,20 @@ public class PacoteController {
         return 1;
     }
 
-    @GetMapping("/hotel")
-    public int getHotel(){
+    @PostMapping("/transporte")
+    public int postTransporte(@RequestBody HotelRegistroDTO hotel){
         return 1;
+    }
+
+    @GetMapping("/hotel")
+    public ResponseEntity<List<Hotel>> getHotel(){
+        return pacoteService.pegarHoteis();
+    }
+
+    @PostMapping("/hotel")
+    @PreAuthorize("hasRole('ROLE_FUNCIONARIO')")
+    public ResponseEntity<String> postHotel(@RequestBody HotelRegistroDTO hotel){
+        return pacoteService.criarHotel(hotel);
     }
 
     @GetMapping("/estatistica/status/viagem")
