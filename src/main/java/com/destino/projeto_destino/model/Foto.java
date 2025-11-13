@@ -19,5 +19,24 @@ public class Foto {
     @Column(name = "FOT_URL", length = 255, nullable = false)
     private String url;
 
-    // Getters e Setters (omitidos para brevidade)
+    public Foto(String url, String nome) {
+        this.url = url;
+        this.nome = nome;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
 }

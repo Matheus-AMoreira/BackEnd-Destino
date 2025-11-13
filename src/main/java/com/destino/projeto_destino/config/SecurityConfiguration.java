@@ -41,11 +41,17 @@ public class SecurityConfiguration {
 
                 .authorizeHttpRequests(auth -> auth
 
+                        //SWAGER
+                                .requestMatchers("/swagger-ui/**").permitAll()
+                                .requestMatchers("/v3/api-docs/**").permitAll()
                 //AuthController
                 .requestMatchers("/api/auth/singup").anonymous()
                 .requestMatchers("/api/auth/login").anonymous()
                 .requestMatchers("/api/auth/usuarios/invalidos").authenticated()
                 .requestMatchers("/api/auth/usuarios/validar/{id}").authenticated()
+
+                //PacoteController
+                .requestMatchers("/api/pacote/**").authenticated()
 
                 //TestController
                 .requestMatchers("/api/test/publico/**").permitAll()

@@ -5,19 +5,19 @@ import jakarta.persistence.*;
 import java.util.List;
 
 @Entity
-@Table(name = "via_viagem")
-public class Viagem {
+@Table(name = "loc_local")
+public class Local {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "LOC_ID")
+    private int id;
     private String nome;
     private List<String> itens;
-    private double valor;
 
-    public Viagem(String nome, List<String> itens, double valor) {
+    public Local(String nome, List<String> itens) {
         this.nome = nome;
         this.itens = itens;
-        this.valor = valor;
     }
 
     public String getNome() {
@@ -34,13 +34,5 @@ public class Viagem {
 
     public void setItens(List<String> itens) {
         this.itens = itens;
-    }
-
-    public String getValor() {
-        return String.format("%.2f", valor);
-    }
-
-    public void setValor(double valor) {
-        this.valor = valor;
     }
 }

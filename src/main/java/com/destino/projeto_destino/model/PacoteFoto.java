@@ -11,6 +11,9 @@ public class PacoteFoto {
     @Column(name = "PCF_ID", nullable = false)
     private int id;
 
+    @Column(name = "PCF_NOME", nullable = false)
+    private String nome;
+
     // Relacionamentos
 
     @ManyToOne
@@ -21,5 +24,4 @@ public class PacoteFoto {
     @JoinColumn(name = "FOT_ID", referencedColumnName = "FOT_ID", nullable = false)
     private Foto foto;
 
-    // Getters e Setters (omitidos para brevidade)
 }

@@ -22,5 +22,45 @@ public class Hotel {
     @Column(name = "HOT_ENDERECO", length = 100, nullable = false)
     private String endereco;
 
-    // Getters e Setters (omitidos para brevidade)
+    @Column(name = "HOT_diária", length = 100, nullable = false)
+    private double diaria;
+
+    public Hotel(String nome, String cidade, String endereco, double diaria) {
+        this.nome = nome;
+        this.cidade = cidade;
+        this.endereco = endereco;
+        this.diaria = diaria;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
+
+    public String getCidade() {
+        return cidade;
+    }
+
+    public void setCidade(String cidade) {
+        this.cidade = cidade;
+    }
+
+    public String getEndereco() {
+        return endereco;
+    }
+
+    public void setEndereco(String endereco) {
+        this.endereco = endereco;
+    }
+
+    public String getdiaria() {
+        return String.format("%.2f", diaria);
+    }
+
+    public void setPrecoDia(double diaria) {
+        this.diaria = diaria;
+    }
 }
