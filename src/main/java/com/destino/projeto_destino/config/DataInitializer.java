@@ -100,19 +100,16 @@ public class DataInitializer implements CommandLineRunner {
                 true
         );
 
-        // --- Início: Carga de dados de Localização (IBGE) ---
         if (localizacaoJaCarregada()) {
             logger.info("Dados de localização (Regiões, Estados, Cidades) já estão carregados.");
         } else {
             logger.info("Iniciando a carga de dados de localização do IBGE...");
             try {
-                // Executa a carga em etapas
                 Map<Long, Regiao> mapaRegioes = carregarRegioes();
                 List<Estado> estados = carregarEstados(mapaRegioes);
                 carregarCidades(estados);
                 logger.info("Carga de dados de localização completa. Total de {} cidades carregadas.", cidadeRepository.count());
             } catch (Exception e) {
-                // Se algo falhar, a transação fará o rollback
                 logger.error("Erro catastrófico ao carregar dados do IBGE. A transação será revertida.", e);
             }
         }
@@ -154,18 +151,10 @@ public class DataInitializer implements CommandLineRunner {
         }
     }
 
-    /**
-     * Verifica se os dados de localização já existem no banco.
-     * Usamos a tabela de Cidades como referência final.
-     */
     private boolean localizacaoJaCarregada() {
         return cidadeRepository.count() > 0;
     }
 
-    /**
-     * Etapa 1: Busca e salva as Regiões do IBGE.
-     * @return Um Mapa de [ID da Região -> Entidade Regiao] para uso na próxima etapa.
-     */
     private Map<Long, Regiao> carregarRegioes() {
         logger.debug("Buscando Regiões...");
         IbgeRegiaoDTO[] regioesDTO = restTemplate.getForObject(IBGE_REGIOES_URL, IbgeRegiaoDTO[].class);
@@ -186,11 +175,6 @@ public class DataInitializer implements CommandLineRunner {
                 .collect(Collectors.toMap(Regiao::getId, Function.identity()));
     }
 
-    /**
-     * Etapa 2: Busca e salva os Estados (UFs), associando-os às Regiões.
-     * @param mapaRegioes O mapa de Regiões da etapa anterior.
-     * @return Uma Lista de [Entidade Estado] para uso na próxima etapa.
-     */
     private List<Estado> carregarEstados(Map<Long, Regiao> mapaRegioes) {
         logger.debug("Buscando Estados...");
         IbgeEstadoDTO[] estadosDTO = restTemplate.getForObject(IBGE_ESTADOS_URL, IbgeEstadoDTO[].class);
@@ -215,10 +199,6 @@ public class DataInitializer implements CommandLineRunner {
         return estados; // Retorna a lista para a próxima etapa
     }
 
-    /**
-     * Etapa 3: Itera sobre os Estados salvos e busca e salva suas respectivas Cidades.
-     * @param estados A lista de Estados salvos na etapa anterior.
-     */
     private void carregarCidades(List<Estado> estados) {
         logger.debug("Buscando Cidades (municípios)...");
 

@@ -8,7 +8,7 @@ WORKDIR /app
 
 COPY pom.xml /app/
 
-RUN mvn dependency:resolve
+RUN keytool -genkeypair -alias springboot -keyalg RSA -keysize 2048 -dname "CN=localhost, OU=TI, O=Destino, L=SaoPaulo, ST=SP, C=BR" -storetype PKCS12 -keystore keystore.p12 -storepass WvbRQ9588@nMA2dMO -keypass WvbRQ9588@nMA2dMO -validity 3650 -ext "SAN=dns:localhost,ip:127.0.0.1,ip:::1"
 
 COPY . /app/
 
@@ -19,5 +19,7 @@ FROM openjdk:25-rc-jdk-slim
 WORKDIR /app
 
 COPY --from=build /app/target/projeto-destino-SNAPSHOT.jar /app/projeto-destino.jar
+
+COPY --from=build /app/keystore.p12 /app/keystore.p12
 
 ENTRYPOINT ["java", "-jar", "projeto-destino.jar"]
