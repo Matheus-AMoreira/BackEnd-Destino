@@ -1,13 +1,14 @@
 package com.destino.projeto_destino.model;
 
-import com.destino.projeto_destino.model.compraUtils.StatusCompra;
-import com.destino.projeto_destino.model.compraUtils.Metodo;
-import com.destino.projeto_destino.model.compraUtils.Processador;
+import com.destino.projeto_destino.model.pacote.Pacote;
+import com.destino.projeto_destino.model.usuario.Usuario;
+import com.destino.projeto_destino.util.compra.StatusCompra;
+import com.destino.projeto_destino.util.compra.Metodo;
+import com.destino.projeto_destino.util.compra.Processador;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
 import java.util.Date;
-import java.util.UUID;
 
 @Entity
 @Table(name = "com_compra")
@@ -32,12 +33,6 @@ public class Compra {
     @Enumerated(EnumType.STRING)
     @Column(name = "COM_PROCESSADOR", nullable = false, length = 50)
     private Processador processadorPagamento;
-
-    @Column(name = "COM_VALOR_BRUTO", nullable = false, precision = 10, scale = 2)
-    private BigDecimal valorBruto;
-
-    @Column(name = "COM_DESCONTO", precision = 10, scale = 2)
-    private BigDecimal desconto;
 
     @Column(name = "COM_VALOR_FINAL", nullable = false, precision = 10, scale = 2)
     private BigDecimal valorFinal;

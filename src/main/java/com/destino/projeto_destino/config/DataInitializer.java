@@ -1,16 +1,16 @@
 package com.destino.projeto_destino.config;
 
-import com.destino.projeto_destino.dto.local.IbgeCidadeDTO;
-import com.destino.projeto_destino.dto.local.IbgeEstadoDTO;
-import com.destino.projeto_destino.dto.local.IbgeRegiaoDTO;
-import com.destino.projeto_destino.model.Usuario;
-import com.destino.projeto_destino.model.local.Cidade;
-import com.destino.projeto_destino.model.local.Estado;
-import com.destino.projeto_destino.model.local.Regiao;
-import com.destino.projeto_destino.model.usuarioUtils.Cpf.Cpf;
-import com.destino.projeto_destino.model.usuarioUtils.Email.Email;
-import com.destino.projeto_destino.model.usuarioUtils.Telefone.Telefone;
-import com.destino.projeto_destino.model.usuarioUtils.UserRole;
+import com.destino.projeto_destino.dto.pacote.local.IbgeCidadeDTO;
+import com.destino.projeto_destino.dto.pacote.local.IbgeEstadoDTO;
+import com.destino.projeto_destino.dto.pacote.local.IbgeRegiaoDTO;
+import com.destino.projeto_destino.model.usuario.Usuario;
+import com.destino.projeto_destino.model.pacote.hotel.cidade.Cidade;
+import com.destino.projeto_destino.model.pacote.hotel.cidade.estado.Estado;
+import com.destino.projeto_destino.model.pacote.hotel.cidade.estado.regiao.Regiao;
+import com.destino.projeto_destino.util.usuario.Cpf.Cpf;
+import com.destino.projeto_destino.util.usuario.Email.Email;
+import com.destino.projeto_destino.util.usuario.Telefone.Telefone;
+import com.destino.projeto_destino.util.usuario.perfil.UserRole;
 import com.destino.projeto_destino.repository.UserRepository;
 import com.destino.projeto_destino.repository.local.CidadeRepository;
 import com.destino.projeto_destino.repository.local.EstadoRepository;

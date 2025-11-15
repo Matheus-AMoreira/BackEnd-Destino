@@ -1,6 +1,6 @@
 package com.destino.projeto_destino.dto;
 
-import com.destino.projeto_destino.model.usuarioUtils.UserRole;
+import com.destino.projeto_destino.util.usuario.perfil.UserRole;
 
 import java.util.Date;
 import java.util.UUID;

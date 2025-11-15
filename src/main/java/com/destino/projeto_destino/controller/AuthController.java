@@ -1,7 +1,11 @@
 package com.destino.projeto_destino.controller;
 
 import com.destino.projeto_destino.dto.*;
-import com.destino.projeto_destino.dto.auth.*;
+import com.destino.projeto_destino.dto.auth.login.LoginResponseDto;
+import com.destino.projeto_destino.dto.auth.login.LoginUsuarioDto;
+import com.destino.projeto_destino.dto.auth.registro.RegistrationResponseDto;
+import com.destino.projeto_destino.dto.auth.registro.RegistroDto;
+import com.destino.projeto_destino.dto.auth.validar.ValidarResponseDTO;
 import com.destino.projeto_destino.services.AuthenticationService;
 import com.destino.projeto_destino.services.JwtService;
 import jakarta.servlet.http.HttpServletResponse;

@@ -1,6 +1,6 @@
 package com.destino.projeto_destino.config;
 
-import com.destino.projeto_destino.model.usuarioUtils.Email.Email;
+import com.destino.projeto_destino.util.usuario.Email.Email;
 import com.destino.projeto_destino.repository.UserRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

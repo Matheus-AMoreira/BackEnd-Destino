@@ -1,5 +1,7 @@
 package com.destino.projeto_destino.model;
 
+import com.destino.projeto_destino.model.pacote.Pacote;
+import com.destino.projeto_destino.model.usuario.Usuario;
 import jakarta.persistence.*;
 
 import java.util.Date;

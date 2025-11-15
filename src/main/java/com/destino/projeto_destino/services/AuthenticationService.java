@@ -1,14 +1,17 @@
 package com.destino.projeto_destino.services;
 
 import com.destino.projeto_destino.dto.*;
-import com.destino.projeto_destino.dto.auth.*;
-import com.destino.projeto_destino.model.usuarioUtils.Cpf.Cpf;
-import com.destino.projeto_destino.model.usuarioUtils.Email.Email;
-import com.destino.projeto_destino.model.usuarioUtils.UserRole;
-import com.destino.projeto_destino.model.Usuario;
+import com.destino.projeto_destino.dto.auth.login.LoginResponseDto;
+import com.destino.projeto_destino.dto.auth.login.LoginUsuarioDto;
+import com.destino.projeto_destino.dto.auth.registro.RegistrationResponseDto;
+import com.destino.projeto_destino.dto.auth.registro.RegistroDto;
+import com.destino.projeto_destino.dto.auth.validar.ValidarResponseDTO;
+import com.destino.projeto_destino.util.usuario.Cpf.Cpf;
+import com.destino.projeto_destino.util.usuario.Email.Email;
+import com.destino.projeto_destino.util.usuario.perfil.UserRole;
+import com.destino.projeto_destino.model.usuario.Usuario;
 import com.destino.projeto_destino.repository.UserRepository;
-import com.destino.projeto_destino.validar.SenhaValidator;
-import jakarta.persistence.EntityNotFoundException;
+import com.destino.projeto_destino.util.usuario.senha.SenhaValidator;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import org.springframework.http.HttpHeaders;

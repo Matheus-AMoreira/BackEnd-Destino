@@ -1,7 +1,9 @@
 package com.destino.projeto_destino.controller;
 
-import com.destino.projeto_destino.dto.hotel.HotelRegistroDTO;
-import com.destino.projeto_destino.model.Hotel;
+import com.destino.projeto_destino.dto.pacote.hotel.HotelRegistroDTO;
+import com.destino.projeto_destino.dto.pacote.transporte.TransporteRegistroDTO;
+import com.destino.projeto_destino.model.pacote.hotel.Hotel;
+import com.destino.projeto_destino.model.pacote.transporte.Transporte;
 import com.destino.projeto_destino.services.PacoteService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -31,19 +33,19 @@ public class PacoteController {
         return 1;
     }
 
-    @GetMapping("/local")
-    public int getLocais(){
+    @PostMapping()
+    public int postPacote(){
         return 1;
     }
 
     @GetMapping("/transporte")
-    public int getTransporte(){
-        return 1;
+    public ResponseEntity<List<Transporte>> getTransporte(){
+        return pacoteService.pegarTransportes();
     }
 
     @PostMapping("/transporte")
-    public int postTransporte(@RequestBody HotelRegistroDTO hotel){
-        return 1;
+    public ResponseEntity<String> postTransporte(@RequestBody TransporteRegistroDTO hotel){
+        return pacoteService.criarTransportes(hotel);
     }
 
     @GetMapping("/hotel")

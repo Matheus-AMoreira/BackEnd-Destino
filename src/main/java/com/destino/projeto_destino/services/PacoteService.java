@@ -1,15 +1,16 @@
 package com.destino.projeto_destino.services;
 
-import com.destino.projeto_destino.dto.hotel.HotelRegistroDTO;
-import com.destino.projeto_destino.dto.transporte.TransporteRegistroDTO;
-import com.destino.projeto_destino.model.Hotel;
-import com.destino.projeto_destino.model.Transporte;
+import com.destino.projeto_destino.dto.pacote.hotel.HotelRegistroDTO;
+import com.destino.projeto_destino.dto.pacote.transporte.TransporteRegistroDTO;
+import com.destino.projeto_destino.model.pacote.hotel.Hotel;
+import com.destino.projeto_destino.model.pacote.transporte.Transporte;
 import com.destino.projeto_destino.repository.HotelRepository;
 import com.destino.projeto_destino.repository.PacoteRepository;
 import com.destino.projeto_destino.repository.TransporteRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -29,11 +30,25 @@ public class PacoteService {
         this.transporteRepository = transporteRepository;
     }
 
+    public ResponseEntity<String> criarPacote(TransporteRegistroDTO transporteRegistroDTO){
+        Transporte transporte = new Transporte();
+        transporte.setEmpresa(transporteRegistroDTO.empresa());
+        transporte.setMeio(transporteRegistroDTO.meio());
+        transporte.setPreco(BigDecimal.valueOf(transporteRegistroDTO.preco(),2));
+
+        Transporte transporteCriado = transporteRepository.save(transporte);
+        return ResponseEntity.ok().body("Transporte por meio " + transporteCriado.getMeio() + " em nome da empresa " + transporteCriado.getEmpresa() + " criado!");
+    }
+
+    public int pegarPacote(){
+        return 1;
+    }
+
     public ResponseEntity<String> criarTransportes(TransporteRegistroDTO transporteRegistroDTO){
         Transporte transporte = new Transporte();
         transporte.setEmpresa(transporteRegistroDTO.empresa());
         transporte.setMeio(transporteRegistroDTO.meio());
-        transporte.setPreco(transporteRegistroDTO.preco());
+        transporte.setPreco(BigDecimal.valueOf(transporteRegistroDTO.preco(),2));
 
         Transporte transporteCriado = transporteRepository.save(transporte);
         return ResponseEntity.ok().body("Transporte por meio " + transporteCriado.getMeio() + " em nome da empresa " + transporteCriado.getEmpresa() + " criado!");
@@ -48,7 +63,7 @@ public class PacoteService {
         Hotel hotel = new Hotel();
         hotel.setNome(hotelRegistroDTO.nome());
         hotel.setEndereco(hotelRegistroDTO.endereco());
-        hotel.setDiaria(hotelRegistroDTO.diaria());
+        hotel.setDiaria(BigDecimal.valueOf(hotelRegistroDTO.diaria(), 2));
         hotel.setCidade(hotelRegistroDTO.cidade());
 
         Hotel hotelCriado=hotelRepository.save(hotel);
