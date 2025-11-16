@@ -1,5 +1,6 @@
 package com.destino.projeto_destino.config;
 
+import com.destino.projeto_destino.config.Jwt.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
@@ -42,21 +43,21 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(auth -> auth
 
                         //SWAGER
-                                .requestMatchers("/swagger-ui/**").permitAll()
-                                .requestMatchers("/v3/api-docs/**").permitAll()
-                //AuthController
-                .requestMatchers("/api/auth/singup").anonymous()
-                .requestMatchers("/api/auth/login").anonymous()
-                .requestMatchers("/api/auth/usuarios/invalidos").authenticated()
-                .requestMatchers("/api/auth/usuarios/validar/{id}").authenticated()
+                        .requestMatchers("/swagger-ui/**").permitAll()
+                        .requestMatchers("/v3/api-docs/**").permitAll()
+                        //AuthController
+                        .requestMatchers("/api/auth/singup").anonymous()
+                        .requestMatchers("/api/auth/login").anonymous()
+                        .requestMatchers("/api/auth/usuarios/invalidos").authenticated()
+                        .requestMatchers("/api/auth/usuarios/validar/{id}").authenticated()
 
-                //PacoteController
-                .requestMatchers("/api/pacote/**").authenticated()
+                        //PacoteController
+                        .requestMatchers("/api/pacote/**").authenticated()
 
-                //TestController
-                .requestMatchers("/api/test/publico/**").permitAll()
-                .requestMatchers("/api/test/privado/**").authenticated()
-                .anyRequest().authenticated()
+                        //TestController
+                        .requestMatchers("/api/test/publico/**").permitAll()
+                        .requestMatchers("/api/test/privado/**").authenticated()
+                        .anyRequest().authenticated()
                 )
                 .sessionManagement(sess -> sess
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
@@ -86,7 +87,7 @@ public class SecurityConfiguration {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(List.of("https://localhost:5173"));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH","DELETE", "OPTIONS"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
 

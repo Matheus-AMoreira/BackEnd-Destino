@@ -1,12 +1,23 @@
 package com.destino.projeto_destino.model.pacote;
 
-import com.destino.projeto_destino.model.pacote.pacoteFoco.PacoteFoto;
 import com.destino.projeto_destino.model.pacote.hotel.Hotel;
-import com.destino.projeto_destino.util.pacote.Status;
-import com.destino.projeto_destino.util.pacote.StringListConverter;
+import com.destino.projeto_destino.model.pacote.pacoteFoco.PacoteFoto;
 import com.destino.projeto_destino.model.pacote.transporte.Transporte;
 import com.destino.projeto_destino.model.usuario.Usuario;
-import jakarta.persistence.*;
+import com.destino.projeto_destino.util.pacote.Status;
+import com.destino.projeto_destino.util.pacote.StringListConverter;
+import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -65,7 +76,7 @@ public class Pacote {
     @JoinColumn(name = "USU_ID", referencedColumnName = "USU_ID", nullable = false)
     private Usuario funcionarion;
 
-    @ManyToOne(fetch = FetchType.LAZY) // LAZY é o padrão e recomendado
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "pcf_id")
     private PacoteFoto fotosDoPacote;
 

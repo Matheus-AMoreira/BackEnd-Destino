@@ -1,6 +1,10 @@
 package com.destino.projeto_destino.dto.pacote;
 
-public record PacoteRegistroDTO(
+import java.util.ArrayList;
 
+public record PacoteRegistroDTO(
+        String nome,
+        String descricao,
+        ArrayList<String> tags
 ) {
 }

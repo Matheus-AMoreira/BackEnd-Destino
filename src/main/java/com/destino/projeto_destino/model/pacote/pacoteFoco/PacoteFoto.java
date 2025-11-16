@@ -1,8 +1,16 @@
 package com.destino.projeto_destino.model.pacote.pacoteFoco;
 
+
 import com.destino.projeto_destino.model.pacote.Pacote;
 import com.destino.projeto_destino.model.pacote.pacoteFoco.foto.Foto;
-import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -24,7 +32,7 @@ public class PacoteFoto {
 
     // Relacionamentos
 
-    @OneToMany(mappedBy = "fotosDoPacote", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "fotosDoPacote")
     private Set<Pacote> pacotes;
 
     @OneToMany(mappedBy = "pacoteFoto", cascade = CascadeType.ALL, orphanRemoval = true)

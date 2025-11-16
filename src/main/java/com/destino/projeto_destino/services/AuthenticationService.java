@@ -1,16 +1,16 @@
 package com.destino.projeto_destino.services;
 
-import com.destino.projeto_destino.dto.*;
+import com.destino.projeto_destino.dto.UsuarioDTO;
 import com.destino.projeto_destino.dto.auth.login.LoginResponseDto;
 import com.destino.projeto_destino.dto.auth.login.LoginUsuarioDto;
 import com.destino.projeto_destino.dto.auth.registro.RegistrationResponseDto;
 import com.destino.projeto_destino.dto.auth.registro.RegistroDto;
 import com.destino.projeto_destino.dto.auth.validar.ValidarResponseDTO;
+import com.destino.projeto_destino.model.usuario.Usuario;
+import com.destino.projeto_destino.repository.UserRepository;
 import com.destino.projeto_destino.util.usuario.Cpf.Cpf;
 import com.destino.projeto_destino.util.usuario.Email.Email;
 import com.destino.projeto_destino.util.usuario.perfil.UserRole;
-import com.destino.projeto_destino.model.usuario.Usuario;
-import com.destino.projeto_destino.repository.UserRepository;
 import com.destino.projeto_destino.util.usuario.senha.SenhaValidator;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
@@ -92,7 +92,6 @@ public class AuthenticationService {
     }
 
 
-
     public ResponseEntity<LoginResponseDto> authenticate(
             LoginUsuarioDto user,
             HttpServletResponse response
@@ -125,15 +124,15 @@ public class AuthenticationService {
 
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
 
-        return ResponseEntity.ok(new LoginResponseDto(false,"Login realizado com sucesso.", Optional.of(new LoginResponseDto.UserInfo(authenticatedUser.getId().toString(), authenticatedUser.getNome()))));
+        return ResponseEntity.ok(new LoginResponseDto(false, "Login realizado com sucesso.", Optional.of(new LoginResponseDto.UserInfo(authenticatedUser.getId().toString(), authenticatedUser.getNome()))));
     }
 
-    public ResponseEntity<List<UsuarioDTO>> inValidUsers(){
+    public ResponseEntity<List<UsuarioDTO>> inValidUsers() {
         List<Usuario> usuarios = userRepository.findByValidoFalse();
 
         List<UsuarioDTO> usuariosDTO = usuarios.stream().map(usuario -> new UsuarioDTO(
                 usuario.getId(),
-                usuario.getNome()+" "+usuario.getSobreNome(),
+                usuario.getNome() + " " + usuario.getSobreNome(),
                 usuario.getCpf(),
                 usuario.getEmail(),
                 usuario.getTelefone(),
@@ -145,7 +144,7 @@ public class AuthenticationService {
         return ResponseEntity.ok().body(usuariosDTO);
     }
 
-    public void logout(HttpServletResponse response){
+    public void logout(HttpServletResponse response) {
         ResponseCookie cookie = ResponseCookie.from("jwt", null)
                 .httpOnly(true)
                 .secure(false)
@@ -157,10 +156,10 @@ public class AuthenticationService {
     }
 
     @Transactional
-    public ResponseEntity<ValidarResponseDTO> validar(UUID id){
+    public ResponseEntity<ValidarResponseDTO> validar(UUID id) {
         int linhasAfetadas = userRepository.validarUsuario(id);
 
-        if(linhasAfetadas == 0){
+        if (linhasAfetadas == 0) {
             return ResponseEntity.ok().body(new ValidarResponseDTO(true, "Não existe usuario com id: " + id));
         }
 

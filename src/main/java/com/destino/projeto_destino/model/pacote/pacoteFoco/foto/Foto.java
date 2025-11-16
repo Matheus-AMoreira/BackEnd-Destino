@@ -1,7 +1,14 @@
 package com.destino.projeto_destino.model.pacote.pacoteFoco.foto;
 
 import com.destino.projeto_destino.model.pacote.pacoteFoco.PacoteFoto;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -22,7 +29,8 @@ public class Foto {
     @Column(name = "FOT_URL", length = 255, nullable = false)
     private String url;
 
-    @ManyToOne()
+    @ManyToOne
+    @JoinColumn(name = "PCF_ID")
     private PacoteFoto pacoteFoto;
 
     public Foto() {

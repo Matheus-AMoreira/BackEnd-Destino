@@ -1,4 +1,4 @@
-package com.destino.projeto_destino.config;
+package com.destino.projeto_destino.config.Jwt;
 
 import com.destino.projeto_destino.services.JwtService;
 import jakarta.servlet.FilterChain;

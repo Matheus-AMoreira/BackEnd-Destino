@@ -1,10 +1,9 @@
 package com.destino.projeto_destino.services;
 
+import com.destino.projeto_destino.config.Jwt.JwtSecretKey;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -17,11 +16,15 @@ import java.util.function.Function;
 
 @Service
 public class JwtService {
-    @Value("${security.jwt.secret-key}")
-    private String secretKey;
 
-    @Value("${security.jwt.expiration-time}")
-    private long jwtExpiration;
+    private final int jwtExpiration;
+
+    private final Key secretKey;
+
+    public JwtService(JwtSecretKey jwtSecretKey, @Value("${security.jwt.expiration-time}") int jwtExpiration) {
+        this.secretKey = jwtSecretKey.pegarChave();
+        this.jwtExpiration = jwtExpiration;
+    }
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
@@ -33,11 +36,8 @@ public class JwtService {
     }
 
     public String generateToken(UserDetails userDetails) {
-        return generateToken(new HashMap<>(), userDetails);
-    }
-
-    public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
-        return buildToken(extraClaims, userDetails, jwtExpiration);
+        Map<String, Object> emptyClaims = new HashMap<>();
+        return buildToken(emptyClaims, userDetails, jwtExpiration);
     }
 
     public long getExpirationTime() {
@@ -55,7 +55,7 @@ public class JwtService {
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + expiration))
-                .signWith(getSignInKey(), SignatureAlgorithm.HS256)
+                .signWith(secretKey, SignatureAlgorithm.HS256)
                 .compact();
     }
 
@@ -75,14 +75,9 @@ public class JwtService {
     private Claims extractAllClaims(String token) {
         return Jwts
                 .parserBuilder()
-                .setSigningKey(getSignInKey())
+                .setSigningKey(secretKey)
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
-    }
-
-    private Key getSignInKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
-        return Keys.hmacShaKeyFor(keyBytes);
     }
 }
