@@ -1,78 +1,53 @@
 package com.destino.projeto_destino.services;
 
-import com.destino.projeto_destino.config.Jwt.JwtSecretKey;
+import com.destino.projeto_destino.model.usuario.Usuario;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.security.Key;
+import java.util.Base64;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.Function;
 
 @Service
 public class JwtService {
 
-    private final int jwtExpiration;
-
     private final Key secretKey;
 
-    public JwtService(JwtSecretKey jwtSecretKey, @Value("${security.jwt.expiration-time}") int jwtExpiration) {
-        this.secretKey = jwtSecretKey.pegarChave();
-        this.jwtExpiration = jwtExpiration;
+    public JwtService(@Value("${security.jwt.secret-key:#{null}}") String secret) {
+        this.secretKey = pegarChave(secret);
     }
 
-    public String extractUsername(String token) {
-        return extractClaim(token, Claims::getSubject);
+    private Key pegarChave(String secret) {
+        if (secret == null || secret.isEmpty()) {
+            Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+            Base64.Encoder encoder = Base64.getUrlEncoder().withoutPadding();
+            System.out.println("🔑 Chave secreta gerada: " + encoder.encodeToString(key.getEncoded()));
+            return key;
+        } else {
+            System.out.println("🔑 Chave secreta encontrada nas configurações");
+            return Keys.hmacShaKeyFor(Base64.getDecoder().decode(secret));
+        }
     }
 
-    public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
-        final Claims claims = extractAllClaims(token);
-        return claimsResolver.apply(claims);
-    }
-
-    public String generateToken(UserDetails userDetails) {
-        Map<String, Object> emptyClaims = new HashMap<>();
-        return buildToken(emptyClaims, userDetails, jwtExpiration);
-    }
-
-    public long getExpirationTime() {
-        return jwtExpiration;
-    }
-
-    private String buildToken(
-            Map<String, Object> extraClaims,
-            UserDetails userDetails,
+    public String generateToken(
+            Usuario usuario,
             long expiration
     ) {
         return Jwts
                 .builder()
-                .setClaims(extraClaims)
-                .setSubject(userDetails.getUsername())
+                .setSubject(usuario.getEmail())
+                .claim("role", "ROLE_" + usuario.getPerfil())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + expiration))
-                .signWith(secretKey, SignatureAlgorithm.HS256)
+                .signWith(secretKey)
                 .compact();
     }
 
-    public boolean isTokenValid(String token, UserDetails userDetails) {
-        final String username = extractUsername(token);
-        return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
-    }
-
-    private boolean isTokenExpired(String token) {
-        return extractExpiration(token).before(new Date());
-    }
-
-    private Date extractExpiration(String token) {
-        return extractClaim(token, Claims::getExpiration);
-    }
-
-    private Claims extractAllClaims(String token) {
+    public Claims extractAllClaims(String token) {
         return Jwts
                 .parserBuilder()
                 .setSigningKey(secretKey)

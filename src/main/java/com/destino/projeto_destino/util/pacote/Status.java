@@ -1,7 +1,7 @@
 package com.destino.projeto_destino.util.pacote;
 
 public enum Status {
-    CONCLUIDAS,
+    CONCLUIDo,
     EMANDAMENTO,
-    CANCELADAS
+    CANCELADo
 }

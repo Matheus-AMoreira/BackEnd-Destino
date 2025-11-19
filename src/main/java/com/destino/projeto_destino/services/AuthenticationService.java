@@ -1,5 +1,6 @@
 package com.destino.projeto_destino.services;
 
+
 import com.destino.projeto_destino.dto.UsuarioDTO;
 import com.destino.projeto_destino.dto.auth.login.LoginResponseDto;
 import com.destino.projeto_destino.dto.auth.login.LoginUsuarioDto;
@@ -9,17 +10,18 @@ import com.destino.projeto_destino.dto.auth.validar.ValidarResponseDTO;
 import com.destino.projeto_destino.model.usuario.Usuario;
 import com.destino.projeto_destino.repository.UserRepository;
 import com.destino.projeto_destino.util.usuario.Cpf.Cpf;
-import com.destino.projeto_destino.util.usuario.Email.Email;
 import com.destino.projeto_destino.util.usuario.perfil.UserRole;
 import com.destino.projeto_destino.util.usuario.senha.SenhaValidator;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -39,6 +41,9 @@ public class AuthenticationService {
 
     private final JwtService jwtService;
 
+    @Value("${security.jwt.expiration-time}")
+    private int jwtExpiration;
+
     public AuthenticationService(
             UserRepository userRepository,
             AuthenticationManager authenticationManager,
@@ -50,7 +55,7 @@ public class AuthenticationService {
         this.jwtService = jwtService;
     }
 
-    public ResponseEntity<RegistrationResponseDto> signup(RegistroDto registrationRequest
+    public ResponseEntity<RegistrationResponseDto> registrar(RegistroDto registrationRequest
     ) {
         if (!SenhaValidator.isValid(registrationRequest.senha())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
@@ -65,25 +70,24 @@ public class AuthenticationService {
                         new RegistrationResponseDto(true, "Erro: usuário já existe!"));
             }
 
-            if (userRepository.findByEmail(new Email(registrationRequest.email())).isPresent()) {
+            if (userRepository.findByEmail(registrationRequest.email()).isPresent()) {
                 return ResponseEntity.status(HttpStatus.CONFLICT).body(
                         new RegistrationResponseDto(true, "Erro: Email já está em uso"));
             }
 
-            Usuario user = new Usuario();
-            user.setNome(registrationRequest.nome());
-            user.setSobreNome(registrationRequest.sobreNome());
-            user.setCpf(registrationRequest.cpf());
-            user.setEmail(registrationRequest.email());
-            user.setTelefone(registrationRequest.telefone());
-            user.setSenha(passwordEncoder.encode(registrationRequest.senha()));
-            user.setPerfil(UserRole.USUARIO);
-            user.setValido(false);
-
-            userRepository.save(user);
+            Usuario user = userRepository.save(new Usuario(
+                    registrationRequest.nome(),
+                    registrationRequest.sobreNome(),
+                    registrationRequest.cpf(),
+                    registrationRequest.email(),
+                    registrationRequest.telefone(),
+                    passwordEncoder.encode(registrationRequest.senha()),
+                    UserRole.USUARIO,
+                    false
+            ));
 
             return ResponseEntity.status(HttpStatus.CREATED).body(
-                    new RegistrationResponseDto(false, "Usuário cadastrado com sucesso!"));
+                    new RegistrationResponseDto(false, "Usuário " + user.getNome() + user.getSobreNome() + "cadastrado com sucesso!"));
 
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
@@ -92,12 +96,14 @@ public class AuthenticationService {
     }
 
 
-    public ResponseEntity<LoginResponseDto> authenticate(
+    public ResponseEntity<LoginResponseDto> autenticar(
             LoginUsuarioDto user,
             HttpServletResponse response
     ) {
+        Authentication authentication;
+
         try {
-            authenticationManager.authenticate(
+            authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
                             user.email(),
                             user.senha()
@@ -108,18 +114,17 @@ public class AuthenticationService {
                     new LoginResponseDto(true, "Credenciais inválidas: e-mail ou senha incorretos.", Optional.empty())
             );
         }
+        System.out.println(authentication);
+        Usuario authenticatedUser = (Usuario) authentication.getPrincipal();
 
-        Usuario authenticatedUser = userRepository.findByEmail(new Email(user.email()))
-                .orElseThrow();
-
-        String jwtToken = jwtService.generateToken(authenticatedUser);
+        String jwtToken = jwtService.generateToken(authenticatedUser, jwtExpiration);
 
         ResponseCookie cookie = ResponseCookie.from("jwt", jwtToken)
                 .httpOnly(true)
-                .secure(false)
+                .secure(true)
                 .path("/")
                 .sameSite("Lax")
-                .maxAge(jwtService.getExpirationTime() / 1000)
+                .maxAge(jwtExpiration / 1000)
                 .build();
 
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
@@ -133,9 +138,9 @@ public class AuthenticationService {
         List<UsuarioDTO> usuariosDTO = usuarios.stream().map(usuario -> new UsuarioDTO(
                 usuario.getId(),
                 usuario.getNome() + " " + usuario.getSobreNome(),
-                usuario.getCpf(),
+                usuario.getCpf().getValorFormatado(),
                 usuario.getEmail(),
-                usuario.getTelefone(),
+                usuario.getTelefone().getValorFormatado(),
                 usuario.getPerfil(),
                 usuario.getValido(),
                 usuario.getCadastro(),

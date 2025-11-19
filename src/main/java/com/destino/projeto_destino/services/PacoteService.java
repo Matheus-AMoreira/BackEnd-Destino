@@ -32,7 +32,6 @@ public class PacoteService {
     }
 
     public ResponseEntity<String> criarPacote(PacoteRegistroDTO pacoteRegistroDTO) {
-        pacoteRegistroDTO.tags().add("");
         return ResponseEntity.ok().body("Transporte por meio criado!");
     }
 

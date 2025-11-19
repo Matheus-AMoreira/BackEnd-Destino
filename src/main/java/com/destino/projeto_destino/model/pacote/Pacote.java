@@ -22,8 +22,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 @Entity
 @Table(name = "pac_pacote")
@@ -44,7 +44,7 @@ public class Pacote {
 
     @Column(name = "PAC_ITENS")
     @Convert(converter = StringListConverter.class)
-    private List<String> tags;
+    private ArrayList<String> tags;
 
     @Column(name = "PAC_PRECO", precision = 10, scale = 2, nullable = false)
     private BigDecimal preco;
@@ -74,7 +74,7 @@ public class Pacote {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "USU_ID", referencedColumnName = "USU_ID", nullable = false)
-    private Usuario funcionarion;
+    private Usuario funcionario;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "pcf_id")
@@ -83,7 +83,20 @@ public class Pacote {
     public Pacote() {
     }
 
-    public Pacote(String nome, String descricao, List<String> tags, BigDecimal preco, Date inicio, Date fim, int disponibilidade, Status status, Transporte transporte, PacoteFoto fotosDoPacote, Usuario funcionarion, Hotel hotel) {
+    public Pacote(
+            String nome,
+            String descricao,
+            ArrayList<String> tags,
+            BigDecimal preco,
+            Date inicio,
+            Date fim,
+            int disponibilidade,
+            Status status,
+            Transporte transporte,
+            PacoteFoto fotosDoPacote,
+            Usuario funcionario,
+            Hotel hotel
+    ) {
         this.nome = nome;
         this.descricao = descricao;
         this.tags = tags;
@@ -94,7 +107,7 @@ public class Pacote {
         this.status = status;
         this.transporte = transporte;
         this.fotosDoPacote = fotosDoPacote;
-        this.funcionarion = funcionarion;
+        this.funcionario = funcionario;
         this.hotel = hotel;
     }
 

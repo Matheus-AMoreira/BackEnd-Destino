@@ -3,18 +3,17 @@ package com.destino.projeto_destino.config;
 import com.destino.projeto_destino.dto.pacote.local.IbgeCidadeDTO;
 import com.destino.projeto_destino.dto.pacote.local.IbgeEstadoDTO;
 import com.destino.projeto_destino.dto.pacote.local.IbgeRegiaoDTO;
-import com.destino.projeto_destino.model.usuario.Usuario;
 import com.destino.projeto_destino.model.pacote.hotel.cidade.Cidade;
 import com.destino.projeto_destino.model.pacote.hotel.cidade.estado.Estado;
 import com.destino.projeto_destino.model.pacote.hotel.cidade.estado.regiao.Regiao;
-import com.destino.projeto_destino.util.usuario.Cpf.Cpf;
-import com.destino.projeto_destino.util.usuario.Email.Email;
-import com.destino.projeto_destino.util.usuario.Telefone.Telefone;
-import com.destino.projeto_destino.util.usuario.perfil.UserRole;
+import com.destino.projeto_destino.model.usuario.Usuario;
 import com.destino.projeto_destino.repository.UserRepository;
 import com.destino.projeto_destino.repository.local.CidadeRepository;
 import com.destino.projeto_destino.repository.local.EstadoRepository;
 import com.destino.projeto_destino.repository.local.RegiaoRepository;
+import com.destino.projeto_destino.util.usuario.Cpf.Cpf;
+import com.destino.projeto_destino.util.usuario.Telefone.Telefone;
+import com.destino.projeto_destino.util.usuario.perfil.UserRole;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
@@ -117,13 +116,12 @@ public class DataInitializer implements CommandLineRunner {
         logger.info("Verificação de dados iniciais concluída.");
     }
 
-    private void criarUsuarioSeNaoExistir(String nome, String sobreNome,String cpf, String email,
+    private void criarUsuarioSeNaoExistir(String nome, String sobreNome, String cpf, String email,
                                           String telefone, String senhaPlana,
                                           UserRole perfil, boolean valido) {
         try {
-            Email emailObj = new Email(email);
 
-            if (usuarioRepository.findByEmail(emailObj).isEmpty()) {
+            if (usuarioRepository.findByEmail(email).isEmpty()) {
 
                 Cpf cpfObj = new Cpf(cpf);
                 Telefone telObj = new Telefone(telefone);
@@ -133,9 +131,9 @@ public class DataInitializer implements CommandLineRunner {
                 Usuario novoUsuario = new Usuario(
                         nome,
                         sobreNome,
-                        cpfObj,
-                        emailObj,
-                        telObj,
+                        cpfObj.getValorPuro(),
+                        email,
+                        telObj.getValorPuro(),
                         senhaHasheada,
                         perfil,
                         valido
@@ -170,7 +168,6 @@ public class DataInitializer implements CommandLineRunner {
         regiaoRepository.saveAll(regioes);
         logger.info("Regiões carregadas com sucesso.");
 
-        // Retorna um mapa para facilitar a associação com os estados
         return regioes.stream()
                 .collect(Collectors.toMap(Regiao::getId, Function.identity()));
     }
@@ -185,7 +182,6 @@ public class DataInitializer implements CommandLineRunner {
 
         List<Estado> estados = Arrays.stream(estadosDTO)
                 .map(dto -> {
-                    // Busca a região correspondente no mapa
                     Regiao regiao = mapaRegioes.get(dto.regiao().id());
                     if (regiao == null) {
                         throw new RuntimeException("Inconsistência de dados: Região ID " + dto.regiao().id() + " não encontrada para o estado " + dto.sigla());
@@ -208,7 +204,7 @@ public class DataInitializer implements CommandLineRunner {
             IbgeCidadeDTO[] cidadesDTO = restTemplate.getForObject(urlCidades, IbgeCidadeDTO[].class);
             if (cidadesDTO == null) {
                 logger.warn("Falha ao buscar cidades para o estado {}. Pulando.", estado.getSigla());
-                continue; // Não é catastrófico, apenas pula este estado
+                continue;
             }
 
             List<Cidade> cidades = Arrays.stream(cidadesDTO)
