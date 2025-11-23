@@ -1,6 +1,6 @@
 package com.destino.projeto_destino.config;
 
-import com.destino.projeto_destino.services.JwtService;
+import com.destino.projeto_destino.services.auth.JwtService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
@@ -64,18 +64,22 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             );
 
             SecurityContextHolder.getContext().setAuthentication(authToken);
-            filterChain.doFilter(request, response);
 
         } catch (ExpiredJwtException e) {
             SecurityContextHolder.clearContext();
             sendError(response, HttpStatus.UNAUTHORIZED, "Token expirado");
+            return;
         } catch (MalformedJwtException e) {
             SecurityContextHolder.clearContext();
             sendError(response, HttpStatus.UNAUTHORIZED, "Token JWT inválido");
+            return;
         } catch (Exception e) {
             SecurityContextHolder.clearContext();
             sendError(response, HttpStatus.UNAUTHORIZED, "Erro na autenticação");
+            return;
         }
+
+        filterChain.doFilter(request, response);
     }
 
     private void sendError(HttpServletResponse response, HttpStatus status, String message) throws IOException {

@@ -1,11 +1,11 @@
 package com.destino.projeto_destino.model.pacote.hotel.cidade.estado.regiao;
 
-import com.destino.projeto_destino.model.pacote.hotel.cidade.estado.Estado;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.util.List;
 
 @Entity
 @Table(name = "reg_regiao")
@@ -17,16 +17,14 @@ public class Regiao {
     @Column(name = "reg_id", nullable = false)
     private Long id;
 
-    @Column(name = "reg_sigla", length = 2,nullable = false)
+    @Column(name = "reg_sigla", length = 2, nullable = false)
     private String sigla;
 
-    @Column(name = "reg_nome", length = 12,nullable = false)
+    @Column(name = "reg_nome", length = 12, nullable = false)
     private String nome;
 
-    @OneToMany(mappedBy = "regiao")
-    private List<Estado> estados;
-
-    public Regiao() {}
+    public Regiao() {
+    }
 
     public Regiao(Long id, String sigla, String nome) {
         this.id = id;

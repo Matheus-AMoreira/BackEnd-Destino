@@ -1,19 +1,16 @@
-package com.destino.projeto_destino.services;
+package com.destino.projeto_destino.services.auth;
 
 
-import com.destino.projeto_destino.dto.UsuarioDTO;
 import com.destino.projeto_destino.dto.auth.login.LoginResponseDto;
 import com.destino.projeto_destino.dto.auth.login.LoginUsuarioDto;
 import com.destino.projeto_destino.dto.auth.registro.RegistrationResponseDto;
 import com.destino.projeto_destino.dto.auth.registro.RegistroDto;
-import com.destino.projeto_destino.dto.auth.validar.ValidarResponseDTO;
 import com.destino.projeto_destino.model.usuario.Usuario;
-import com.destino.projeto_destino.repository.UserRepository;
+import com.destino.projeto_destino.repository.UsuarioRepository;
 import com.destino.projeto_destino.util.usuario.Cpf.Cpf;
 import com.destino.projeto_destino.util.usuario.perfil.UserRole;
 import com.destino.projeto_destino.util.usuario.senha.SenhaValidator;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -26,14 +23,11 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 public class AuthenticationService {
-    private final UserRepository userRepository;
+    private final UsuarioRepository userRepository;
 
     private final PasswordEncoder passwordEncoder;
 
@@ -45,7 +39,7 @@ public class AuthenticationService {
     private int jwtExpiration;
 
     public AuthenticationService(
-            UserRepository userRepository,
+            UsuarioRepository userRepository,
             AuthenticationManager authenticationManager,
             PasswordEncoder passwordEncoder, JwtService jwtService
     ) {
@@ -132,23 +126,6 @@ public class AuthenticationService {
         return ResponseEntity.ok(new LoginResponseDto(false, "Login realizado com sucesso.", Optional.of(new LoginResponseDto.UserInfo(authenticatedUser.getId().toString(), authenticatedUser.getNome()))));
     }
 
-    public ResponseEntity<List<UsuarioDTO>> inValidUsers() {
-        List<Usuario> usuarios = userRepository.findByValidoFalse();
-
-        List<UsuarioDTO> usuariosDTO = usuarios.stream().map(usuario -> new UsuarioDTO(
-                usuario.getId(),
-                usuario.getNome() + " " + usuario.getSobreNome(),
-                usuario.getCpf().getValorFormatado(),
-                usuario.getEmail(),
-                usuario.getTelefone().getValorFormatado(),
-                usuario.getPerfil(),
-                usuario.getValido(),
-                usuario.getCadastro(),
-                usuario.getCadastro())).collect(Collectors.toList());
-
-        return ResponseEntity.ok().body(usuariosDTO);
-    }
-
     public void logout(HttpServletResponse response) {
         ResponseCookie cookie = ResponseCookie.from("jwt", null)
                 .httpOnly(true)
@@ -158,16 +135,5 @@ public class AuthenticationService {
                 .build();
 
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
-    }
-
-    @Transactional
-    public ResponseEntity<ValidarResponseDTO> validar(UUID id) {
-        int linhasAfetadas = userRepository.validarUsuario(id);
-
-        if (linhasAfetadas == 0) {
-            return ResponseEntity.ok().body(new ValidarResponseDTO(true, "Não existe usuario com id: " + id));
-        }
-
-        return ResponseEntity.ok().body(new ValidarResponseDTO(false, "Usuário atualizado com sucesso!"));
     }
 }

@@ -1,4 +1,4 @@
-package com.destino.projeto_destino.services;
+package com.destino.projeto_destino.services.auth;
 
 import com.destino.projeto_destino.model.usuario.Usuario;
 import io.jsonwebtoken.Claims;

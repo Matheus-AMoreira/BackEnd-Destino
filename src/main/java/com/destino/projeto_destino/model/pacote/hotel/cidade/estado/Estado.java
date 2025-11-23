@@ -1,13 +1,15 @@
 package com.destino.projeto_destino.model.pacote.hotel.cidade.estado;
 
-import com.destino.projeto_destino.model.pacote.hotel.cidade.Cidade;
 import com.destino.projeto_destino.model.pacote.hotel.cidade.estado.regiao.Regiao;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.util.List;
 
 @Entity
 @Table(name = "est_estado")
@@ -19,19 +21,16 @@ public class Estado {
     @Column(name = "est_id", nullable = false)
     private Long id;
 
-    @Column(name = "est_sigla", length = 2,nullable = false)
+    @Column(name = "est_sigla", length = 2, nullable = false)
     private String sigla;
 
-    @Column(name = "est_nome", length = 100,nullable = false)
+    @Column(name = "est_nome", length = 100, nullable = false)
     private String nome;
 
     @NotNull
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "reg_id")
     private Regiao regiao;
-
-    @OneToMany(mappedBy = "estado")
-    private List<Cidade> cidades;
 
     public Estado() {
     }

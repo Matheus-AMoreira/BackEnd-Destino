@@ -1,11 +1,14 @@
 package com.destino.projeto_destino.model.pacote.transporte;
 
 import com.destino.projeto_destino.util.transporte.Meio;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.math.BigDecimal;
 
 @Entity
 @Getter
@@ -24,12 +27,12 @@ public class Transporte {
     private Meio meio;
 
     @Column(name = "TRA_PRECO", precision = 10, scale = 2, nullable = false)
-    private BigDecimal preco;
+    private int preco;
 
     public Transporte() {
     }
 
-    public Transporte(String empresa, Meio meio, BigDecimal preco) {
+    public Transporte(String empresa, Meio meio, int preco) {
         this.empresa = empresa;
         this.meio = meio;
         this.preco = preco;

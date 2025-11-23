@@ -6,6 +6,8 @@ import com.destino.projeto_destino.model.pacote.transporte.Transporte;
 import com.destino.projeto_destino.model.usuario.Usuario;
 import com.destino.projeto_destino.util.pacote.Status;
 import com.destino.projeto_destino.util.pacote.StringListConverter;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
@@ -18,17 +20,19 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 
 @Entity
 @Table(name = "pac_pacote")
 @Getter
 @Setter
+@Builder
 public class Pacote {
 
     @Id
@@ -49,11 +53,13 @@ public class Pacote {
     @Column(name = "PAC_PRECO", precision = 10, scale = 2, nullable = false)
     private BigDecimal preco;
 
+    @JsonFormat(pattern = "dd-MM-yyyy")
     @Column(name = "PAC_DATA_INICIO_VIAGEM", nullable = false)
-    private Date inicio;
+    private LocalDate inicio;
 
+    @JsonFormat(pattern = "dd-MM-yyyy")
     @Column(name = "PAC_DATA_FIM_VIAGEM", nullable = false)
-    private Date fim;
+    private LocalDate fim;
 
     @Column(name = "PAC_DISPONIBILIDADE", nullable = false)
     private int disponibilidade;
@@ -68,35 +74,24 @@ public class Pacote {
     @JoinColumn(name = "TRA_ID", referencedColumnName = "TRA_ID", nullable = false)
     private Transporte transporte;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "HOT_ID", referencedColumnName = "HOT_ID", nullable = false)
     private Hotel hotel;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "USU_ID", referencedColumnName = "USU_ID", nullable = false)
     private Usuario funcionario;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "pcf_id")
     private PacoteFoto fotosDoPacote;
 
     public Pacote() {
     }
 
-    public Pacote(
-            String nome,
-            String descricao,
-            ArrayList<String> tags,
-            BigDecimal preco,
-            Date inicio,
-            Date fim,
-            int disponibilidade,
-            Status status,
-            Transporte transporte,
-            PacoteFoto fotosDoPacote,
-            Usuario funcionario,
-            Hotel hotel
-    ) {
+    public Pacote(int id, String nome, String descricao, ArrayList<String> tags, BigDecimal preco, LocalDate inicio, LocalDate fim, int disponibilidade, Status status, Transporte transporte, Hotel hotel, Usuario funcionario, PacoteFoto fotosDoPacote) {
+        this.id = id;
         this.nome = nome;
         this.descricao = descricao;
         this.tags = tags;
@@ -106,9 +101,9 @@ public class Pacote {
         this.disponibilidade = disponibilidade;
         this.status = status;
         this.transporte = transporte;
-        this.fotosDoPacote = fotosDoPacote;
-        this.funcionario = funcionario;
         this.hotel = hotel;
+        this.funcionario = funcionario;
+        this.fotosDoPacote = fotosDoPacote;
     }
 
     public String getPreco() {

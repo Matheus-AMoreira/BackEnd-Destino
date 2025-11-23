@@ -1,7 +1,12 @@
 package com.destino.projeto_destino.model.pacote.hotel.cidade;
 
 import com.destino.projeto_destino.model.pacote.hotel.cidade.estado.Estado;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,18 +18,19 @@ import lombok.Setter;
 public class Cidade {
 
     @Id
-    @Column(name = "cid_id",nullable = false)
+    @Column(name = "cid_id", nullable = false)
     private Long id;
 
-    @Column(name = "cid_nome", length = 40,nullable = false)
+    @Column(name = "cid_nome", length = 40, nullable = false)
     private String nome;
 
     @NotNull
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "est_id", nullable = false)
     private Estado estado;
 
-    public Cidade() {}
+    public Cidade() {
+    }
 
     public Cidade(Long id, String nome, Estado estado) {
         this.id = id;

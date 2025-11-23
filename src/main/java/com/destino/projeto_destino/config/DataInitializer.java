@@ -7,7 +7,7 @@ import com.destino.projeto_destino.model.pacote.hotel.cidade.Cidade;
 import com.destino.projeto_destino.model.pacote.hotel.cidade.estado.Estado;
 import com.destino.projeto_destino.model.pacote.hotel.cidade.estado.regiao.Regiao;
 import com.destino.projeto_destino.model.usuario.Usuario;
-import com.destino.projeto_destino.repository.UserRepository;
+import com.destino.projeto_destino.repository.UsuarioRepository;
 import com.destino.projeto_destino.repository.local.CidadeRepository;
 import com.destino.projeto_destino.repository.local.EstadoRepository;
 import com.destino.projeto_destino.repository.local.RegiaoRepository;
@@ -36,7 +36,7 @@ public class DataInitializer implements CommandLineRunner {
     private static final String IBGE_ESTADOS_URL = "https://servicodados.ibge.gov.br/api/v1/localidades/estados";
     private static final String IBGE_CIDADES_URL_TEMPLATE = "https://servicodados.ibge.gov.br/api/v1/localidades/estados/%s/municipios";
 
-    private final UserRepository usuarioRepository;
+    private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
     private final RegiaoRepository regiaoRepository;
     private final EstadoRepository estadoRepository;
@@ -44,7 +44,7 @@ public class DataInitializer implements CommandLineRunner {
     private final RestTemplate restTemplate;
 
     public DataInitializer(
-            UserRepository usuarioRepository,
+            UsuarioRepository usuarioRepository,
             PasswordEncoder passwordEncoder,
             RegiaoRepository regiaoRepository,
             EstadoRepository estadoRepository,

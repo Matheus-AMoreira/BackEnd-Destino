@@ -1,6 +1,6 @@
 package com.destino.projeto_destino.config;
 
-import com.destino.projeto_destino.repository.UserRepository;
+import com.destino.projeto_destino.repository.UsuarioRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
@@ -31,11 +31,11 @@ import java.util.List;
 public class SecurityConfiguration {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
-    private final UserRepository userRepository;
+    private final UsuarioRepository userRepository;
 
     public SecurityConfiguration(
             JwtAuthenticationFilter jwtAuthenticationFilter,
-            UserRepository userRepository
+            UsuarioRepository userRepository
     ) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
         this.userRepository = userRepository;
@@ -58,11 +58,25 @@ public class SecurityConfiguration {
                         //AuthController
                         .requestMatchers("/api/auth/singup").anonymous()
                         .requestMatchers("/api/auth/login").anonymous()
-                        .requestMatchers("/api/auth/usuarios/invalidos").authenticated()
-                        .requestMatchers("/api/auth/usuarios/validar/{id}").authenticated()
+                        .requestMatchers("/api/auth/logout").authenticated()
+
+                        //UsuarioController
+                        .requestMatchers("/api/usuario/**").authenticated()
 
                         //PacoteController
-                        .requestMatchers("/api/pacote/**").authenticated()
+                        .requestMatchers("/api/pacote/**").permitAll()
+
+                        //HotelController
+                        .requestMatchers("/api/hotel/**").permitAll()
+
+                        //TransporteController
+                        .requestMatchers("/api/transporte/**").permitAll()
+
+                        //CompraController
+                        .requestMatchers("/api/compra/**").permitAll()
+
+                        //DashboardController
+                        .requestMatchers("/api/dashboard/**").permitAll()
 
                         //TestController
                         .requestMatchers("/api/test/publico/**").permitAll()
