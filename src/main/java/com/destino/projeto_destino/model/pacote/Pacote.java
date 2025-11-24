@@ -7,13 +7,11 @@ import com.destino.projeto_destino.model.usuario.Usuario;
 import com.destino.projeto_destino.util.pacote.Status;
 import com.destino.projeto_destino.util.pacote.StringListConverter;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -78,8 +76,7 @@ public class Pacote {
     @JoinColumn(name = "HOT_ID", referencedColumnName = "HOT_ID", nullable = false)
     private Hotel hotel;
 
-    @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "USU_ID", referencedColumnName = "USU_ID", nullable = false)
     private Usuario funcionario;
 
@@ -106,7 +103,7 @@ public class Pacote {
         this.fotosDoPacote = fotosDoPacote;
     }
 
-    public String getPreco() {
+    public String getPrecoFormatado() {
         return String.format("%.2f", preco);
     }
 }

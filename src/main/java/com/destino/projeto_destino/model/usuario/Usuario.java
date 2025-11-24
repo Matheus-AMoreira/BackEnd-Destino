@@ -5,6 +5,7 @@ import com.destino.projeto_destino.util.usuario.Cpf.CpfConverter;
 import com.destino.projeto_destino.util.usuario.Telefone.Telefone;
 import com.destino.projeto_destino.util.usuario.Telefone.TelefoneConverter;
 import com.destino.projeto_destino.util.usuario.perfil.UserRole;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
@@ -56,6 +57,7 @@ public class Usuario implements UserDetails {
     @Convert(converter = TelefoneConverter.class)
     private Telefone telefone;
 
+    @JsonIgnore
     @Column(nullable = false, name = "USU_SENHA", length = 100)
     private String senha;
 

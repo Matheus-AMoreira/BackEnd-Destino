@@ -1,5 +1,6 @@
 package com.destino.projeto_destino.controller.usuario;
 
+import com.destino.projeto_destino.dto.dashboard.ViagensResponseDTO;
 import com.destino.projeto_destino.dto.pacote.PacoteRegistroDTO;
 import com.destino.projeto_destino.model.pacote.Pacote;
 import com.destino.projeto_destino.services.pacote.PacoteService;
@@ -28,6 +29,12 @@ public class PacoteController {
     @GetMapping
     public ResponseEntity<List<Pacote>> getPacotes() {
         return pacoteService.pegarPacotes();
+    }
+
+    @GetMapping("/viagens")
+    public ResponseEntity<List<ViagensResponseDTO>> getViagens() {
+        List<ViagensResponseDTO> viagens = pacoteService.pegarViagens();
+        return ResponseEntity.ok().body(viagens);
     }
 
     @GetMapping("/{name}")

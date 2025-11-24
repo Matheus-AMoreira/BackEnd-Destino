@@ -1,5 +1,6 @@
 package com.destino.projeto_destino.services.pacote;
 
+import com.destino.projeto_destino.dto.dashboard.ViagensResponseDTO;
 import com.destino.projeto_destino.dto.pacote.PacoteRegistroDTO;
 import com.destino.projeto_destino.model.pacote.Pacote;
 import com.destino.projeto_destino.model.pacote.hotel.Hotel;
@@ -79,6 +80,10 @@ public class PacoteService {
 
     public ResponseEntity<List<Pacote>> pegarPacotes() {
         return ResponseEntity.ok().body(pacoteRepository.findAll());
+    }
+
+    public List<ViagensResponseDTO> pegarViagens() {
+        return pacoteRepository.buscarViagens();
     }
 
     public ResponseEntity<List<Pacote>> pegarPacotesPorNome(String nome) {
