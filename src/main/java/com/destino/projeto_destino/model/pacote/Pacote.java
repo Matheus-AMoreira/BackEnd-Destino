@@ -1,7 +1,7 @@
 package com.destino.projeto_destino.model.pacote;
 
 import com.destino.projeto_destino.model.pacote.hotel.Hotel;
-import com.destino.projeto_destino.model.pacote.pacoteFoco.PacoteFoto;
+import com.destino.projeto_destino.model.pacote.pacoteFoto.PacoteFoto;
 import com.destino.projeto_destino.model.pacote.transporte.Transporte;
 import com.destino.projeto_destino.model.usuario.Usuario;
 import com.destino.projeto_destino.util.pacote.Status;
@@ -51,11 +51,13 @@ public class Pacote {
     @Column(name = "PAC_PRECO", precision = 10, scale = 2, nullable = false)
     private BigDecimal preco;
 
-    @JsonFormat(pattern = "dd-MM-yyyy")
+    // ALTERADO: Padrão ISO-8601 (yyyy-MM-dd) compatível com input type="date" e SQL
+    @JsonFormat(pattern = "yyyy-MM-dd")
     @Column(name = "PAC_DATA_INICIO_VIAGEM", nullable = false)
     private LocalDate inicio;
 
-    @JsonFormat(pattern = "dd-MM-yyyy")
+    // ALTERADO: Padrão ISO-8601 (yyyy-MM-dd) compatível com input type="date" e SQL
+    @JsonFormat(pattern = "yyyy-MM-dd")
     @Column(name = "PAC_DATA_FIM_VIAGEM", nullable = false)
     private LocalDate fim;
 

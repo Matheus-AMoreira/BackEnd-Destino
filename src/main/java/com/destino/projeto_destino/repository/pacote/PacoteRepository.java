@@ -1,4 +1,4 @@
-package com.destino.projeto_destino.repository;
+package com.destino.projeto_destino.repository.pacote;
 
 import com.destino.projeto_destino.dto.dashboard.ViagensResponseDTO;
 import com.destino.projeto_destino.model.pacote.Pacote;
@@ -6,9 +6,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
-import java.util.UUID;
 
-public interface PacoteRepository extends JpaRepository<Pacote, UUID> {
+public interface PacoteRepository extends JpaRepository<Pacote, Integer> {
     List<Pacote> findByNome(String nome);
 
     @Query("SELECT p.id, p.nome, p.descricao, p.tags, p.preco FROM Pacote p")

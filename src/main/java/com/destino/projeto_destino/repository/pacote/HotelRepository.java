@@ -1,4 +1,4 @@
-package com.destino.projeto_destino.repository;
+package com.destino.projeto_destino.repository.pacote;
 
 import com.destino.projeto_destino.model.pacote.hotel.Hotel;
 import org.springframework.data.jpa.repository.JpaRepository;

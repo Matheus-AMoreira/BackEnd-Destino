@@ -1,6 +1,6 @@
-package com.destino.projeto_destino.model.pacote.pacoteFoco.foto;
+package com.destino.projeto_destino.model.pacote.pacoteFoto.foto;
 
-import com.destino.projeto_destino.model.pacote.pacoteFoco.PacoteFoto;
+import com.destino.projeto_destino.model.pacote.pacoteFoto.PacoteFoto;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

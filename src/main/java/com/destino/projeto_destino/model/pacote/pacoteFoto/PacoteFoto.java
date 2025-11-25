@@ -1,8 +1,9 @@
-package com.destino.projeto_destino.model.pacote.pacoteFoco;
+package com.destino.projeto_destino.model.pacote.pacoteFoto;
 
 
 import com.destino.projeto_destino.model.pacote.Pacote;
-import com.destino.projeto_destino.model.pacote.pacoteFoco.foto.Foto;
+import com.destino.projeto_destino.model.pacote.pacoteFoto.foto.Foto;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -30,8 +31,12 @@ public class PacoteFoto {
     @Column(name = "PCF_NOME", nullable = false)
     private String nome;
 
+    @Column(name = "pcf_foto", length = 255, nullable = false)
+    private String fotoDoPacote;
+
     // Relacionamentos
 
+    @JsonIgnore
     @OneToMany(mappedBy = "fotosDoPacote")
     private Set<Pacote> pacotes;
 

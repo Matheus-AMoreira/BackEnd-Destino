@@ -1,4 +1,4 @@
-package com.destino.projeto_destino.controller.usuario;
+package com.destino.projeto_destino.controller.pacote;
 
 import com.destino.projeto_destino.dto.pacote.hotel.HotelRegistroDTO;
 import com.destino.projeto_destino.model.pacote.hotel.Hotel;

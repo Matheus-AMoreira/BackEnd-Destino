@@ -2,7 +2,7 @@ package com.destino.projeto_destino.services.pacote;
 
 import com.destino.projeto_destino.dto.pacote.transporte.TransporteRegistroDTO;
 import com.destino.projeto_destino.model.pacote.transporte.Transporte;
-import com.destino.projeto_destino.repository.TransporteRepository;
+import com.destino.projeto_destino.repository.pacote.TransporteRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 

@@ -11,7 +11,6 @@ import java.util.List;
 public interface CompraRepository extends JpaRepository<Compra, Long> {
 
     // Agrupa compras por Mês. Retorna [Mês (Integer), Quantidade (Long)]
-    // Ex: [1, 50], [2, 35]...
     @Query("SELECT MONTH(c.dataCompra), COUNT(c) FROM Compra c GROUP BY MONTH(c.dataCompra)")
     List<Object[]> countComprasByMonth();
 }

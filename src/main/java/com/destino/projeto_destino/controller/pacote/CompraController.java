@@ -1,4 +1,4 @@
-package com.destino.projeto_destino.controller.usuario;
+package com.destino.projeto_destino.controller.pacote;
 
 import com.destino.projeto_destino.services.CompraService;
 import com.destino.projeto_destino.services.usuario.AvaliacaoService;

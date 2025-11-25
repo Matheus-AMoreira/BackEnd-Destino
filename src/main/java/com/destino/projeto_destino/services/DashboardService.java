@@ -2,7 +2,7 @@ package com.destino.projeto_destino.services;
 
 import com.destino.projeto_destino.dto.dashboard.ChartDataDTO;
 import com.destino.projeto_destino.repository.CompraRepository;
-import com.destino.projeto_destino.repository.PacoteRepository;
+import com.destino.projeto_destino.repository.pacote.PacoteRepository;
 import com.destino.projeto_destino.util.pacote.Status;
 import com.destino.projeto_destino.util.transporte.Meio;
 import org.springframework.stereotype.Service;
