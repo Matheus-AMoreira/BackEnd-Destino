@@ -67,7 +67,7 @@ public class SecurityConfiguration {
                         .requestMatchers("/api/pacote/**").permitAll()
 
                         //PacoteFotoController
-                        .requestMatchers("/api/pacote-foto").permitAll()
+                        .requestMatchers("/api/pacote-foto/**").permitAll()
 
                         //HotelController
                         .requestMatchers("/api/hotel/**").permitAll()

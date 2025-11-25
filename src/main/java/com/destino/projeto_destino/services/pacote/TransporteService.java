@@ -2,6 +2,7 @@ package com.destino.projeto_destino.services.pacote;
 
 import com.destino.projeto_destino.dto.pacote.transporte.TransporteRegistroDTO;
 import com.destino.projeto_destino.model.pacote.transporte.Transporte;
+import com.destino.projeto_destino.repository.pacote.PacoteRepository;
 import com.destino.projeto_destino.repository.pacote.TransporteRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -12,23 +13,42 @@ import java.util.List;
 public class TransporteService {
 
     private final TransporteRepository transporteRepository;
+    private final PacoteRepository pacoteRepository;
 
-    public TransporteService(TransporteRepository transporteRepository) {
+    public TransporteService(TransporteRepository transporteRepository, PacoteRepository pacoteRepository) {
         this.transporteRepository = transporteRepository;
+        this.pacoteRepository = pacoteRepository;
     }
 
-    public ResponseEntity<String> criarTransportes(TransporteRegistroDTO transporteRegistroDTO) {
+    public ResponseEntity<String> criarTransportes(TransporteRegistroDTO dto) {
         Transporte transporte = new Transporte();
-        transporte.setEmpresa(transporteRegistroDTO.empresa());
-        transporte.setMeio(transporteRegistroDTO.meio());
-        transporte.setPreco(transporte.getPreco());
+        transporte.setEmpresa(dto.empresa());
+        transporte.setMeio(dto.meio());
+        transporte.setPreco(dto.preco());
+        Transporte criado = transporteRepository.save(transporte);
+        return ResponseEntity.ok("Transporte " + criado.getEmpresa() + " criado!");
+    }
 
-        Transporte transporteCriado = transporteRepository.save(transporte);
-        return ResponseEntity.ok().body("Transporte por meio " + transporteCriado.getMeio() + " em nome da empresa " + transporteCriado.getEmpresa() + " criado!");
+    public ResponseEntity<String> atualizarTransporte(int id, TransporteRegistroDTO dto) {
+        return transporteRepository.findById(id).map(t -> {
+            t.setEmpresa(dto.empresa());
+            t.setMeio(dto.meio());
+            t.setPreco(dto.preco());
+            transporteRepository.save(t);
+            return ResponseEntity.ok("Transporte atualizado com sucesso!");
+        }).orElse(ResponseEntity.notFound().build());
+    }
+
+    public ResponseEntity<String> deletarTransporte(int id) {
+        if (!transporteRepository.existsById(id)) return ResponseEntity.notFound().build();
+        if (pacoteRepository.existsByTransporteId(id)) {
+            return ResponseEntity.badRequest().body("Não é possível deletar: Existem pacotes vinculados.");
+        }
+        transporteRepository.deleteById(id);
+        return ResponseEntity.ok("Transporte deletado com sucesso.");
     }
 
     public ResponseEntity<List<Transporte>> pegarTransportes() {
-        List<Transporte> transporteList = transporteRepository.findAll();
-        return ResponseEntity.ok().body(transporteList);
+        return ResponseEntity.ok().body(transporteRepository.findAll());
     }
 }
