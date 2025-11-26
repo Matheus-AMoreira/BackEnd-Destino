@@ -2,6 +2,7 @@ package com.destino.projeto_destino.services.pacote;
 
 import com.destino.projeto_destino.dto.dashboard.ViagensResponseDTO;
 import com.destino.projeto_destino.dto.pacote.PacoteRegistroDTO;
+import com.destino.projeto_destino.dto.pacote.TopDestinoDTO;
 import com.destino.projeto_destino.model.pacote.Pacote;
 import com.destino.projeto_destino.model.pacote.hotel.Hotel;
 import com.destino.projeto_destino.model.pacote.pacoteFoto.PacoteFoto;
@@ -15,12 +16,18 @@ import com.destino.projeto_destino.repository.pacote.hotel.HotelRepository;
 import com.destino.projeto_destino.util.pacote.Status;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -31,6 +38,36 @@ public class PacoteService {
     private final TransporteRepository transporteRepository;
     private final UsuarioRepository usuarioRepository;
     private final PacoteFotoRepository pacoteFotoRepository;
+
+    public ResponseEntity<Map<String, List<Pacote>>> pegarPacotesAgrupadosPorLocal() {
+        List<Pacote> todosPacotes = pacoteRepository.findAll();
+
+        Map<String, List<Pacote>> agrupado = todosPacotes.stream()
+                .collect(Collectors.groupingBy(p -> {
+                    if (p.getHotel() != null && p.getHotel().getCidade() != null) {
+                        return p.getHotel().getCidade().getNome() + " - " + p.getHotel().getCidade().getEstado().getSigla();
+                    }
+                    return "Destino Indefinido";
+                }));
+
+        return ResponseEntity.ok(agrupado);
+    }
+
+    public ResponseEntity<List<Pacote>> pegarPacotesPublicos() {
+        return ResponseEntity.ok(pacoteRepository.findPacotesPublicos());
+    }
+
+    // Retorna pacotes com paginação
+    public ResponseEntity<Page<Pacote>> pegarPacotesPaginados(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
+        return ResponseEntity.ok(pacoteRepository.findAll(pageable));
+    }
+
+    // Retorna os destinos mais vendidos (Top N)
+    public ResponseEntity<List<TopDestinoDTO>> pegarDestinosMaisVendidos(int limite) {
+        Pageable pageable = PageRequest.of(0, limite);
+        return ResponseEntity.ok(pacoteRepository.findDestinosMaisVendidos(pageable));
+    }
 
     @Transactional
     public ResponseEntity<String> criarPacote(PacoteRegistroDTO pacoteRegistroDTO) {
@@ -49,8 +86,7 @@ public class PacoteService {
         Usuario funcionario = usuarioRepository.findById(dto.funcionario())
                 .orElseThrow(() -> new RuntimeException("Funcionário não encontrado"));
 
-        PacoteFoto pacoteFoto = pacoteFotoRepository.findById(dto.pacoteFoto())
-                .orElseThrow(() -> new RuntimeException("Pacote de fotos não encontrado"));
+        PacoteFoto pacoteFoto = pacoteFotoRepository.findById(dto.pacoteFoto()).orElse(null);
 
         long diasViagem = ChronoUnit.DAYS.between(dto.inicio(), dto.fim());
 
