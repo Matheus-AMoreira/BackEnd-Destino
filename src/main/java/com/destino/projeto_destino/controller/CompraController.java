@@ -1,20 +1,25 @@
 package com.destino.projeto_destino.controller;
 
+import com.destino.projeto_destino.dto.compra.CompraRequestDTO;
 import com.destino.projeto_destino.services.CompraService;
-import com.destino.projeto_destino.services.usuario.AvaliacaoService;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/compra")
-@EnableMethodSecurity(prePostEnabled = true)
 public class CompraController {
-    private final CompraService compraService;
-    private final AvaliacaoService avaliacaoService;
 
-    public CompraController(CompraService compraService, AvaliacaoService avaliacaoService) {
+    private final CompraService compraService;
+
+    public CompraController(CompraService compraService) {
         this.compraService = compraService;
-        this.avaliacaoService = avaliacaoService;
+    }
+
+    @PostMapping
+    public ResponseEntity<String> realizarCompra(@RequestBody CompraRequestDTO dto) {
+        return compraService.processarCompra(dto);
     }
 }
