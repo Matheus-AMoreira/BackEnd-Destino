@@ -1,7 +1,7 @@
 package com.destino.projeto_destino.dto.compra;
 
-import com.destino.projeto_destino.util.compra.Metodo;
-import com.destino.projeto_destino.util.compra.Processador;
+import com.destino.projeto_destino.util.model.compra.Metodo;
+import com.destino.projeto_destino.util.model.compra.Processador;
 
 import java.util.UUID;
 

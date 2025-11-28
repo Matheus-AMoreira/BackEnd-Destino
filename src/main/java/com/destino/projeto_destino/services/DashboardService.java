@@ -1,10 +1,10 @@
 package com.destino.projeto_destino.services;
 
 import com.destino.projeto_destino.dto.dashboard.ChartDataDTO;
-import com.destino.projeto_destino.repository.CompraRepository;
 import com.destino.projeto_destino.repository.pacote.PacoteRepository;
-import com.destino.projeto_destino.util.pacote.Status;
-import com.destino.projeto_destino.util.transporte.Meio;
+import com.destino.projeto_destino.repository.usuario.CompraRepository;
+import com.destino.projeto_destino.util.model.pacote.Status;
+import com.destino.projeto_destino.util.model.transporte.Meio;
 import org.springframework.stereotype.Service;
 
 import java.text.DateFormatSymbols;

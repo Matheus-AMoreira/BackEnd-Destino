@@ -9,6 +9,10 @@ public record LoginResponseDto(
 ) {
     public record UserInfo(
             String id,
-            String nome
-    ) { }
+            String nome,
+            String email,
+            String role,
+            String token
+    ) {
+    }
 }

@@ -1,6 +1,6 @@
 package com.destino.projeto_destino.dto.pacote;
 
-import com.destino.projeto_destino.util.pacote.Status;
+import com.destino.projeto_destino.util.model.pacote.Status;
 
 import java.util.Date;
 import java.util.List;

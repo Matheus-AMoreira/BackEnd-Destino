@@ -1,10 +1,10 @@
 package com.destino.projeto_destino.model.usuario;
 
-import com.destino.projeto_destino.util.usuario.Cpf.Cpf;
-import com.destino.projeto_destino.util.usuario.Cpf.CpfConverter;
-import com.destino.projeto_destino.util.usuario.Telefone.Telefone;
-import com.destino.projeto_destino.util.usuario.Telefone.TelefoneConverter;
-import com.destino.projeto_destino.util.usuario.perfil.UserRole;
+import com.destino.projeto_destino.util.model.usuario.Cpf.Cpf;
+import com.destino.projeto_destino.util.model.usuario.Cpf.CpfConverter;
+import com.destino.projeto_destino.util.model.usuario.Telefone.Telefone;
+import com.destino.projeto_destino.util.model.usuario.Telefone.TelefoneConverter;
+import com.destino.projeto_destino.util.model.usuario.perfil.UserRole;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;

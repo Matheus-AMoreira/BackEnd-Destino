@@ -34,7 +34,7 @@ public class PacoteFoto {
     private String fotoDoPacote;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "PCF_ID") // Chave estrangeira na tabela 'fot_foto'
+    @JoinColumn(name = "PCF_ID")
     private Set<Foto> fotos = new HashSet<>();
 
     public PacoteFoto() {

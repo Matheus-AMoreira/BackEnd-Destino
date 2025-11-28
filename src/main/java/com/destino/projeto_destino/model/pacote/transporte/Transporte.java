@@ -1,6 +1,6 @@
 package com.destino.projeto_destino.model.pacote.transporte;
 
-import com.destino.projeto_destino.util.transporte.Meio;
+import com.destino.projeto_destino.util.model.transporte.Meio;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

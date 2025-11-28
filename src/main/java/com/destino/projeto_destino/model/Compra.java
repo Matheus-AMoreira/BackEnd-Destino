@@ -2,9 +2,9 @@ package com.destino.projeto_destino.model;
 
 import com.destino.projeto_destino.model.pacote.Pacote;
 import com.destino.projeto_destino.model.usuario.Usuario;
-import com.destino.projeto_destino.util.compra.Metodo;
-import com.destino.projeto_destino.util.compra.Processador;
-import com.destino.projeto_destino.util.compra.StatusCompra;
+import com.destino.projeto_destino.util.model.compra.Metodo;
+import com.destino.projeto_destino.util.model.compra.Processador;
+import com.destino.projeto_destino.util.model.compra.StatusCompra;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

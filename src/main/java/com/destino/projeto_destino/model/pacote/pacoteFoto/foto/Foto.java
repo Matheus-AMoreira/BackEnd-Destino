@@ -23,11 +23,8 @@ public class Foto {
     @Column(name = "FOT_NOME", length = 100, nullable = false)
     private String nome;
 
-    @Column(name = "FOT_URL", length = 255, nullable = false)
+    @Column(name = "FOT_URL", nullable = false)
     private String url;
-
-    // Removido: private PacoteFoto pacoteFoto;
-    // Motivo: Simplificação para relação unidirecional.
 
     public Foto() {
     }

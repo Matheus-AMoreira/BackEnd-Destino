@@ -3,14 +3,13 @@ package com.destino.projeto_destino.services.usuario;
 import com.destino.projeto_destino.dto.UsuarioDTO;
 import com.destino.projeto_destino.dto.auth.validar.ValidarResponseDTO;
 import com.destino.projeto_destino.model.usuario.Usuario;
-import com.destino.projeto_destino.repository.UsuarioRepository;
+import com.destino.projeto_destino.repository.usuario.UsuarioRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 public class UsuarioService {
@@ -27,19 +26,17 @@ public class UsuarioService {
 
     public ResponseEntity<List<UsuarioDTO>> inValidUsers() {
         List<Usuario> usuarios = userRepository.findByValidoFalse();
-
-        List<UsuarioDTO> usuariosDTO = usuarios.stream().map(usuario -> new UsuarioDTO(
-                usuario.getId(),
+        List<UsuarioDTO> users = usuarios.stream().map(usuario -> new UsuarioDTO(
+                usuario.getId().toString(),
                 usuario.getNome() + " " + usuario.getSobreNome(),
                 usuario.getCpf().getValorFormatado(),
                 usuario.getEmail(),
                 usuario.getTelefone().getValorFormatado(),
-                usuario.getPerfil(),
-                usuario.getValido(),
-                usuario.getCadastro(),
-                usuario.getCadastro())).collect(Collectors.toList());
-
-        return ResponseEntity.ok().body(usuariosDTO);
+                usuario.getPerfil().name(),
+                usuario.getValido() == true ? "Sim" : "Não",
+                usuario.getCadastro()
+        )).toList();
+        return ResponseEntity.ok().body(users);
     }
 
     @Transactional

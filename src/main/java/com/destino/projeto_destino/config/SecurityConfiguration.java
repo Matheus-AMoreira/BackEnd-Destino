@@ -1,6 +1,6 @@
 package com.destino.projeto_destino.config;
 
-import com.destino.projeto_destino.repository.UsuarioRepository;
+import com.destino.projeto_destino.repository.usuario.UsuarioRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
