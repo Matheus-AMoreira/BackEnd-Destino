@@ -50,40 +50,45 @@ public class SecurityConfiguration {
                 .formLogin(AbstractHttpConfigurer::disable)
                 .addFilterBefore(jwtAuthenticationFilter, BasicAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> auth
+                        // Swagger
+                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
 
-                        //SWAGER
-                        .requestMatchers("/swagger-ui/**").permitAll()
-                        .requestMatchers("/v3/api-docs/**").permitAll()
+                        // Endpoints Públicos
+                        .requestMatchers(
+                                "/api/compra/**",
+                                "/api/test/publico/**",
+                                "/api/publico/pacote/**"
+                        ).permitAll()
 
-                        //AuthController
-                        .requestMatchers("/api/auth/singup").anonymous()
-                        .requestMatchers("/api/auth/login").anonymous()
-                        .requestMatchers("/api/auth/logout").authenticated()
+                        // AuthController (Rotas públicas de autenticação)
+                        .requestMatchers(
+                                "/api/auth/cadastrar",
+                                "/api/auth/entrar",
+                                "/api/auth/renovar-token",
+                                "/api/auth/sair"
+                        ).permitAll()
 
-                        //UsuarioController
+                        .requestMatchers(
+                                "/api/compra/**"
+                        ).hasRole("USUARIO")
+
+                        // Rotas para funcionários
+                        .requestMatchers(
+                                "/api/pacote/**",
+                                "/api/pacote/{id}",
+                                "/api/usuario/**",
+                                "/api/pacote/agrupado-admin",
+                                "/api/hotel/**",
+                                "/api/transporte/**",
+                                "/api/dashboard/**",
+                                "/api/pacote-foto/**"
+                        ).hasRole("FUNCIONARIO")
+
+                        // Endpoints Protegidos
                         .requestMatchers("/api/usuario/**").authenticated()
-
-                        //PacoteController
-                        .requestMatchers("/api/pacote/**").permitAll()
-
-                        //PacoteFotoController
-                        .requestMatchers("/api/pacote-foto/**").permitAll()
-
-                        //HotelController
-                        .requestMatchers("/api/hotel/**").permitAll()
-
-                        //TransporteController
-                        .requestMatchers("/api/transporte/**").permitAll()
-
-                        //CompraController
-                        .requestMatchers("/api/compra/**").permitAll()
-
-                        //DashboardController
-                        .requestMatchers("/api/dashboard/**").permitAll()
-
-                        //TestController
-                        .requestMatchers("/api/test/publico/**").permitAll()
                         .requestMatchers("/api/test/privado/**").authenticated()
+
+                        .anyRequest().authenticated()
                 ).build();
     }
 

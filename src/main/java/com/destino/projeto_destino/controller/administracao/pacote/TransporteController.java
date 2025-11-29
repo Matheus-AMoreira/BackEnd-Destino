@@ -4,6 +4,7 @@ import com.destino.projeto_destino.dto.pacote.transporte.TransporteRegistroDTO;
 import com.destino.projeto_destino.model.pacote.transporte.Transporte;
 import com.destino.projeto_destino.services.pacote.TransporteService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,6 +20,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/transporte")
 @EnableMethodSecurity(prePostEnabled = true)
+@PreAuthorize("hasRole('ROLE_FUNCIONARIO')")
 public class TransporteController {
     private final TransporteService transporteService;
 
@@ -26,7 +28,7 @@ public class TransporteController {
         this.transporteService = transporteService;
     }
 
-    @GetMapping("/transporte")
+    @GetMapping
     public ResponseEntity<List<Transporte>> getTransporte() {
         return transporteService.pegarTransportes();
     }

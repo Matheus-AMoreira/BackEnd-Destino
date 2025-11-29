@@ -5,7 +5,6 @@ import com.destino.projeto_destino.dto.auth.validar.ValidarResponseDTO;
 import com.destino.projeto_destino.model.usuario.Usuario;
 import com.destino.projeto_destino.services.usuario.UsuarioService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -28,19 +27,16 @@ public class UsuarioController {
     }
 
     @GetMapping("/invalidos")
-    @PreAuthorize("hasRole('ROLE_ADMINISTRADOR')")
     public ResponseEntity<List<UsuarioDTO>> inValiduser() {
         return usuarioService.inValidUsers();
     }
 
     @PatchMapping("/validar/{id}")
-    @PreAuthorize("hasRole('ROLE_ADMINISTRADOR')")
     public ResponseEntity<ValidarResponseDTO> validUser(@PathVariable UUID id) {
         return usuarioService.validar(id);
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('ROLE_FUNCIONARIO')")
     public ResponseEntity<Iterable<Usuario>> buscarUsuarios() {
         return ResponseEntity.ok().body(usuarioService.buscarUsuarios());
     }

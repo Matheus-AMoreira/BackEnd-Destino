@@ -8,12 +8,12 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import lombok.Getter;
 import lombok.Setter;
-
-import java.time.Instant;
 
 @Entity
 @Setter
+@Getter
 @Table(name = "ses_session")
 public class SessionToken {
 
@@ -26,7 +26,7 @@ public class SessionToken {
     private String token;
 
     @Column(name = "ses_validade")
-    private Instant validade;
+    private Long validade;
 
     @OneToOne
     @JoinColumn(name = "USU_ID", referencedColumnName = "USU_ID", nullable = false)
@@ -35,7 +35,7 @@ public class SessionToken {
     public SessionToken() {
     }
 
-    public SessionToken(String token, Instant validade, Usuario usuario) {
+    public SessionToken(String token, Long validade, Usuario usuario) {
         this.token = token;
         this.validade = validade;
         this.usuario = usuario;

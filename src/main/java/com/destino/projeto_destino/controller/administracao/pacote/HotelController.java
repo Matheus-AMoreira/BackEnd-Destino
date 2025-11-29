@@ -45,7 +45,7 @@ public class HotelController {
         return hotelService.listarCidadesPorEstado(estadoId);
     }
 
-    @GetMapping("/")
+    @GetMapping()
     public ResponseEntity<List<Hotel>> procurarHoteis() {
         return hotelService.pegarHoteis();
     }

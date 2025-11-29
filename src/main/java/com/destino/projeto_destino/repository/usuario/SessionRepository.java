@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
 public interface SessionRepository extends JpaRepository<SessionToken, String> {
@@ -18,5 +19,5 @@ public interface SessionRepository extends JpaRepository<SessionToken, String> {
     @Modifying
     @Transactional
     @Query("DELETE FROM SessionToken st WHERE st.usuario.id = :usuarioId")
-    int deleteUserSessionToken(@Param("usuarioId") String usuarioId);
+    int deleteUserSessionToken(@Param("usuarioId") UUID usuarioId);
 }

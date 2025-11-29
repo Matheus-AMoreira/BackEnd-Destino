@@ -6,7 +6,6 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpStatus;
@@ -20,7 +19,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.time.Instant;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -40,34 +39,46 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
-        if (request.getCookies() == null) {
+
+        final String authHeader = request.getHeader("Authorization");
+        final String jwt;
+
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
         }
-        String jwt = Arrays.stream(request.getCookies())
-                .filter(cookie -> "jwt".equals(cookie.getName()))
-                .map(Cookie::getValue)
-                .findFirst()
-                .orElse(null);
+
+        jwt = authHeader.substring(7);
 
         try {
             final Claims claims = jwtService.extractAllClaims(jwt);
 
-            List<GrantedAuthority> authorities = List.of(
-                    new SimpleGrantedAuthority((String) claims.get("role"))
-            );
+            if (claims.getSubject() != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
-            UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                    claims.getSubject(),
-                    null,
-                    authorities
-            );
+                List<GrantedAuthority> grantedAuthorities = new ArrayList<>();
+                grantedAuthorities.add(new SimpleGrantedAuthority((String) claims.get("role")));
+                List<String> authoritiesClaim = (List<String>) claims.get("authorities");
 
-            SecurityContextHolder.getContext().setAuthentication(authToken);
+                if (authoritiesClaim != null) {
+                    for (String auth : authoritiesClaim) {
+                        grantedAuthorities.add(new SimpleGrantedAuthority(auth));
+                    }
+                }
+
+                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                        claims.getSubject(),
+                        null,
+                        grantedAuthorities
+                );
+                System.out.println(authToken);
+                SecurityContextHolder.getContext().setAuthentication(authToken);
+            }
 
         } catch (ExpiredJwtException e) {
             SecurityContextHolder.clearContext();
-            sendError(response, HttpStatus.UNAUTHORIZED, "Token expirado");
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            response.getWriter().write("{\"error\": \"Token expirado\", \"code\": \"TOKEN_EXPIRED\"}");
+            filterChain.doFilter(request, response);
             return;
         } catch (MalformedJwtException e) {
             SecurityContextHolder.clearContext();

@@ -1,7 +1,7 @@
 package com.destino.projeto_destino.services.auth;
 
 
-import com.destino.projeto_destino.dto.auth.login.LoginResponseDto;
+import com.destino.projeto_destino.dto.auth.login.LoginResponseDTO;
 import com.destino.projeto_destino.dto.auth.login.LoginUsuarioDto;
 import com.destino.projeto_destino.dto.auth.registro.RegistrationResponseDto;
 import com.destino.projeto_destino.dto.auth.registro.RegistroDto;
@@ -13,143 +13,189 @@ import com.destino.projeto_destino.util.model.usuario.Cpf.Cpf;
 import com.destino.projeto_destino.util.model.usuario.perfil.UserRole;
 import com.destino.projeto_destino.util.model.usuario.senha.SenhaValidator;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.security.SecureRandom;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Base64;
 import java.util.Optional;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class AuthenticationService {
+
+    private static final String COOKIE_NAME = "session_token";
+    private static final long JWT_EXPIRATION_MS = 20 * 60 * 1000; // 20 minutos
+    private static final int REFRESH_TOKEN_DAYS = 30; // 30 dias
+
     private final UsuarioRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
     private final SessionRepository sessionRepository;
-    private final SecureRandom secureRandom;
 
-    public ResponseEntity<RegistrationResponseDto> registrar(RegistroDto registrationRequest
-    ) {
-        if (!SenhaValidator.isValid(registrationRequest.senha())) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                    new RegistrationResponseDto(true, "A senha não atende aos requisitos de segurança...")
-            );
+    public RegistrationResponseDto cadastrarUsuario(RegistroDto dados) {
+        if (!SenhaValidator.isValid(dados.senha())) {
+            return new RegistrationResponseDto(true, "A senha não atende aos requisitos de segurança.");
+        }
+
+        if (userRepository.findByCpf(new Cpf(dados.cpf())).isPresent()) {
+            return new RegistrationResponseDto(true, "Erro: CPF já cadastrado.");
+        }
+
+        if (userRepository.findByEmail(dados.email()).isPresent()) {
+            return new RegistrationResponseDto(true, "Erro: Email já está em uso.");
         }
 
         try {
-
-            if (userRepository.findByCpf(new Cpf(registrationRequest.cpf())).isPresent()) {
-                return ResponseEntity.status(HttpStatus.CONFLICT).body(
-                        new RegistrationResponseDto(true, "Erro: usuário já existe!"));
-            }
-
-            if (userRepository.findByEmail(registrationRequest.email()).isPresent()) {
-                return ResponseEntity.status(HttpStatus.CONFLICT).body(
-                        new RegistrationResponseDto(true, "Erro: Email já está em uso"));
-            }
-
-            Usuario user = userRepository.save(new Usuario(
-                    registrationRequest.nome(),
-                    registrationRequest.sobreNome(),
-                    registrationRequest.cpf(),
-                    registrationRequest.email(),
-                    registrationRequest.telefone(),
-                    passwordEncoder.encode(registrationRequest.senha()),
+            Usuario novoUsuario = new Usuario(
+                    dados.nome(),
+                    dados.sobreNome(),
+                    dados.cpf(),
+                    dados.email(),
+                    dados.telefone(),
+                    passwordEncoder.encode(dados.senha()),
                     UserRole.USUARIO,
                     false
-            ));
+            );
 
-            return ResponseEntity.status(HttpStatus.CREATED).body(
-                    new RegistrationResponseDto(false, "Usuário " + user.getNome() + user.getSobreNome() + "cadastrado com sucesso!"));
+            userRepository.save(novoUsuario);
+            return new RegistrationResponseDto(false, "Usuário cadastrado com sucesso!");
 
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                    new RegistrationResponseDto(true, "Falha na validação dos dados: " + e.getMessage()));
+        } catch (Exception e) {
+            return new RegistrationResponseDto(true, "Erro interno ao cadastrar: " + e.getMessage());
         }
     }
 
-    @Transactional
-    public ResponseEntity<LoginResponseDto> autenticar(
-            LoginUsuarioDto user,
-            HttpServletResponse response
-    ) {
-        Authentication authentication;
-
+    public LoginResponseDTO realizarLogin(LoginUsuarioDto dadosLogin, HttpServletResponse response) {
         try {
-            authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            user.email(),
-                            user.senha()
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(dadosLogin.email(), dadosLogin.senha())
+            );
+
+            Usuario usuario = (Usuario) authentication.getPrincipal();
+
+            String jwtToken = jwtService.generateToken(usuario, JWT_EXPIRATION_MS);
+            String refreshToken = gerarRefreshToken();
+
+            long validadeEmSegundos = Instant.now().plus(REFRESH_TOKEN_DAYS, ChronoUnit.DAYS).getEpochSecond();
+
+            salvarSessaoNoBanco(usuario, refreshToken, validadeEmSegundos);
+
+            criarCookieSessao(response, refreshToken, validadeEmSegundos);
+
+            return new LoginResponseDTO(
+                    false,
+                    "Login realizado com sucesso",
+                    new LoginResponseDTO.UserInfo(
+                            usuario.getId(),
+                            usuario.getNome() + " " + usuario.getSobreNome(),
+                            usuario.getEmail(),
+                            usuario.getPerfil().toString(),
+                            jwtToken,
+                            JWT_EXPIRATION_MS / 1000
                     )
             );
-        } catch (AuthenticationException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
-                    new LoginResponseDto(true, "Credenciais inválidas: e-mail ou senha incorretos.", Optional.empty())
-            );
+
+        } catch (BadCredentialsException e) {
+            return new LoginResponseDTO(true, "Email ou senha incorretos.", null);
+        } catch (Exception e) {
+            return new LoginResponseDTO(true, "Erro ao realizar login: " + e.getMessage(), null);
         }
+    }
 
-        Usuario authenticatedUser = (Usuario) authentication.getPrincipal();
+    private String gerarRefreshToken() {
+        SecureRandom random = new SecureRandom();
+        byte[] bytes = new byte[64];
+        random.nextBytes(bytes);
+        return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
+    }
 
-        int jwtExpiration = 1200000;
-        String jwtToken = jwtService.generateToken(authenticatedUser, jwtExpiration);
-
-        byte[] tokenBytes = new byte[32];
-        this.secureRandom.nextBytes(tokenBytes);
-        String token = Base64.getUrlEncoder().withoutPadding().encodeToString(tokenBytes);
-
-        SessionToken sessionToken = new SessionToken(
-                token,
-                Instant.now().plusSeconds(30 * 24 * 60 * 60),
-                authenticatedUser
-        );
-
+    private void salvarSessaoNoBanco(Usuario usuario, String token, long validade) {
+        sessionRepository.deleteUserSessionToken(usuario.getId());
+        SessionToken sessionToken = new SessionToken(token, validade, usuario);
         sessionRepository.save(sessionToken);
+    }
 
-        ResponseCookie cookie = ResponseCookie.from("token", sessionToken.toString())
+    // --- Métodos Auxiliares ---
+
+    private void criarCookieSessao(HttpServletResponse response, String token, long maxAgeSeconds) {
+        long duracaoCookie = maxAgeSeconds - Instant.now().getEpochSecond();
+
+        ResponseCookie cookie = ResponseCookie.from(COOKIE_NAME, token)
                 .httpOnly(true)
                 .secure(true)
                 .path("/")
-                .sameSite("Lax")
-                .maxAge(30L * 24 * 60 * 60 * 1000)
+                .maxAge(duracaoCookie)
+                .sameSite("None")
                 .build();
 
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
-
-        return ResponseEntity.ok(new LoginResponseDto(false, "Login realizado com sucesso.",
-                Optional.of(new LoginResponseDto.UserInfo(
-                        authenticatedUser.getId().toString(),
-                        authenticatedUser.getNome() + " " + authenticatedUser.getSobreNome(),
-                        authenticatedUser.getEmail(),
-                        authenticatedUser.getPerfil().toString(),
-                        jwtToken
-                ))));
     }
 
-    public ResponseEntity<LoginResponseDto> logout(HttpServletResponse response, String id) {
-        ResponseCookie cookie = ResponseCookie.from("token", null)
+    public LoginResponseDTO renovarToken(String tokenSessao, HttpServletResponse response) {
+        Optional<SessionToken> sessionTokenOpt = sessionRepository.findByToken(tokenSessao);
+
+        if (sessionTokenOpt.isEmpty()) {
+            limparCookie(response);
+            return new LoginResponseDTO(true, "Sessão não encontrada.", null);
+        }
+
+        SessionToken sessao = sessionTokenOpt.get();
+        Usuario usuario = sessao.getUsuario();
+
+        if (Instant.now().getEpochSecond() > sessao.getValidade()) {
+            limparCookie(response);
+            sessionRepository.delete(sessao);
+            return new LoginResponseDTO(true, "Sessão expirada. Faça login novamente.", null);
+        }
+
+        // Gera novo JWT de 20 min
+        String novoJwt = jwtService.generateToken(usuario, JWT_EXPIRATION_MS);
+
+        // Monta a resposta com a estrutura correta
+        return new LoginResponseDTO(
+                false,
+                "Token renovado com sucesso.",
+                new LoginResponseDTO.UserInfo(
+                        usuario.getId(),
+                        usuario.getNome() + " " + usuario.getSobreNome(),
+                        usuario.getEmail(),
+                        usuario.getPerfil().toString(),
+                        novoJwt,
+                        JWT_EXPIRATION_MS / 1000
+                )
+        );
+    }
+
+    private void limparCookie(HttpServletResponse response) {
+        ResponseCookie cookie = ResponseCookie.from(COOKIE_NAME, "")
                 .httpOnly(true)
-                .secure(false)
+                .secure(true)
                 .path("/")
                 .maxAge(0)
+                .sameSite("None")
                 .build();
 
-        sessionRepository.deleteUserSessionToken(id);
-
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+    }
 
-        return ResponseEntity.ok().body(new LoginResponseDto(false, "Sucesso ao sair!", Optional.empty()));
+    @Transactional
+    public void realizarLogout(String tokenSessao, HttpServletResponse response) {
+        if (tokenSessao != null) {
+            Optional<SessionToken> sessao = sessionRepository.findByToken(tokenSessao);
+            sessao.ifPresent(sessionToken -> sessionRepository.deleteUserSessionToken(sessionToken.getUsuario().getId()));
+        }
+        limparCookie(response);
     }
 }
