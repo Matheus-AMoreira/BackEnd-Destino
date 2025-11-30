@@ -1,8 +1,7 @@
 package com.destino.projeto_destino.services.pacote;
 
-import com.destino.projeto_destino.dto.dashboard.ViagensResponseDTO;
 import com.destino.projeto_destino.dto.pacote.PacoteRegistroDTO;
-import com.destino.projeto_destino.dto.pacote.TopDestinoDTO;
+import com.destino.projeto_destino.dto.pacote.PacoteResponseDTO;
 import com.destino.projeto_destino.model.pacote.Pacote;
 import com.destino.projeto_destino.model.pacote.hotel.Hotel;
 import com.destino.projeto_destino.model.pacote.pacoteFoto.PacoteFoto;
@@ -16,10 +15,6 @@ import com.destino.projeto_destino.repository.usuario.UsuarioRepository;
 import com.destino.projeto_destino.util.model.pacote.Status;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -53,20 +48,14 @@ public class PacoteService {
         return ResponseEntity.ok(agrupado);
     }
 
-    public ResponseEntity<List<Pacote>> pegarPacotesPublicos() {
-        return ResponseEntity.ok(pacoteRepository.findPacotesPublicos());
-    }
-
     // Retorna pacotes com paginação
-    public ResponseEntity<Page<Pacote>> pegarPacotesPaginados(int page, int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());
-        return ResponseEntity.ok(pacoteRepository.findAll(pageable));
+    public List<PacoteResponseDTO> pegarPacotes() {
+        return pacoteRepository.encontrePacotes();
     }
 
     // Retorna os destinos mais vendidos (Top N)
-    public ResponseEntity<List<TopDestinoDTO>> pegarDestinosMaisVendidos(int limite) {
-        Pageable pageable = PageRequest.of(0, limite);
-        return ResponseEntity.ok(pacoteRepository.findDestinosMaisVendidos(pageable));
+    public List<PacoteResponseDTO> pacotesMaisvendidos() {
+        return pacoteRepository.procuraPacotesMaisVendidos();
     }
 
     @Transactional
@@ -75,7 +64,14 @@ public class PacoteService {
         return salvarOuAtualizarPacote(new Pacote(), pacoteRegistroDTO, false);
     }
 
-    // Lógica compartilhada para evitar duplicidade de código
+    @Transactional
+    public ResponseEntity<String> atualizarPacote(long id, PacoteRegistroDTO dto) {
+        // Busca o existente, se achar, atualiza (true indica update)
+        return pacoteRepository.findById(id)
+                .map(pacoteExistente -> salvarOuAtualizarPacote(pacoteExistente, dto, true))
+                .orElse(ResponseEntity.notFound().build());
+    }
+
     private ResponseEntity<String> salvarOuAtualizarPacote(Pacote pacote, PacoteRegistroDTO dto, boolean isUpdate) {
         Hotel hotel = hotelRepository.findById(dto.hotel())
                 .orElseThrow(() -> new RuntimeException("Hotel não encontrado"));
@@ -124,29 +120,13 @@ public class PacoteService {
         return ResponseEntity.ok().body(isUpdate ? "Pacote atualizado com sucesso!" : "Pacote criado com sucesso!");
     }
 
-    @Transactional
-    public ResponseEntity<String> atualizarPacote(int id, PacoteRegistroDTO dto) {
-        // Busca o existente, se achar, atualiza (true indica update)
-        return pacoteRepository.findById(id)
-                .map(pacoteExistente -> salvarOuAtualizarPacote(pacoteExistente, dto, true))
-                .orElse(ResponseEntity.notFound().build());
-    }
-
-    public ResponseEntity<Pacote> pegarPacotePorId(int id) {
+    public ResponseEntity<Pacote> pegarPacotePorId(long id) {
         return pacoteRepository.findById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    public ResponseEntity<List<Pacote>> pegarPacotes() {
-        return ResponseEntity.ok().body(pacoteRepository.findAll());
-    }
-
-    public List<ViagensResponseDTO> pegarViagens() {
-        return pacoteRepository.buscarViagens();
-    }
-
-    public ResponseEntity<List<Pacote>> pegarPacotesPorNome(String nome) {
-        return ResponseEntity.ok().body(pacoteRepository.findByNome(nome));
+    public List<PacoteResponseDTO> pegarPacotesPorNome(String nome) {
+        return pacoteRepository.procurePeloNome(nome);
     }
 }

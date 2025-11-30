@@ -2,7 +2,15 @@ package com.destino.projeto_destino.model;
 
 import com.destino.projeto_destino.model.pacote.Pacote;
 import com.destino.projeto_destino.model.usuario.Usuario;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 
 import java.util.Date;
 
@@ -33,6 +41,4 @@ public class Avaliacao {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "PAC_ID", referencedColumnName = "PAC_ID", nullable = false)
     private Pacote pacote;
-
-    // Construtores, Getters e Setters (Omitidos para brevidade)
 }

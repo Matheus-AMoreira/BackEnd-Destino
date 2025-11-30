@@ -1,21 +1,26 @@
 package com.destino.projeto_destino.dto.pacote;
 
+import com.destino.projeto_destino.model.pacote.hotel.Hotel;
+import com.destino.projeto_destino.model.pacote.pacoteFoto.PacoteFoto;
+import com.destino.projeto_destino.model.pacote.transporte.Transporte;
 import com.destino.projeto_destino.util.model.pacote.Status;
 
-import java.util.Date;
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 public record PacoteResponseDTO(
+        long id,
         String nome,
         String descricao,
         List<String> tags,
-        int preco,
-        Date inicio,
-        Date fim,
+        BigDecimal preco,
+        LocalDate inicio,
+        LocalDate fim,
         int disponibilidade,
         Status status,
-        int transporte,
-        int fotosDoPacote,
-        int hotel
+        Hotel hotel,
+        Transporte transporte,
+        PacoteFoto fotosDoPacote
 ) {
 }

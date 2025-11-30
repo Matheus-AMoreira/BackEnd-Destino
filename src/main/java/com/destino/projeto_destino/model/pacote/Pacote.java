@@ -36,7 +36,7 @@ public class Pacote {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "PAC_ID", nullable = false)
-    private int id;
+    private long id;
 
     @Column(name = "PAC_NOME", length = 100, nullable = false)
     private String nome;
@@ -51,12 +51,10 @@ public class Pacote {
     @Column(name = "PAC_PRECO", precision = 10, scale = 2, nullable = false)
     private BigDecimal preco;
 
-    // ALTERADO: Padrão ISO-8601 (yyyy-MM-dd) compatível com input type="date" e SQL
     @JsonFormat(pattern = "yyyy-MM-dd")
     @Column(name = "PAC_DATA_INICIO_VIAGEM", nullable = false)
     private LocalDate inicio;
 
-    // ALTERADO: Padrão ISO-8601 (yyyy-MM-dd) compatível com input type="date" e SQL
     @JsonFormat(pattern = "yyyy-MM-dd")
     @Column(name = "PAC_DATA_FIM_VIAGEM", nullable = false)
     private LocalDate fim;
@@ -89,7 +87,7 @@ public class Pacote {
     public Pacote() {
     }
 
-    public Pacote(int id, String nome, String descricao, ArrayList<String> tags, BigDecimal preco, LocalDate inicio, LocalDate fim, int disponibilidade, Status status, Transporte transporte, Hotel hotel, Usuario funcionario, PacoteFoto fotosDoPacote) {
+    public Pacote(long id, String nome, String descricao, ArrayList<String> tags, BigDecimal preco, LocalDate inicio, LocalDate fim, int disponibilidade, Status status, Transporte transporte, Hotel hotel, Usuario funcionario, PacoteFoto fotosDoPacote) {
         this.id = id;
         this.nome = nome;
         this.descricao = descricao;
