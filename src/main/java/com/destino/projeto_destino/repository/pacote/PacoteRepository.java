@@ -9,9 +9,8 @@ import java.util.List;
 
 public interface PacoteRepository extends JpaRepository<Pacote, Long> {
 
-    @Query("SELECT p.id, p.nome, p.descricao, p.tags,p.preco, p.inicio,p.fim, " +
-            "p.disponibilidade, p.status, p.hotel, p.transporte, p.fotosDoPacote from Pacote p")
-    List<PacoteResponseDTO> encontrePacotes();
+    @Query("SELECT p from Pacote p")
+    List<Pacote> encontrePacotes();
 
     @Query("SELECT p.id, p.nome, p.descricao, p.tags,p.preco, p.inicio,p.fim, " +
             "p.disponibilidade, p.status, p.hotel, p.transporte, p.fotosDoPacote " +

@@ -1,4 +1,4 @@
-package com.destino.projeto_destino.services;
+package com.destino.projeto_destino.services.compra;
 
 import com.destino.projeto_destino.dto.dashboard.ChartDataDTO;
 import com.destino.projeto_destino.repository.pacote.PacoteRepository;

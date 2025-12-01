@@ -1,7 +1,7 @@
 package com.destino.projeto_destino.controller.administracao;
 
 import com.destino.projeto_destino.dto.dashboard.ChartDataDTO;
-import com.destino.projeto_destino.services.DashboardService;
+import com.destino.projeto_destino.services.compra.DashboardService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.web.bind.annotation.GetMapping;

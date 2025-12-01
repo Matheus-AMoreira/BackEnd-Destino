@@ -81,7 +81,7 @@ public class Pacote {
     private Usuario funcionario;
 
     @ManyToOne
-    @JoinColumn(name = "pcf_id")
+    @JoinColumn(name = "pcf_id", referencedColumnName = "pcf_id", nullable = true)
     private PacoteFoto fotosDoPacote;
 
     public Pacote() {

@@ -1,6 +1,6 @@
 package com.destino.projeto_destino.services.usuario;
 
-import com.destino.projeto_destino.dto.UsuarioDTO;
+import com.destino.projeto_destino.dto.usuario.UsuarioDTO;
 import com.destino.projeto_destino.dto.auth.validar.ValidarResponseDTO;
 import com.destino.projeto_destino.model.usuario.Usuario;
 import com.destino.projeto_destino.repository.usuario.UsuarioRepository;

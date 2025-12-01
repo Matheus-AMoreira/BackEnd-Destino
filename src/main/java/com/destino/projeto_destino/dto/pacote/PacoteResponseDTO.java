@@ -8,6 +8,7 @@ import com.destino.projeto_destino.util.model.pacote.Status;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 public record PacoteResponseDTO(
         long id,

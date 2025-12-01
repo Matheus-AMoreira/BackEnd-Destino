@@ -34,7 +34,7 @@ public class AuthController {
         RegistrationResponseDto resposta = authenticationService.cadastrarUsuario(usuario);
 
         if (resposta.erro()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(resposta);
+            return ResponseEntity.ok().body(resposta);
         }
         return ResponseEntity.status(HttpStatus.CREATED).body(resposta);
     }

@@ -39,10 +39,7 @@ public class PacoteService {
 
         Map<String, List<Pacote>> agrupado = todosPacotes.stream()
                 .collect(Collectors.groupingBy(p -> {
-                    if (p.getHotel() != null && p.getHotel().getCidade() != null) {
                         return p.getHotel().getCidade().getNome() + " - " + p.getHotel().getCidade().getEstado().getSigla();
-                    }
-                    return "Destino Indefinido";
                 }));
 
         return ResponseEntity.ok(agrupado);
@@ -50,7 +47,24 @@ public class PacoteService {
 
     // Retorna pacotes com paginação
     public List<PacoteResponseDTO> pegarPacotes() {
-        return pacoteRepository.encontrePacotes();
+        List<Pacote> pacotes = pacoteRepository.encontrePacotes();
+        System.out.println(pacotes.toString());
+        List<PacoteResponseDTO> PacoteResponseDTO = pacotes.stream()
+                .map(pacote -> new PacoteResponseDTO(
+                        pacote.getId(),
+                        pacote.getNome(),
+                        pacote.getDescricao(),
+                        pacote.getTags(),
+                        pacote.getPreco(),
+                        pacote.getInicio(),
+                        pacote.getFim(),
+                        pacote.getDisponibilidade(),
+                        pacote.getStatus(),
+                        pacote.getHotel(),
+                        pacote.getTransporte(),
+                        pacote.getFotosDoPacote()
+                )).toList();
+        return  PacoteResponseDTO;
     }
 
     // Retorna os destinos mais vendidos (Top N)
