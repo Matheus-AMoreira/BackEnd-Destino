@@ -1,6 +1,7 @@
 package com.destino.projeto_destino.controller.usuario;
 
 import com.destino.projeto_destino.dto.compra.CompraRequestDTO;
+import com.destino.projeto_destino.dto.compra.CompraResponseDTO;
 import com.destino.projeto_destino.dto.compra.ViagemDetalhadaDTO;
 import com.destino.projeto_destino.dto.compra.ViagemResumoDTO;
 import com.destino.projeto_destino.services.compra.CompraService;
@@ -28,8 +29,8 @@ public class CompraController {
     }
 
     @PostMapping
-    public ResponseEntity<String> realizarCompra(@RequestBody CompraRequestDTO dto) {
-        return compraService.processarCompra(dto);
+    public ResponseEntity<CompraResponseDTO> realizarCompra(@RequestBody CompraRequestDTO dto) {
+        return ResponseEntity.ok().body(compraService.processarCompra(dto));
     }
 
     @GetMapping

@@ -1,6 +1,7 @@
 package com.destino.projeto_destino.services.compra;
 
 import com.destino.projeto_destino.dto.compra.CompraRequestDTO;
+import com.destino.projeto_destino.dto.compra.CompraResponseDTO;
 import com.destino.projeto_destino.dto.compra.ViagemDetalhadaDTO;
 import com.destino.projeto_destino.dto.compra.ViagemResumoDTO;
 import com.destino.projeto_destino.model.Compra;
@@ -22,6 +23,7 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -38,7 +40,7 @@ public class CompraService {
     }
 
     @Transactional
-    public ResponseEntity<String> processarCompra(CompraRequestDTO dto) {
+    public CompraResponseDTO processarCompra(CompraRequestDTO dto) {
         // 1. Buscar Usuário e Pacote
         Usuario usuario = usuarioRepository.findById(dto.usuarioId())
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
@@ -48,7 +50,7 @@ public class CompraService {
 
         // 2. Validar Disponibilidade
         if (pacote.getDisponibilidade() <= 0) {
-            return ResponseEntity.badRequest().body("Pacote esgotado!");
+            return new CompraResponseDTO("Pacote esgotado!", Optional.empty());
         }
 
         // 3. Calcular Valor Final (Regra de Negócio: 5% desconto no PIX)
@@ -73,9 +75,9 @@ public class CompraService {
         pacote.setDisponibilidade(pacote.getDisponibilidade() - 1);
         pacoteRepository.save(pacote);
 
-        compraRepository.save(compra);
+        var compraRealizada = compraRepository.save(compra);
 
-        return ResponseEntity.ok(compra.getId().toString());
+        return new CompraResponseDTO("Compra realizasda com sucesso", Optional.of(compraRealizada));
     }
 
     public List<ViagemResumoDTO> listarViagensDoUsuario(String emailUsuario) {

@@ -51,11 +51,11 @@ public class Pacote {
     @Column(name = "PAC_PRECO", precision = 10, scale = 2, nullable = false)
     private BigDecimal preco;
 
-    @JsonFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "dd-MM-yyyy")
     @Column(name = "PAC_DATA_INICIO_VIAGEM", nullable = false)
     private LocalDate inicio;
 
-    @JsonFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "dd-MM-yyyy")
     @Column(name = "PAC_DATA_FIM_VIAGEM", nullable = false)
     private LocalDate fim;
 

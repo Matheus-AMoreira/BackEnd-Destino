@@ -5,6 +5,7 @@ import com.destino.projeto_destino.model.usuario.Usuario;
 import com.destino.projeto_destino.util.model.compra.Metodo;
 import com.destino.projeto_destino.util.model.compra.Processador;
 import com.destino.projeto_destino.util.model.compra.StatusCompra;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -32,6 +33,7 @@ public class Compra {
     @Column(name = "COM_ID", nullable = false)
     private Long id;
 
+    @JsonFormat(pattern = "dd-MM-yyyy")
     @Column(name = "COM_DATA_COMPRA", nullable = false)
     private Date dataCompra;
 
