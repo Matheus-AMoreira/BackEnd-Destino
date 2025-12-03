@@ -24,7 +24,7 @@ import com.destino.projeto_destino.repository.usuario.UsuarioRepository;
 import com.destino.projeto_destino.util.model.compra.Metodo;
 import com.destino.projeto_destino.util.model.compra.Processador;
 import com.destino.projeto_destino.util.model.compra.StatusCompra;
-import com.destino.projeto_destino.util.model.pacote.Status;
+import com.destino.projeto_destino.util.model.pacote.PacoteStatus;
 import com.destino.projeto_destino.util.model.transporte.Meio;
 import com.destino.projeto_destino.util.model.usuario.Cpf.Cpf;
 import com.destino.projeto_destino.util.model.usuario.Telefone.Telefone;
@@ -113,7 +113,7 @@ public class DataInitializer implements CommandLineRunner {
         }
 
         // Criar Pacotes
-        criarPacotesFicticios();
+        criarPacotesFicticios(gerarTransporteAleatorio());
 
         criarComprasFicticias();
 
@@ -340,7 +340,8 @@ public class DataInitializer implements CommandLineRunner {
 
         int preco = 100 + random.nextInt(900); // Preço entre 100 e 1000
 
-        return new Transporte(nomeEmpresa, meioSorteado, preco);
+        Transporte transporte = new Transporte(nomeEmpresa, meioSorteado, preco);
+        return transporteRepository.save(transporte);
     }
 
     // Gerar hoteis
@@ -418,17 +419,17 @@ public class DataInitializer implements CommandLineRunner {
                 .add(BigDecimal.valueOf(hotel.getDiaria() * diasDuracao));
 
         // --- STATUS: Lógica de Passado/Futuro + Chance de Cancelamento ---
-        Status status;
+        PacoteStatus status;
 
         // 1% de chance de ser CANCELADO (Sorteia 0 a 99, se for 0 cancela)
         if (random.nextInt(100) == 0) {
-            status = Status.CANCELADO;
+            status = PacoteStatus.CANCELADO;
         } else {
             // Se não cancelado, verifica data
             if (fim.isBefore(LocalDate.now())) {
-                status = Status.CONCLUIDO; // Já acabou
+                status = PacoteStatus.CONCLUIDO; // Já acabou
             } else {
-                status = Status.EMANDAMENTO; // Futuro ou acontecendo agora
+                status = PacoteStatus.EMANDAMENTO; // Futuro ou acontecendo agora
             }
         }
         // ---------------------------------------------------------------
@@ -449,7 +450,7 @@ public class DataInitializer implements CommandLineRunner {
                 .build();
     }
 
-    private void criarPacotesFicticios() {
+    private void criarPacotesFicticios(Transporte transporte) {
         logger.info("Iniciando geração de pacotes e dados relacionados...");
 
         Usuario funcionario = usuarioRepository.findByEmail("funcionario@destino.com")
@@ -462,10 +463,6 @@ public class DataInitializer implements CommandLineRunner {
             logger.warn("Dados insuficientes (funcionário ou usuários) para gerar pacotes completos.");
             return;
         }
-
-        // Gera 1 Transporte novo
-        Transporte transporte = gerarTransporteAleatorio();
-        transporteRepository.save(transporte);
 
         // Loop de criação
         for (int i = 0; i < 5; i++) {

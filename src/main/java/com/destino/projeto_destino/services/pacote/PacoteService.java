@@ -12,7 +12,7 @@ import com.destino.projeto_destino.repository.pacote.PacoteRepository;
 import com.destino.projeto_destino.repository.pacote.TransporteRepository;
 import com.destino.projeto_destino.repository.pacote.hotel.HotelRepository;
 import com.destino.projeto_destino.repository.usuario.UsuarioRepository;
-import com.destino.projeto_destino.util.model.pacote.Status;
+import com.destino.projeto_destino.util.model.pacote.PacoteStatus;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -112,19 +112,19 @@ public class PacoteService {
         }
 
         // --- Lógica de Status Automático ---
-        Status novoStatus;
+        PacoteStatus novoStatus;
         // Se o DTO já vier como CANCELADO (num update manual), respeitamos
-        if (isUpdate && pacote.getStatus() == Status.CANCELADO) {
-            novoStatus = Status.CANCELADO;
+        if (isUpdate && pacote.getStatus() == PacoteStatus.CANCELADO) {
+            novoStatus = PacoteStatus.CANCELADO;
         } else {
             // Calcula baseado nas datas
             java.time.LocalDate hoje = java.time.LocalDate.now();
 
             if (dto.fim().isBefore(hoje)) {
-                novoStatus = Status.CONCLUIDO;
+                novoStatus = PacoteStatus.CONCLUIDO;
             } else {
                 // Assume EMANDAMENTO para pacotes futuros ou ocorrendo agora
-                novoStatus = Status.EMANDAMENTO;
+                novoStatus = PacoteStatus.EMANDAMENTO;
             }
         }
         // -----------------------------------

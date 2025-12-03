@@ -3,6 +3,7 @@ package com.destino.projeto_destino.repository.usuario;
 import com.destino.projeto_destino.model.Compra;
 import com.destino.projeto_destino.model.pacote.Pacote;
 import com.destino.projeto_destino.model.usuario.Usuario;
+import com.destino.projeto_destino.util.model.pacote.PacoteStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -22,7 +23,13 @@ public interface CompraRepository extends JpaRepository<Compra, Long> {
     @Query("SELECT c FROM Compra c WHERE c.usuario.id = :usuarioId ORDER BY c.pacote.inicio DESC")
     List<Compra> findAllByUsuarioId(@Param("usuarioId") UUID usuarioId);
 
-    // Busca compra específica garantindo que pertence ao usuário (segurança)
+    @Query("SELECT c FROM Compra c WHERE c.usuario.id = :usuarioId AND c.pacote.status = :status ORDER BY c.pacote.inicio DESC")
+    List<Compra> findAllByUsuarioIdWhereStatusConcluido(@Param("usuarioId") UUID usuarioId, @Param("status") PacoteStatus status);
+
+    @Query("SELECT c FROM Compra c WHERE c.usuario.id = :usuarioId AND c.pacote.status = :status ORDER BY c.pacote.inicio DESC")
+    List<Compra> findAllByUsuarioIdWhereStatusEmAdamento(@Param("usuarioId") UUID usuarioId, @Param("status") PacoteStatus status);
+
+    // Busca compra específica garantindo que pertence ao usuario (segurança)
     @Query("SELECT c FROM Compra c WHERE c.id = :compraId AND c.usuario.email = :emailUsuario")
     Compra findByIdAndUsuarioEmail(@Param("compraId") Long compraId, @Param("emailUsuario") String emailUsuario);
 

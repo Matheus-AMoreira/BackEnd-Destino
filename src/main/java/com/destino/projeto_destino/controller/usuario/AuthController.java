@@ -1,4 +1,4 @@
-package com.destino.projeto_destino.controller.autenticacao;
+package com.destino.projeto_destino.controller.usuario;
 
 import com.destino.projeto_destino.dto.auth.login.LoginResponseDTO;
 import com.destino.projeto_destino.dto.auth.login.LoginUsuarioDto;

@@ -1,11 +1,10 @@
-package com.destino.projeto_destino.controller.usuario;
+package com.destino.projeto_destino.controller.compra;
 
 import com.destino.projeto_destino.dto.compra.CompraRequestDTO;
 import com.destino.projeto_destino.dto.compra.CompraResponseDTO;
 import com.destino.projeto_destino.dto.compra.ViagemDetalhadaDTO;
 import com.destino.projeto_destino.dto.compra.ViagemResumoDTO;
 import com.destino.projeto_destino.services.compra.CompraService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -29,17 +28,17 @@ public class CompraController {
     }
 
     @GetMapping("/andamento")
-    public ResponseEntity<List<ViagemResumoDTO>> listarMinhasViagens() {
+    public ResponseEntity<List<ViagemResumoDTO>> listarViagensEmAndamento() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String email = auth.getName();
-        return ResponseEntity.ok(compraService.listarViagensDoUsuario(email));
+        return ResponseEntity.ok().body(compraService.listarViagensEmAndamentoDoUsuario(email));
     }
 
     @GetMapping("/concluidas")
-    public void listarMinhasViagensContrluidas() {
+    public ResponseEntity<List<ViagemResumoDTO>> listarViagensComcluidas() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String email = auth.getName();
-        System.out.println(auth);
+        return ResponseEntity.ok().body(compraService.listarViagensConcluidasDoUsuarios(email));
     }
 
 
@@ -47,7 +46,7 @@ public class CompraController {
     public ResponseEntity<ViagemDetalhadaDTO> detalharViagem(@PathVariable Long id) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String email = auth.getName();
-        return ResponseEntity.ok(compraService.buscarDetalhesViagem(id, email));
+        return ResponseEntity.ok().body(compraService.buscarDetalhesViagem(id, email));
     }
 
     @PostMapping

@@ -3,12 +3,11 @@ package com.destino.projeto_destino.dto.pacote;
 import com.destino.projeto_destino.model.pacote.hotel.Hotel;
 import com.destino.projeto_destino.model.pacote.pacoteFoto.PacoteFoto;
 import com.destino.projeto_destino.model.pacote.transporte.Transporte;
-import com.destino.projeto_destino.util.model.pacote.Status;
+import com.destino.projeto_destino.util.model.pacote.PacoteStatus;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 public record PacoteResponseDTO(
         long id,
@@ -19,7 +18,7 @@ public record PacoteResponseDTO(
         LocalDate inicio,
         LocalDate fim,
         int disponibilidade,
-        Status status,
+        PacoteStatus status,
         Hotel hotel,
         Transporte transporte,
         PacoteFoto fotosDoPacote

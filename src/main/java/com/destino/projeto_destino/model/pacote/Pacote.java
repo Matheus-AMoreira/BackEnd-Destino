@@ -4,7 +4,7 @@ import com.destino.projeto_destino.model.pacote.hotel.Hotel;
 import com.destino.projeto_destino.model.pacote.pacoteFoto.PacoteFoto;
 import com.destino.projeto_destino.model.pacote.transporte.Transporte;
 import com.destino.projeto_destino.model.usuario.Usuario;
-import com.destino.projeto_destino.util.model.pacote.Status;
+import com.destino.projeto_destino.util.model.pacote.PacoteStatus;
 import com.destino.projeto_destino.util.model.pacote.StringListConverter;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.Column;
@@ -64,7 +64,7 @@ public class Pacote {
 
     @Column(name = "PAC_STATUS", nullable = false)
     @Enumerated(EnumType.STRING)
-    private Status status;
+    private PacoteStatus status;
 
     // Relacionamentos
 
@@ -87,7 +87,7 @@ public class Pacote {
     public Pacote() {
     }
 
-    public Pacote(long id, String nome, String descricao, ArrayList<String> tags, BigDecimal preco, LocalDate inicio, LocalDate fim, int disponibilidade, Status status, Transporte transporte, Hotel hotel, Usuario funcionario, PacoteFoto fotosDoPacote) {
+    public Pacote(long id, String nome, String descricao, ArrayList<String> tags, BigDecimal preco, LocalDate inicio, LocalDate fim, int disponibilidade, PacoteStatus status, Transporte transporte, Hotel hotel, Usuario funcionario, PacoteFoto fotosDoPacote) {
         this.id = id;
         this.nome = nome;
         this.descricao = descricao;

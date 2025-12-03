@@ -3,7 +3,7 @@ package com.destino.projeto_destino.services.compra;
 import com.destino.projeto_destino.dto.dashboard.ChartDataDTO;
 import com.destino.projeto_destino.repository.pacote.PacoteRepository;
 import com.destino.projeto_destino.repository.usuario.CompraRepository;
-import com.destino.projeto_destino.util.model.pacote.Status;
+import com.destino.projeto_destino.util.model.pacote.PacoteStatus;
 import com.destino.projeto_destino.util.model.transporte.Meio;
 import org.springframework.stereotype.Service;
 
@@ -25,7 +25,7 @@ public class DashboardService {
 
     public List<ChartDataDTO> getStatusDistribution() {
         return pacoteRepository.countPacotesByStatus().stream().map(result -> {
-            Status status = (Status) result[0];
+            PacoteStatus status = (PacoteStatus) result[0];
             Long count = (Long) result[1];
 
             String label = switch (status) {

@@ -14,6 +14,7 @@ import com.destino.projeto_destino.repository.usuario.UsuarioRepository;
 import com.destino.projeto_destino.util.model.compra.Metodo;
 import com.destino.projeto_destino.util.model.compra.Processador;
 import com.destino.projeto_destino.util.model.compra.StatusCompra;
+import com.destino.projeto_destino.util.model.pacote.PacoteStatus;
 import jakarta.transaction.Transactional;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -91,11 +92,20 @@ public class CompraService {
         return new CompraResponseDTO("Compra realizada com sucesso", Optional.of(compraRealizada));
     }
 
-    public List<ViagemResumoDTO> listarViagensDoUsuario(String emailUsuario) {
+    public List<ViagemResumoDTO> listarViagensEmAndamentoDoUsuario(String emailUsuario) {
         var usuario = usuarioRepository.findByEmail(emailUsuario)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
 
-        List<Compra> compras = compraRepository.findAllByUsuarioId(usuario.getId());
+        List<Compra> compras = compraRepository.findAllByUsuarioIdWhereStatusEmAdamento(usuario.getId(), PacoteStatus.EMANDAMENTO);
+
+        return compras.stream().map(this::converterParaResumoDTO).collect(Collectors.toList());
+    }
+
+    public List<ViagemResumoDTO> listarViagensConcluidasDoUsuarios(String emailUsuario) {
+        var usuario = usuarioRepository.findByEmail(emailUsuario)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+
+        List<Compra> compras = compraRepository.findAllByUsuarioIdWhereStatusConcluido(usuario.getId(), PacoteStatus.CONCLUIDO);
 
         return compras.stream().map(this::converterParaResumoDTO).collect(Collectors.toList());
     }
