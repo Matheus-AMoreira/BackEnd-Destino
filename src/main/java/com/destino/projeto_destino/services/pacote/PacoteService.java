@@ -111,6 +111,24 @@ public class PacoteService {
             return ResponseEntity.badRequest().body("Preço do pacote não cobre os custos! Mínimo: " + precoMinimo);
         }
 
+        // --- Lógica de Status Automático ---
+        Status novoStatus;
+        // Se o DTO já vier como CANCELADO (num update manual), respeitamos
+        if (isUpdate && pacote.getStatus() == Status.CANCELADO) {
+            novoStatus = Status.CANCELADO;
+        } else {
+            // Calcula baseado nas datas
+            java.time.LocalDate hoje = java.time.LocalDate.now();
+
+            if (dto.fim().isBefore(hoje)) {
+                novoStatus = Status.CONCLUIDO;
+            } else {
+                // Assume EMANDAMENTO para pacotes futuros ou ocorrendo agora
+                novoStatus = Status.EMANDAMENTO;
+            }
+        }
+        // -----------------------------------
+
         // Atualiza os dados do objeto
         pacote.setNome(dto.nome());
         pacote.setFuncionario(funcionario);
@@ -123,11 +141,7 @@ public class PacoteService {
         pacote.setInicio(dto.inicio());
         pacote.setFim(dto.fim());
         pacote.setDisponibilidade(dto.disponibilidade());
-
-        // Se for criação, define status inicial. Na edição, mantemos o status que já estava.
-        if (!isUpdate) {
-            pacote.setStatus(Status.EMANDAMENTO);
-        }
+        pacote.setStatus(novoStatus); // Aplica o status calculado
 
         pacoteRepository.save(pacote);
 

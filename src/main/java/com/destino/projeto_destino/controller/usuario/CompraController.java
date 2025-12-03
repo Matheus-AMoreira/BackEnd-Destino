@@ -28,22 +28,30 @@ public class CompraController {
         this.compraService = compraService;
     }
 
-    @PostMapping
-    public ResponseEntity<CompraResponseDTO> realizarCompra(@RequestBody CompraRequestDTO dto) {
-        return ResponseEntity.ok().body(compraService.processarCompra(dto));
-    }
-
-    @GetMapping
+    @GetMapping("/andamento")
     public ResponseEntity<List<ViagemResumoDTO>> listarMinhasViagens() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String email = auth.getName();
         return ResponseEntity.ok(compraService.listarViagensDoUsuario(email));
     }
 
+    @GetMapping("/concluidas")
+    public void listarMinhasViagensContrluidas() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String email = auth.getName();
+        System.out.println(auth);
+    }
+
+
     @GetMapping("/{id}")
     public ResponseEntity<ViagemDetalhadaDTO> detalharViagem(@PathVariable Long id) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String email = auth.getName();
         return ResponseEntity.ok(compraService.buscarDetalhesViagem(id, email));
+    }
+
+    @PostMapping
+    public ResponseEntity<CompraResponseDTO> realizarCompra(@RequestBody CompraRequestDTO dto) {
+        return ResponseEntity.ok().body(compraService.processarCompra(dto));
     }
 }

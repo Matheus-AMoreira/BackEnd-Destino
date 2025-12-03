@@ -49,6 +49,9 @@ public class Compra {
     @Column(name = "COM_PROCESSADOR", nullable = false, length = 50)
     private Processador processadorPagamento;
 
+    @Column(name = "COM_PARCELAS", nullable = false)
+    private int parcelas;
+
     @Column(name = "COM_VALOR_FINAL", nullable = false, precision = 10, scale = 2)
     private BigDecimal valorFinal;
 

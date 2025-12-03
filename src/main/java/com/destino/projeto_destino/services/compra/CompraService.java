@@ -11,6 +11,7 @@ import com.destino.projeto_destino.model.usuario.Usuario;
 import com.destino.projeto_destino.repository.pacote.PacoteRepository;
 import com.destino.projeto_destino.repository.usuario.CompraRepository;
 import com.destino.projeto_destino.repository.usuario.UsuarioRepository;
+import com.destino.projeto_destino.util.model.compra.Metodo;
 import com.destino.projeto_destino.util.model.compra.Processador;
 import com.destino.projeto_destino.util.model.compra.StatusCompra;
 import jakarta.transaction.Transactional;
@@ -53,10 +54,19 @@ public class CompraService {
             return new CompraResponseDTO("Pacote esgotado!", Optional.empty());
         }
 
-        // 3. Calcular Valor Final (Regra de Negócio: 5% desconto no PIX)
+        // 3. Regras de Pagamento (PIX vs Cartão)
         BigDecimal valorFinal = pacote.getPreco();
+        int parcelasfinais = dto.parcelas();
+        Metodo metodoFinal = dto.metodo();
+
         if (dto.processador() == Processador.PIX) {
             valorFinal = valorFinal.multiply(BigDecimal.valueOf(0.95)); // 5% desconto
+            parcelasfinais = 1; // PIX é sempre 1x
+            metodoFinal = Metodo.VISTA; // PIX é sempre à vista
+        } else {
+            if (parcelasfinais > 1) {
+                metodoFinal = Metodo.PARCELADO;
+            }
         }
 
         // 4. Criar a Compra
@@ -64,11 +74,12 @@ public class CompraService {
         compra.setUsuario(usuario);
         compra.setPacote(pacote);
         compra.setDataCompra(new Date());
-        compra.setMetodo(dto.metodo());
+        compra.setMetodo(metodoFinal);
         compra.setProcessadorPagamento(dto.processador());
+        compra.setParcelas(parcelasfinais); // Salva a quantidade correta
         compra.setValorFinal(valorFinal);
 
-        // Simulação: Aprovação imediata para fins didáticos
+        // Simulação: Aprovação imediata
         compra.setStatus(StatusCompra.ACEITO);
 
         // 5. Atualizar Estoque do Pacote
@@ -77,7 +88,7 @@ public class CompraService {
 
         var compraRealizada = compraRepository.save(compra);
 
-        return new CompraResponseDTO("Compra realizasda com sucesso", Optional.of(compraRealizada));
+        return new CompraResponseDTO("Compra realizada com sucesso", Optional.of(compraRealizada));
     }
 
     public List<ViagemResumoDTO> listarViagensDoUsuario(String emailUsuario) {
