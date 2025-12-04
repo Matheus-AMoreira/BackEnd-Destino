@@ -96,7 +96,7 @@ public class DataInitializer implements CommandLineRunner {
         logger.info("Iniciando verificação de dados iniciais...");
 
         //Criar usuários
-        inserirUsuarios();
+        inserirUsuarios(100);
 
         if (localizacaoJaCarregada()) {
             logger.info("Dados de localização (Regiões, Estados, Cidades) já estão carregados.");
@@ -113,14 +113,12 @@ public class DataInitializer implements CommandLineRunner {
         }
 
         // Criar Pacotes
-        criarPacotesFicticios(gerarTransporteAleatorio());
-
-        criarComprasFicticias();
+        criarPacotesFicticios(1000, gerarTransporteAleatorio());
 
         logger.info("Verificação de dados iniciais concluída.");
     }
 
-    private void inserirUsuarios(){
+    private void inserirUsuarios(int vezes){
         // Administrador
         criarUsuarioSeNaoExistir(
                 "Aministrador",
@@ -145,7 +143,9 @@ public class DataInitializer implements CommandLineRunner {
                 true
         );
 
-        criarUsuarioInvalidoAleatorio();
+        for(int i = 0 ; i < vezes; i++){
+            criarUsuarioInvalidoAleatorio();
+        }
     }
 
     private void criarUsuarioInvalidoAleatorio() {
@@ -158,10 +158,10 @@ public class DataInitializer implements CommandLineRunner {
         String nome = nomes[random.nextInt(nomes.length)];
         String sobrenome = sobrenomes[random.nextInt(sobrenomes.length)];
 
-        // --- LÓGICA DE E-MAIL REALISTA ---
+        // --- LÓGICA DE E-MAIL ---
         String[] separadores = {"_", ".", "-"};
         String separador = separadores[random.nextInt(separadores.length)];
-        int quatroDigitos = 1000 + random.nextInt(9000); // Garante números entre 1000 e 9999
+        int quatroDigitos = 1000 + random.nextInt(9000);
 
         // Exemplo: marcos.silva4821@destino.com
         String email = nome.toLowerCase() + separador + sobrenome.toLowerCase() + quatroDigitos + "@destino.com";
@@ -184,7 +184,7 @@ public class DataInitializer implements CommandLineRunner {
                     telefone,
                     senha,
                     UserRole.USUARIO,
-                    false // Define como INVÁLIDO
+                    false
             );
 
             usuarioRepository.save(usuario);
@@ -334,11 +334,11 @@ public class DataInitializer implements CommandLineRunner {
         String nomeEmpresa = prefixos[random.nextInt(prefixos.length)] + " " +
                 sufixos[random.nextInt(sufixos.length)];
 
-        // Sorteia um meio de transporte (assumindo que Meio é um Enum)
+        // Sorteia um meio de transporte
         Meio[] meios = Meio.values();
         Meio meioSorteado = meios[random.nextInt(meios.length)];
 
-        int preco = 100 + random.nextInt(900); // Preço entre 100 e 1000
+        int preco = 100 + random.nextInt(900);
 
         Transporte transporte = new Transporte(nomeEmpresa, meioSorteado, preco);
         return transporteRepository.save(transporte);
@@ -450,13 +450,12 @@ public class DataInitializer implements CommandLineRunner {
                 .build();
     }
 
-    private void criarPacotesFicticios(Transporte transporte) {
+    private void criarPacotesFicticios(int vezes, Transporte transporte) {
         logger.info("Iniciando geração de pacotes e dados relacionados...");
 
         Usuario funcionario = usuarioRepository.findByEmail("funcionario@destino.com")
                 .orElse(usuarioRepository.findAll().stream().findFirst().orElse(null));
 
-        // BUSCA ÚNICA: Carrega usuários na memória 1 vez para usar em todos os pacotes
         List<Usuario> todosUsuarios = usuarioRepository.findAll();
 
         if (funcionario == null || todosUsuarios.isEmpty()) {
@@ -465,7 +464,7 @@ public class DataInitializer implements CommandLineRunner {
         }
 
         // Loop de criação
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < vezes; i++) {
             Cidade cidadeAleatoria = buscarCidadeAleatoriaSemCarregarTudo();
 
             if (cidadeAleatoria != null) {
@@ -473,9 +472,8 @@ public class DataInitializer implements CommandLineRunner {
                 hotelRepository.save(hotel);
 
                 Pacote pacote = gerarPacoteAleatorio(hotel, transporte, funcionario);
-                pacoteRepository.save(pacote); // Salva o Pacote primeiro
+                pacoteRepository.save(pacote);
 
-                // CHAMA O GERADOR AQUI: Passa o pacote recém-criado e a lista de usuários
                 gerarAvaliacoesParaPacote(pacote, todosUsuarios);
             }
         }
