@@ -13,6 +13,7 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.awt.*;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -25,12 +26,12 @@ public class PacoteFoto {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "PCF_ID", nullable = false)
-    private int id;
+    private Long id;
 
     @Column(name = "PCF_NOME", nullable = false)
     private String nome;
 
-    @Column(name = "PCF_foto", length = 255, nullable = false)
+    @Column(name = "PCF_foto", columnDefinition = "TEXT", nullable = false)
     private String fotoDoPacote;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)

@@ -29,7 +29,7 @@ public class TransporteService {
         return ResponseEntity.ok("Transporte " + criado.getEmpresa() + " criado!");
     }
 
-    public ResponseEntity<String> atualizarTransporte(int id, TransporteRegistroDTO dto) {
+    public ResponseEntity<String> atualizarTransporte(long id, TransporteRegistroDTO dto) {
         return transporteRepository.findById(id).map(t -> {
             t.setEmpresa(dto.empresa());
             t.setMeio(dto.meio());
@@ -39,7 +39,7 @@ public class TransporteService {
         }).orElse(ResponseEntity.notFound().build());
     }
 
-    public ResponseEntity<String> deletarTransporte(int id) {
+    public ResponseEntity<String> deletarTransporte(long id) {
         if (!transporteRepository.existsById(id)) return ResponseEntity.notFound().build();
         if (pacoteRepository.existsByTransporteId(id)) {
             return ResponseEntity.badRequest().body("Não é possível deletar: Existem pacotes vinculados.");

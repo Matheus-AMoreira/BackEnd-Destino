@@ -26,7 +26,7 @@ public class PacoteFotoService {
         return ResponseEntity.ok(pacoteFotoRepository.findAll());
     }
 
-    public ResponseEntity<PacoteFoto> buscarPorId(int id) {
+    public ResponseEntity<PacoteFoto> buscarPorId(long id) {
         return pacoteFotoRepository.findById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
@@ -65,7 +65,7 @@ public class PacoteFotoService {
     }
 
     @Transactional
-    public ResponseEntity<String> atualizarPacoteFoto(int id, PacoteFotoRegistroDTO dto) {
+    public ResponseEntity<String> atualizarPacoteFoto(long id, PacoteFotoRegistroDTO dto) {
         return pacoteFotoRepository.findById(id).map(pacoteFoto -> {
             montarPacoteFoto(pacoteFoto, dto);
             pacoteFotoRepository.save(pacoteFoto);

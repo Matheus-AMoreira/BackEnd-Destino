@@ -43,9 +43,9 @@ public interface PacoteRepository extends JpaRepository<Pacote, Long> {
     Optional<Pacote> findByNome(String nome);
 
     // --- Métodos de Verificação de Integridade ---
-    boolean existsByHotelId(int id);
+    boolean existsByHotelId(long id);
 
-    boolean existsByTransporteId(int id);
+    boolean existsByTransporteId(long id);
 
     // --- Dashboard ---
     @Query("SELECT p.status, COUNT(p) FROM Pacote p GROUP BY p.status")

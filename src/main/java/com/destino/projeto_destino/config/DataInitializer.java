@@ -96,7 +96,7 @@ public class DataInitializer implements CommandLineRunner {
         logger.info("Iniciando verificação de dados iniciais...");
 
         //Criar usuários
-        inserirUsuarios(100);
+        inserirUsuarios(5);
 
         if (localizacaoJaCarregada()) {
             logger.info("Dados de localização (Regiões, Estados, Cidades) já estão carregados.");
@@ -113,7 +113,7 @@ public class DataInitializer implements CommandLineRunner {
         }
 
         // Criar Pacotes
-        criarPacotesFicticios(1000, gerarTransporteAleatorio());
+        criarPacotesFicticios(100, gerarTransporteAleatorio());
 
         logger.info("Verificação de dados iniciais concluída.");
     }
@@ -327,7 +327,7 @@ public class DataInitializer implements CommandLineRunner {
 
     // Gerar transporte
     private Transporte gerarTransporteAleatorio() {
-        String[] prefixos = {"Via", "Expresso", "Rápido", "Trans", "Viação", "Aero"};
+        String[] prefixos = {"Via", "Expresso", "Rápido", "Rápido", "Viação", "Aero"};
         String[] sufixos = {"Brasil", "Norte", "Sul", "Log", "Tur", "Lines", "Way"};
         Random random = new Random();
 

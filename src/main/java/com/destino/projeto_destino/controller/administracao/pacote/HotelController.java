@@ -30,6 +30,17 @@ public class HotelController {
         this.hotelService = hotelService;
     }
 
+    @GetMapping
+    public ResponseEntity<List<Hotel>> procurarHoteis() {
+        return ResponseEntity.ok().body(hotelService.pegarHoteis());
+    }
+
+    // Endpoint para buscar hotel específico para edição
+    @GetMapping("/{id}")
+    public ResponseEntity<Hotel> getHotelById(@PathVariable long id) {
+        return ResponseEntity.ok().body(hotelService.pegarHotelById(id));
+    }
+
     @GetMapping("/regioes")
     public ResponseEntity<List<Regiao>> getRegioes() {
         return hotelService.listarRegioes();
@@ -45,39 +56,9 @@ public class HotelController {
         return hotelService.listarCidadesPorEstado(estadoId);
     }
 
-    @GetMapping
-    public ResponseEntity<List<Hotel>> procurarHoteis() {
-        return hotelService.pegarHoteis();
-    }
-
-    // Endpoint para buscar hotel específico para edição
-    @GetMapping("/{id}")
-    public ResponseEntity<Hotel> getHotelById(@PathVariable int id) {
-        return hotelService.pegarHoteis().getBody().stream()
-                .filter(h -> h.getId() == id)
-                .findFirst()
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
-    }
-
     @GetMapping("/cidades")
     public ResponseEntity<List<Cidade>> listarCidades() {
         return hotelService.pegarTodasCidades();
-    }
-
-    @PostMapping("/")
-    public ResponseEntity<String> registrarHotel(@RequestBody HotelRegistroDTO hotel) {
-        return hotelService.criarHotel(hotel);
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<String> atualizarHotel(@PathVariable int id, @RequestBody HotelRegistroDTO hotel) {
-        return hotelService.atualizarHotel(id, hotel);
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<String> deletarHotel(@PathVariable int id) {
-        return hotelService.deletarHotel(id);
     }
 
     @GetMapping("/regiao/{regiao}")
@@ -88,5 +69,20 @@ public class HotelController {
     @GetMapping("/cidade/regiao/{regiao}")
     public ResponseEntity<List<Hotel>> pegarHotelPorRegiao(@PathVariable String regiao) {
         return hotelService.pegarHotelPorRegiao(regiao);
+    }
+
+    @PostMapping
+    public ResponseEntity<String> registrarHotel(@RequestBody HotelRegistroDTO hotel) {
+        return hotelService.criarHotel(hotel);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<String> atualizarHotel(@PathVariable long id, @RequestBody HotelRegistroDTO hotel) {
+        return hotelService.atualizarHotel(id, hotel);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deletarHotel(@PathVariable long id) {
+        return hotelService.deletarHotel(id);
     }
 }

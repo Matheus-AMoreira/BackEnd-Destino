@@ -13,9 +13,9 @@ public record PacoteRegistroDTO(
         LocalDate inicio,
         LocalDate fim,
         int disponibilidade,
-        int transporte,
-        int hotel,
-        int pacoteFoto,
+        long transporte,
+        long hotel,
+        long pacoteFoto,
         UUID funcionario
 ) {
 }

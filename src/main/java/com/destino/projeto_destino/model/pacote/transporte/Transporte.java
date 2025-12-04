@@ -18,7 +18,7 @@ public class Transporte {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "TRA_ID", nullable = false)
-    private int id;
+    private Long id;
 
     @Column(name = "TRA_EMPRESA", length = 100, nullable = false)
     private String empresa;

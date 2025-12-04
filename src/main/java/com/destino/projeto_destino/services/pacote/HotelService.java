@@ -43,6 +43,14 @@ public class HotelService {
         return ResponseEntity.ok(cidadeRepository.findByEstadoId(estadoId));
     }
 
+    public List<Hotel> pegarHoteis() {
+        return hotelRepository.findAll();
+    }
+
+    public Hotel pegarHotelById(long id) {
+        return hotelRepository.findHotelById(id);
+    }
+
     // --- CRUD Hotel ---
 
     @Transactional
@@ -55,7 +63,7 @@ public class HotelService {
     }
 
     @Transactional
-    public ResponseEntity<String> atualizarHotel(int id, HotelRegistroDTO dto) {
+    public ResponseEntity<String> atualizarHotel(long id, HotelRegistroDTO dto) {
         return hotelRepository.findById(id).map(hotel -> {
             Cidade cidade = cidadeRepository.getReferenceById(dto.cidade());
 
@@ -69,11 +77,7 @@ public class HotelService {
         }).orElse(ResponseEntity.notFound().build());
     }
 
-    public ResponseEntity<List<Hotel>> pegarHoteis() {
-        return ResponseEntity.ok().body(hotelRepository.findAll());
-    }
-
-    public ResponseEntity<String> deletarHotel(int id) {
+    public ResponseEntity<String> deletarHotel(long id) {
         if (!hotelRepository.existsById(id)) {
             return ResponseEntity.notFound().build();
         }

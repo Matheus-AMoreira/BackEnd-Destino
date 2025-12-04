@@ -32,7 +32,7 @@ public class PacoteFotoController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<PacoteFoto> buscarPorId(@PathVariable int id) {
+    public ResponseEntity<PacoteFoto> buscarPorId(@PathVariable long id) {
         return service.buscarPorId(id);
     }
 
@@ -42,7 +42,7 @@ public class PacoteFotoController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<String> atualizar(@PathVariable int id, @RequestBody PacoteFotoRegistroDTO dto) {
+    public ResponseEntity<String> atualizar(@PathVariable long id, @RequestBody PacoteFotoRegistroDTO dto) {
         return service.atualizarPacoteFoto(id, dto);
     }
 }
