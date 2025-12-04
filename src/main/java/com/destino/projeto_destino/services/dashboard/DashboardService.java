@@ -1,4 +1,4 @@
-package com.destino.projeto_destino.services.compra;
+package com.destino.projeto_destino.services.dashboard;
 
 import com.destino.projeto_destino.dto.dashboard.ChartDataDTO;
 import com.destino.projeto_destino.repository.pacote.PacoteRepository;
@@ -51,8 +51,13 @@ public class DashboardService {
         }).collect(Collectors.toList());
     }
 
-    public List<ChartDataDTO> getViagensConcluidasPorMes() {
-        List<Object[]> results = pacoteRepository.countViagensConcluidasByMonth();
+    public List<ChartDataDTO> getViagensConcluidasPorMes(int ano) {
+        List<Object[]> results = pacoteRepository.countViagensConcluidasByMonth(ano);
+        return mapMonthResults(results);
+    }
+
+    public List<ChartDataDTO> getComprasPorMes(int ano) {
+        List<Object[]> results = compraRepository.countComprasByMonth(ano);
         return mapMonthResults(results);
     }
 
@@ -74,10 +79,5 @@ public class DashboardService {
 
             return new ChartDataDTO(label, count);
         }).collect(Collectors.toList());
-    }
-
-    public List<ChartDataDTO> getComprasPorMes() {
-        List<Object[]> results = compraRepository.countComprasByMonth();
-        return mapMonthResults(results);
     }
 }

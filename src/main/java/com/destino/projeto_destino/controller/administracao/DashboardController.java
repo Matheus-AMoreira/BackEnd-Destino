@@ -1,13 +1,15 @@
 package com.destino.projeto_destino.controller.administracao;
 
 import com.destino.projeto_destino.dto.dashboard.ChartDataDTO;
-import com.destino.projeto_destino.services.compra.DashboardService;
+import com.destino.projeto_destino.services.dashboard.DashboardService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -32,12 +34,19 @@ public class DashboardController {
     }
 
     @GetMapping("/viagens/mensais")
-    public ResponseEntity<List<ChartDataDTO>> getViagensMensais() {
-        return ResponseEntity.ok(dashboardService.getViagensConcluidasPorMes());
+    public ResponseEntity<List<ChartDataDTO>> getViagensMensais(
+            @RequestParam(name = "ano", required = false) Integer ano
+    ) {
+        // Se não vier ano na requisição, usa o ano atual do servidor
+        int anoFiltro = (ano != null) ? ano : LocalDate.now().getYear();
+        return ResponseEntity.ok(dashboardService.getViagensConcluidasPorMes(anoFiltro));
     }
 
     @GetMapping("/viagens/vendidos")
-    public ResponseEntity<List<ChartDataDTO>> getComprasMensais() {
-        return ResponseEntity.ok(dashboardService.getComprasPorMes());
+    public ResponseEntity<List<ChartDataDTO>> getComprasMensais(
+            @RequestParam(name = "ano", required = false) Integer ano
+    ) {
+        int anoFiltro = (ano != null) ? ano : LocalDate.now().getYear();
+        return ResponseEntity.ok(dashboardService.getComprasPorMes(anoFiltro));
     }
 }

@@ -17,8 +17,8 @@ import java.util.UUID;
 public interface CompraRepository extends JpaRepository<Compra, Long> {
 
     // Agrupa compras por Mês. Retorna [Mês (Integer), Quantidade (Long)]
-    @Query("SELECT MONTH(c.dataCompra), COUNT(c) FROM Compra c GROUP BY MONTH(c.dataCompra)")
-    List<Object[]> countComprasByMonth();
+    @Query("SELECT MONTH(c.dataCompra), COUNT(c) FROM Compra c WHERE YEAR(c.dataCompra) = :ano GROUP BY MONTH(c.dataCompra) ORDER BY MONTH(c.dataCompra) ASC")
+    List<Object[]> countComprasByMonth(@Param("ano") int ano);
 
     @Query("SELECT c FROM Compra c WHERE c.usuario.id = :usuarioId ORDER BY c.pacote.inicio DESC")
     List<Compra> findAllByUsuarioId(@Param("usuarioId") UUID usuarioId);

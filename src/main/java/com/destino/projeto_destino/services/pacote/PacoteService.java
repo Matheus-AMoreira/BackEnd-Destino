@@ -15,6 +15,8 @@ import com.destino.projeto_destino.repository.usuario.UsuarioRepository;
 import com.destino.projeto_destino.util.model.pacote.PacoteStatus;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -46,10 +48,29 @@ public class PacoteService {
     }
 
     // Retorna pacotes com paginação
-    public List<PacoteResponseDTO> pegarPacotes() {
-        List<Pacote> pacotes = pacoteRepository.encontrePacotes();
-        System.out.println(pacotes.toString());
-        List<PacoteResponseDTO> PacoteResponseDTO = pacotes.stream()
+    public Page<PacoteResponseDTO> pegarPacotes(Pageable pageable) {
+        Page<Pacote> pacotes = pacoteRepository.encontrePacotes(pageable);
+        return pacotes.map(pacote -> new PacoteResponseDTO(
+                pacote.getId(),
+                pacote.getNome(),
+                pacote.getDescricao(),
+                pacote.getTags(),
+                pacote.getPreco(),
+                pacote.getInicio(),
+                pacote.getFim(),
+                pacote.getDisponibilidade(),
+                pacote.getStatus(),
+                pacote.getHotel(),
+                pacote.getTransporte(),
+                pacote.getFotosDoPacote()
+        ));
+    }
+
+    public Page<PacoteResponseDTO> buscarPacotesComFiltros(String nome, BigDecimal precoMax, Pageable pageable) {
+        // Se a string vier vazia, passamos null para a query ignorar o filtro
+        String termo = (nome != null && !nome.isBlank()) ? nome : null;
+
+        return pacoteRepository.buscarComFiltros(termo, precoMax, pageable)
                 .map(pacote -> new PacoteResponseDTO(
                         pacote.getId(),
                         pacote.getNome(),
@@ -63,8 +84,13 @@ public class PacoteService {
                         pacote.getHotel(),
                         pacote.getTransporte(),
                         pacote.getFotosDoPacote()
-                )).toList();
-        return  PacoteResponseDTO;
+                ));
+    }
+
+    public ResponseEntity<Pacote> pegarPacotePorNomeExato(String nome) {
+        return pacoteRepository.findByNome(nome)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     // Retorna os destinos mais vendidos (Top N)
