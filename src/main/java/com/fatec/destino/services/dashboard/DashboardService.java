@@ -3,7 +3,6 @@ package com.fatec.destino.services.dashboard;
 import com.fatec.destino.dto.dashboard.ChartDataDTO;
 import com.fatec.destino.repository.pacote.PacoteRepository;
 import com.fatec.destino.repository.usuario.CompraRepository;
-import com.fatec.destino.util.model.pacote.PacoteStatus;
 import com.fatec.destino.util.model.transporte.Meio;
 import org.springframework.stereotype.Service;
 
@@ -25,7 +24,7 @@ public class DashboardService {
 
     public List<ChartDataDTO> getStatusDistribution() {
         return pacoteRepository.countPacotesByStatus().stream().map(result -> {
-            PacoteStatus status = (PacoteStatus) result[0];
+            PacoteConverter status = (PacoteConverter) result[0];
             Long count = (Long) result[1];
 
             String label = switch (status) {

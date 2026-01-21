@@ -1,8 +1,10 @@
 plugins {
 	id 'java'
+    id 'org.jetbrains.kotlin.jvm' version '2.3.0'
+    id 'org.jetbrains.kotlin.plugin.spring' version '2.3.0'
 	id 'org.springframework.boot' version '4.0.1'
 	id 'io.spring.dependency-management' version '1.1.7'
-    id("io.swagger.core.v3.swagger-gradle-plugin") version "2.2.41"
+    id 'io.swagger.core.v3.swagger-gradle-plugin' version "2.2.41"
 }
 
 group = 'com.fatec'
@@ -13,6 +15,12 @@ java {
 	toolchain {
 		languageVersion = JavaLanguageVersion.of(25)
 	}
+}
+
+kotlin {
+    compilerOptions {
+        freeCompilerArgs.addAll("-Xjsr305=strict", "-Xannotation-default-target=param-property")
+    }
 }
 
 configurations {

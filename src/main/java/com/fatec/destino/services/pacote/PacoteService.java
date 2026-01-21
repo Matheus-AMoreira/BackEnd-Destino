@@ -12,7 +12,6 @@ import com.fatec.destino.repository.pacote.PacoteRepository;
 import com.fatec.destino.repository.pacote.TransporteRepository;
 import com.fatec.destino.repository.pacote.hotel.HotelRepository;
 import com.fatec.destino.repository.usuario.UsuarioRepository;
-import com.fatec.destino.util.model.pacote.PacoteStatus;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -138,19 +137,19 @@ public class PacoteService {
         }
 
         // --- Lógica de Status Automático ---
-        PacoteStatus novoStatus;
+        PacoteConverter novoStatus;
         // Se o DTO já vier como CANCELADO (num update manual), respeitamos
-        if (isUpdate && pacote.getStatus() == PacoteStatus.CANCELADO) {
-            novoStatus = PacoteStatus.CANCELADO;
+        if (isUpdate && pacote.getStatus() == PacoteConverter.CANCELADO) {
+            novoStatus = PacoteConverter.CANCELADO;
         } else {
             // Calcula baseado nas datas
             java.time.LocalDate hoje = java.time.LocalDate.now();
 
             if (dto.fim().isBefore(hoje)) {
-                novoStatus = PacoteStatus.CONCLUIDO;
+                novoStatus = PacoteConverter.CONCLUIDO;
             } else {
                 // Assume EMANDAMENTO para pacotes futuros ou ocorrendo agora
-                novoStatus = PacoteStatus.EMANDAMENTO;
+                novoStatus = PacoteConverter.EMANDAMENTO;
             }
         }
         // -----------------------------------

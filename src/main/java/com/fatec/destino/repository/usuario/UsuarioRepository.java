@@ -1,7 +1,7 @@
 package com.fatec.destino.repository.usuario;
 
 import com.fatec.destino.model.usuario.Usuario;
-import com.fatec.destino.util.model.usuario.Cpf.Cpf;
+import com.fatec.destino.util.model.usuario.cpf.Cpf;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
