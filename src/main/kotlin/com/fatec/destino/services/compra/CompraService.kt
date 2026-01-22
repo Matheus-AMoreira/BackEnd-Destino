@@ -77,47 +77,56 @@ class CompraService(
     }
 
     fun listarViagensEmAndamentoDoUsuario(emailUsuario : String) : List<ViagemResumoDTO> {
-        val usuario = usuarioRepository.findByEmail(emailUsuario).orElseThrow { RuntimeException("Usuário não encontrado") }
+        val usuario = usuarioRepository.findByEmail(emailUsuario)
 
-        val compras = compraRepository.findAllByUsuarioIdWhereStatusEmAdamento(usuario.id, PacoteStatus.EMANDAMENTO)
+        val compras = compraRepository.findAllByUsuarioIdWhereStatusEmAdamento(
+            usuario?.id,
+            PacoteStatus.EMANDAMENTO
+        )
 
-        //return compras.stream().map(this::converterParaResumoDTO).collect(Collectors.toList());
+        if(compras.isNullOrEmpty()){
+            return emptyList()
+        }
+
         return compras.map { compra -> ViagemResumoDTO(
-            id = compra.id,
-            pacoteId = compra.pacote.id,
-            nomePacote = compra.pacote.nome,
-            descricao = compra.pacote.descricao,
-            valor = compra.valorFinal,
-            statusCompra = compra.statusCompra,
-            dataPartida = compra.pacote.inicio,
-            dataRetorno = compra.pacote.fim,
-            imagemCapa = compra.pacote.fotosDoPacote?.fotoDoPacote,
-            cidade = compra.pacote.hotel.cidade,
-            estado = compra.pacote.hotel.cidade?.estado?.sigla
+            id = compra?.id,
+            pacoteId = compra?.pacote?.id,
+            nomePacote = compra?.pacote?.nome,
+            descricao = compra?.pacote?.descricao,
+            valor = compra?.valorFinal,
+            statusCompra = compra?.statusCompra,
+            dataPartida = compra?.pacote?.inicio,
+            dataRetorno = compra?.pacote?.fim,
+            imagemCapa = compra?.pacote?.fotosDoPacote?.fotoDoPacote,
+            cidade = compra?.pacote?.hotel?.cidade,
+            estado = compra?.pacote?.hotel?.cidade?.estado?.sigla
         ) }
     }
 
-    fun listarViagensConcluidasDoUsuarios(emailUsuario: String): List<ViagemResumoDTO> {
+    fun listarViagensConcluidasDoUsuarios(emailUsuario: String): List<ViagemResumoDTO>? {
         val usuario = usuarioRepository.findByEmail(emailUsuario)
-            .orElseThrow { RuntimeException("Usuário não encontrado") }
+
+        if (usuario == null){
+            return emptyList();
+        }
 
         val compras = compraRepository.findAllByUsuarioIdWhereStatusConcluido(
             usuario.id,
             PacoteStatus.CONCLUIDO
         )
 
-        return compras.map { compra -> ViagemResumoDTO(
-            id = compra.id,
-            pacoteId = compra.pacote.id,
-            nomePacote = compra.pacote.nome,
-            descricao = compra.pacote.descricao,
-            valor = compra.valorFinal,
-            statusCompra = compra.statusCompra,
-            dataPartida = compra.pacote.inicio,
-            dataRetorno = compra.pacote.fim,
-            imagemCapa = compra.pacote.fotosDoPacote?.fotoDoPacote,
-            cidade = compra.pacote.hotel.cidade,
-            estado = compra.pacote.hotel.cidade?.estado?.sigla
+        return compras?.map { compra -> ViagemResumoDTO(
+            id = compra?.id,
+            pacoteId = compra?.pacote?.id,
+            nomePacote = compra?.pacote?.nome,
+            descricao = compra?.pacote?.descricao,
+            valor = compra?.valorFinal,
+            statusCompra = compra?.statusCompra,
+            dataPartida = compra?.pacote?.inicio,
+            dataRetorno = compra?.pacote?.fim,
+            imagemCapa = compra?.pacote?.fotosDoPacote?.fotoDoPacote,
+            cidade = compra?.pacote?.hotel?.cidade,
+            estado = compra?.pacote?.hotel?.cidade?.estado?.sigla
         ) }
     }
 

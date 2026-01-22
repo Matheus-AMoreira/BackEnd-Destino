@@ -28,19 +28,18 @@ class JwtAuthenticationFilter(
         filterChain: FilterChain
     ) {
         val authHeader = request.getHeader("Authorization")
-        val jwt: String
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response)
             return
         }
 
-        jwt = authHeader.substring(7)
+        val jwt: String = authHeader.substring(7)
 
         try {
             val claims = jwtService.extractAllClaims(jwt)
 
-            if (claims?.subject != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            if (claims?.subject != null && SecurityContextHolder.getContext().authentication == null) {
                 val grantedAuthorities: MutableList<GrantedAuthority?> = ArrayList<GrantedAuthority?>()
                 grantedAuthorities.add(SimpleGrantedAuthority((claims["role"] as kotlin.String?)!!))
                 val authoritiesClaim = claims["authorities"] as MutableList<String>?
@@ -52,7 +51,7 @@ class JwtAuthenticationFilter(
                 }
 
                 val authToken = UsernamePasswordAuthenticationToken(
-                    claims.getSubject(),
+                    claims.subject,
                     null,
                     grantedAuthorities as Collection<out GrantedAuthority>
                 )
@@ -62,7 +61,7 @@ class JwtAuthenticationFilter(
         } catch (_: ExpiredJwtException) {
             SecurityContextHolder.clearContext()
             response.status = HttpStatus.UNAUTHORIZED.value()
-            response.writer.write("{\"error\": \"Token expirado\", \"code\": \"TOKEN_EXPIRED\"}")
+            response.writer.write("error: Token expirado, code: TOKEN_EXPIRED")
             filterChain.doFilter(request, response)
             return
         } catch (e: MalformedJwtException) {
@@ -82,6 +81,6 @@ class JwtAuthenticationFilter(
     private fun sendError(response: HttpServletResponse, message: String?) {
         response.status = HttpStatus.UNAUTHORIZED.value()
         response.contentType = "application/json"
-        response.writer.write("""{"error": "$message", "timestamp": "${Instant.now()}"}""")
+        response.writer.write("error: $message, timestamp: ${Instant.now()}")
     }
 }

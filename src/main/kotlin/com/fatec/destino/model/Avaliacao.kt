@@ -17,22 +17,22 @@ import java.util.*
 @Table(name = "ava_avaliacao")
 class Avaliacao (
     @Column(name = "AVA_NOTA", nullable = false)
-    var nota: Int = 0,
+    var nota: Int,
 
     @Column(name = "AVA_COMENTARIO", length = 500, columnDefinition = "TEXT")
     var comentario: String? = null,
 
     @Column(name = "AVA_DATA", nullable = false)
-    var data: Date? = null,
+    var data: Date,
 
     // Chaves Estrangeiras (Objetos)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "USU_ID", referencedColumnName = "USU_ID", nullable = false)
-    val usuario: Usuario? = null,
+    val usuario: Usuario,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "PAC_ID", referencedColumnName = "PAC_ID", nullable = false)
-    val pacote: Pacote? = null
+    val pacote: Pacote
 ) {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

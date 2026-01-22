@@ -13,11 +13,11 @@ import com.fatec.destino.model.pacote.hotel.cidade.estado.regiao.Regiao
 import com.fatec.destino.model.pacote.transporte.Transporte
 import com.fatec.destino.model.usuario.Usuario
 import com.fatec.destino.repository.pacote.PacoteRepository
-import com.fatec.destino.repository.pacote.TransporteRepository
 import com.fatec.destino.repository.pacote.hotel.HotelRepository
 import com.fatec.destino.repository.pacote.hotel.local.CidadeRepository
 import com.fatec.destino.repository.pacote.hotel.local.EstadoRepository
 import com.fatec.destino.repository.pacote.hotel.local.RegiaoRepository
+import com.fatec.destino.repository.pacote.transporte.TransporteRepository
 import com.fatec.destino.repository.usuario.AvaliacaoRepository
 import com.fatec.destino.repository.usuario.CompraRepository
 import com.fatec.destino.repository.usuario.UsuarioRepository
@@ -197,7 +197,7 @@ class DataInitializer(
     private fun criarUsuarioSeNaoExistir(nome: String, sobreNome: String, cpf: String, email: String,
                                          telefone: String, senhaPlana: String, perfil: UserRole, valido: Boolean) {
         runCatching {
-            if (usuarioRepository.findByEmail(email).isEmpty) {
+            if (usuarioRepository.findByEmail(email) == null) {
                 val telObj = Telefone(telefone)
                 val senhaHasheada = passwordEncoder.encode(senhaPlana).toString()
 
@@ -277,7 +277,7 @@ class DataInitializer(
     }
 
     private fun criarPacotesFicticios(vezes: Int, transporte: Transporte) {
-        val funcionario = usuarioRepository.findByEmail("funcionario@destino.com").orElseGet {
+        val funcionario = usuarioRepository.findByEmail("funcionario@destino.com") ?: {
             usuarioRepository.findAll().firstOrNull()
         } ?: return
 
@@ -293,17 +293,17 @@ class DataInitializer(
     }
 
     private fun gerarAvaliacoesParaPacote(pacote: Pacote, usuarios: List<Usuario>) {
-        if (pacote.fim?.isAfter(LocalDate.now()) ?: return) return
+        if (pacote.fim.isAfter(LocalDate.now()) ?: return) return
 
         val random = Random()
         val sorteados = usuarios.shuffled().take(1 + random.nextInt(minOf(10, usuarios.size)))
 
         sorteados.forEach { usuario ->
-            if (compraRepository.findByUsuarioAndPacote(usuario, pacote).isEmpty) {
+            if (compraRepository.findByUsuarioAndPacote(usuario, pacote) == null) {
                 compraRepository.save(Compra(
                     usuario = usuario,
                     pacote = pacote,
-                    dataCompra = Date.valueOf(pacote.inicio?.minusDays(15L + random.nextInt(30))),
+                    dataCompra = Date.valueOf(pacote.inicio.minusDays(15L + random.nextInt(30))),
                     metodo = Metodo.VISTA,
                     processadorPagamento = Processador.PIX,
                     parcelas = 1,
@@ -312,7 +312,7 @@ class DataInitializer(
                 ))
             }
 
-            if (avaliacaoRepository.findByUsuarioAndPacote(usuario, pacote).isEmpty) {
+            if (avaliacaoRepository.findByUsuarioAndPacote(usuario, pacote) == null) {
                 avaliacaoRepository.save(criarAvaliacaoAleatoria(usuario, pacote, random))
             }
         }
@@ -331,7 +331,7 @@ class DataInitializer(
             pacote = pacote,
             nota = nota,
             comentario = comentario,
-            data = Date.valueOf(pacote.fim?.plusDays(1L + random.nextInt(5)))
+            data = Date.valueOf(pacote.fim.plusDays(1L + random.nextInt(5)))
         )
     }
 }

@@ -9,12 +9,12 @@ import java.util.UUID
 data class ViagemResumoDTO(
     val id: UUID?,
     val pacoteId: Long?,
-    val nomePacote: String,
+    val nomePacote: String?,
     val descricao: String?,
-    val valor: BigDecimal,
-    val statusCompra: StatusCompra,
-    val dataPartida: LocalDate,
-    val dataRetorno: LocalDate,
+    val valor: BigDecimal?,
+    val statusCompra: StatusCompra?,
+    val dataPartida: LocalDate?,
+    val dataRetorno: LocalDate?,
     val imagemCapa: String?,
     val cidade: Cidade?,
     val estado: String?

@@ -21,10 +21,10 @@ class JwtService(@Value("\${security.jwt.secret-key:#{null}}") secret: String?) 
     }
 
     private fun pegarChave(secret: String?): Key {
-        if (secret == null || secret.isEmpty()) {
+        if (secret.isNullOrEmpty()) {
             val key: Key = Jwts.SIG.HS512.key().build()
             val encoder = Base64.getUrlEncoder().withoutPadding()
-            println("🔑 Chave secreta gerada: " + encoder.encodeToString(key.getEncoded()))
+            println("🔑 Chave secreta gerada: " + encoder.encodeToString(key.encoded))
             return key
         } else {
             println("🔑 Chave secreta encontrada nas configurações")
@@ -37,7 +37,7 @@ class JwtService(@Value("\${security.jwt.secret-key:#{null}}") secret: String?) 
         expiration: Long
     ): String? {
         val authorities = usuario.getAuthorities().stream()
-            .map<String?> { obj: GrantedAuthority? -> obj!!.getAuthority() }
+            .map<String?> { obj: GrantedAuthority? -> obj!!.authority }
             .toList()
 
         return Jwts

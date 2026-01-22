@@ -44,11 +44,11 @@ class AuthenticationService(
             return UsuarioRegistrationResponseDto(true, "A senha não atende aos requisitos de segurança.")
         }
 
-        if (userRepository.findByCpf(dados.cpf).isPresent) {
+        if (userRepository.findByCpf(dados.cpf) == null) {
             return UsuarioRegistrationResponseDto(true, "Erro: CPF já cadastrado.")
         }
 
-        if (userRepository.findByEmail(dados.email).isPresent) {
+        if (userRepository.findByEmail(dados.email) == null) {
             return UsuarioRegistrationResponseDto(true, "Erro: Email já está em uso.")
         }
 

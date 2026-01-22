@@ -1,6 +1,7 @@
 package com.fatec.destino.model.pacote
 
 import com.fasterxml.jackson.annotation.JsonFormat
+import com.fatec.destino.dto.pacote.PacoteRegistroDTO
 import com.fatec.destino.model.pacote.hotel.Hotel
 import com.fatec.destino.model.pacote.pacoteFoto.PacoteFoto
 import com.fatec.destino.model.pacote.transporte.Transporte
@@ -20,6 +21,7 @@ import jakarta.persistence.ManyToOne
 import jakarta.persistence.Table
 import java.math.BigDecimal
 import java.time.LocalDate
+import java.time.temporal.ChronoUnit
 
 @Entity
 @Table(name = "pac_pacote")
@@ -28,11 +30,11 @@ class Pacote (
     var nome: String,
 
     @Column(name = "PAC_DESCRICAO", nullable = false, columnDefinition = "TEXT")
-    var descricao: String?,
+    var descricao: String,
 
     @Column(name = "PAC_ITENS")
     @Convert(converter = StringListConverter::class)
-    var tags: ArrayList<String?>? = null,
+    var tags: ArrayList<String>? = null,
 
     @Column(name = "PAC_PRECO", precision = 10, scale = 2, nullable = false)
     var preco: BigDecimal,
@@ -73,6 +75,44 @@ class Pacote (
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "PAC_ID", nullable = false)
     var id: Long? = null
+
+    fun atualizarDados(
+        dto: PacoteRegistroDTO,
+        hotel: Hotel,
+        transporte: Transporte,
+        funcionario: Usuario,
+        foto: PacoteFoto?
+    ) {
+        // Regra de Negócio: Validar preço antes de atribuir
+        val dias = ChronoUnit.DAYS.between(dto.inicio, dto.fim).coerceAtLeast(1).toBigDecimal()
+        val custoMinimo = (hotel.diaria.toBigDecimal() * dias) + transporte.preco.toBigDecimal()
+
+        if (dto.preco < custoMinimo) {
+            throw IllegalArgumentException("Preço insuficiente! O custo base é $custoMinimo")
+        }
+
+        // Se passar na validação, atribui os valores
+        this.nome = dto.nome
+        this.descricao = dto.descricao
+        this.preco = dto.preco
+        this.inicio = dto.inicio
+        this.fim = dto.fim
+        this.hotel = hotel
+        this.transporte = transporte
+        this.funcionario = funcionario
+        this.fotosDoPacote = foto
+
+        // A própria classe decide o status
+        recalcularStatus()
+    }
+
+    private fun recalcularStatus() {
+        this.status = when {
+            this.status == PacoteStatus.CANCELADO -> PacoteStatus.CANCELADO
+            this.fim.isBefore(LocalDate.now()) -> PacoteStatus.CONCLUIDO
+            else -> PacoteStatus.EMANDAMENTO
+        }
+    }
 
     val precoFormatado: String
         get() = String.format("%.2f", preco)

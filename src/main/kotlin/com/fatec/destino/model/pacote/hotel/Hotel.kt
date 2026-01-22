@@ -15,7 +15,7 @@ import jakarta.persistence.Table
 @Table(name = "hot_hotel")
 class Hotel(
     @Column(name = "HOT_NOME", length = 50, nullable = false)
-    var nome: String? = null,
+    var nome: HotelRegistroDTO = null,
 
     @Column(name = "HOT_ENDERECO", length = 100, nullable = false)
     var endereco: String? = null,
