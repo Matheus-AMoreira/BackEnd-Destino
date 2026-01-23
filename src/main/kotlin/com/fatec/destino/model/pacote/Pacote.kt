@@ -87,14 +87,14 @@ class Pacote (
         val dias = ChronoUnit.DAYS.between(dto.inicio, dto.fim).coerceAtLeast(1).toBigDecimal()
         val custoMinimo = (hotel.diaria.toBigDecimal() * dias) + transporte.preco.toBigDecimal()
 
-        if (dto.preco < custoMinimo) {
+        if (dto.preco.toBigDecimal() < custoMinimo) {
             throw IllegalArgumentException("Preço insuficiente! O custo base é $custoMinimo")
         }
 
         // Se passar na validação, atribui os valores
         this.nome = dto.nome
         this.descricao = dto.descricao
-        this.preco = dto.preco
+        this.preco = dto.preco.toBigDecimal()
         this.inicio = dto.inicio
         this.fim = dto.fim
         this.hotel = hotel

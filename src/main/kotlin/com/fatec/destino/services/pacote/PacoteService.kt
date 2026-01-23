@@ -3,26 +3,18 @@ package com.fatec.destino.services.pacote
 import com.fatec.destino.dto.pacote.PacoteRegistroDTO
 import com.fatec.destino.dto.pacote.PacoteResponseDTO
 import com.fatec.destino.model.pacote.Pacote
-import com.fatec.destino.model.pacote.pacoteFoto.PacoteFoto
-import com.fatec.destino.model.pacote.transporte.Transporte
 import com.fatec.destino.repository.pacote.PacoteFotoRepository.PacoteFotoRepository
 import com.fatec.destino.repository.pacote.PacoteRepository
 import com.fatec.destino.repository.pacote.hotel.HotelRepository
 import com.fatec.destino.repository.pacote.transporte.TransporteRepository
 import com.fatec.destino.repository.usuario.UsuarioRepository
-import com.fatec.destino.util.model.pacote.PacoteStatus
 import jakarta.transaction.Transactional
-import lombok.AllArgsConstructor
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
-import java.time.LocalDate
-import java.time.temporal.ChronoUnit
-import java.util.function.Function
-import java.util.function.Supplier
-import java.util.stream.Collectors
+import kotlin.String
 
 @Service
 class PacoteService(
@@ -65,26 +57,44 @@ class PacoteService(
     }
 
     @Transactional
-    fun salvarOuAtualizar(dto: PacoteRegistroDTO, id: Long? = null): ResponseEntity<String> {
-        val pacote = id?.let {
-            pacoteRepository.findById(it).orElseThrow { ResponseStatusException(HttpStatus.NOT_FOUND) }
-        } ?: Pacote()
-
-        // O Service foca na infraestrutura (buscar no banco)
-        val hotel = hotelRepository.findById(dto.hotel).orElseThrow { ... }
-        val transporte = transporteRepository.findById(dto.transporte).orElseThrow { ... }
-        val funcionario = usuarioRepository.findById(dto.funcionario).orElseThrow { ... }
-        val foto = pacoteFotoRepository.findById(dto.pacoteFoto).orElse(null)
-
-        try {
-            // O Pacote garante a própria regra de negócio
-            pacote.atualizarDados(dto, hotel, transporte, funcionario, foto)
-            pacoteRepository.save(pacote)
-        } catch (e: IllegalArgumentException) {
-            return ResponseEntity.badRequest().body(e.message)
+    fun salvarOuAtualizar(dto: PacoteRegistroDTO, id: Long?): ResponseEntity<String> {
+        // 1. Resolvemos a entidade (Ou buscamos no banco ou criamos uma nova)
+        val pacote = if (id != null) {
+            pacoteRepository.findById(id).orElseThrow {
+                NoSuchElementException("Pacote com ID $id não encontrado")
+            }
+        } else {
+            // Se o ID for nulo, instanciamos um pacote novo com dados iniciais obrigatórios
+            // Aqui você precisará buscar as referências de Hotel, Transporte, etc., via ID do DTO
+            Pacote(
+                nome = dto.nome,
+                descricao = dto.descricao,
+                preco = dto.preco.toBigDecimal(),
+                inicio = dto.inicio,
+                fim = dto.fim,
+                transporte = transporteRepository.findById(dto.transporte).get(),
+                hotel = hotelRepository.findById(dto.hotel).get(),
+                funcionario = usuarioRepository.findById(dto.funcionario).get()
+            )
         }
 
-        return ResponseEntity.ok("Pacote processado com sucesso!")
+        // 2. Se for uma atualização (ID != null), chamamos seu método de negócio
+        if (id != null) {
+            // Busque as dependências necessárias para o método atualizarDados
+            val hotel = hotelRepository.findById(dto.hotel).get()
+            val transporte = transporteRepository.findById(dto.transporte).get()
+            val funcionario = usuarioRepository.findById(dto.funcionario).get()
+            val foto = dto.pacoteFoto.let { pacoteFotoRepository.findById(it).orElse(null) }
+
+            // Chama a lógica que você já criou dentro da Entity
+            pacote.atualizarDados(dto, hotel, transporte, funcionario, foto)
+        }
+
+        // 3. Salva no banco.
+        // Se o objeto 'pacote' veio do findById, ele já tem o ID preenchido e o Hibernate fará UPDATE.
+        pacoteRepository.save(pacote)
+
+        return ResponseEntity.ok("Pacote ${if (id == null) "criado" else "atualizado"} com sucesso!")
     }
 
     fun pegarPacotePorId(id: Long): ResponseEntity<Pacote> {
@@ -98,6 +108,6 @@ class PacoteService(
     }
 
     private fun Pacote.toResponseDTO() = PacoteResponseDTO(
-        id, nome, descricao, tags, preco, inicio, fim, disponibilidade, status, hotel, transporte, fotosDoPacote
+        id, nome, preco.toInt(), hotel.nome.nome(), transporte.empresa.toString()
     )
 }
