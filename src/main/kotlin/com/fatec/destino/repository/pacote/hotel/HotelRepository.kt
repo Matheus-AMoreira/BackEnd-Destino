@@ -8,20 +8,20 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface HotelRepository : JpaRepository<Hotel, Long> {
-    fun findByCidadeId(cidadeId: Long?): MutableList<Hotel?>?
+    fun findByCidadeId(cidadeId: Long): List<Hotel>
 
     @Query("SELECT h FROM Hotel h WHERE h.id = :id")
-    fun findHotelById(@Param("id") id: Long): Hotel?
+    fun findHotelById(@Param("id") id: Long): Hotel? // Único que pode ser nulo (unitário)
 
     @Query("SELECT h.diaria FROM Hotel h WHERE h.id = :id")
     fun findDiariaPorId(@Param("id") id: Long): Int
 
     @Query("SELECT h FROM Hotel h WHERE h.cidade.estado.id = :estadoId")
-    fun findByEstadoId(estadoId: Long?): MutableList<Hotel?>?
+    fun findByEstadoId(estadoId: Long): List<Hotel>
 
     @Query("SELECT h FROM Hotel h WHERE h.cidade.estado.regiao.id = :regiaoId")
-    fun findByRegiaoId(regiaoId: Long?): MutableList<Hotel?>?
+    fun findByRegiaoId(regiaoId: Long): List<Hotel>
 
     @Query("SELECT h FROM Hotel h WHERE h.cidade.estado.regiao.nome = :regiaoNome")
-    fun findByCidadeEstadoRegiaoNome(regiao: String?): MutableList<Hotel?>?
+    fun findByCidadeEstadoRegiaoNome(regiaoNome: String): List<Hotel>
 }

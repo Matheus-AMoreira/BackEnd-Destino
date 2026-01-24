@@ -22,10 +22,11 @@ class PacoteFoto (
 
     @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true)
     @JoinColumn(name = "PCF_ID")
-    var fotos: MutableSet<Foto?>? = HashSet<Foto?>()
+    var fotos: HashSet<Foto?>
 ){
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "PCF_ID", nullable = false)
     var id: Long? = null
+
 }

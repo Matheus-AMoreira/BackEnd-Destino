@@ -3,7 +3,7 @@ package com.fatec.destino.services.pacote
 import com.fatec.destino.dto.pacote.PacoteRegistroDTO
 import com.fatec.destino.dto.pacote.PacoteResponseDTO
 import com.fatec.destino.model.pacote.Pacote
-import com.fatec.destino.repository.pacote.PacoteFotoRepository.PacoteFotoRepository
+import com.fatec.destino.repository.pacote.pacoteFotoRepository.PacoteFotoRepository
 import com.fatec.destino.repository.pacote.PacoteRepository
 import com.fatec.destino.repository.pacote.hotel.HotelRepository
 import com.fatec.destino.repository.pacote.transporte.TransporteRepository
@@ -108,6 +108,6 @@ class PacoteService(
     }
 
     private fun Pacote.toResponseDTO() = PacoteResponseDTO(
-        id, nome, preco.toInt(), hotel.nome.nome(), transporte.empresa.toString()
+        id, nome, preco.toInt(), hotel.cidade.nome, transporte.empresa.toString()
     )
 }

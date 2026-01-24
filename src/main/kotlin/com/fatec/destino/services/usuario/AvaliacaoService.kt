@@ -8,6 +8,7 @@ import com.fatec.destino.repository.usuario.AvaliacaoRepository
 import com.fatec.destino.repository.usuario.CompraRepository
 import com.fatec.destino.repository.usuario.UsuarioRepository
 import jakarta.transaction.Transactional
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 import java.util.*
@@ -22,27 +23,23 @@ class AvaliacaoService(
 ) {
     @Transactional
     fun avaliarPacote(dto: AvaliacaoRegistroDTO): Avaliacao {
-        val usuario = usuarioRepository.findById(dto.usuarioId)
-            .orElseThrow<RuntimeException?>(Supplier { RuntimeException("Usuário não encontrado") })
+        val usuario = usuarioRepository.findByIdOrNull(dto.usuarioId)
+            ?: throw RuntimeException("Usuário não encontrado")
 
-        val pacote = pacoteRepository.findById(dto.pacoteId)
-            .orElseThrow<RuntimeException?>(Supplier { RuntimeException("Pacote não encontrado") })
+        val pacote = pacoteRepository.findByIdOrNull(dto.pacoteId)
+            ?: throw RuntimeException("Pacote não encontrado")
 
         // 1. Verifica se o usuário comprou o pacote
-        val comprou = compraRepository.findAllByUsuarioId(usuario.id)!!.stream()
-            .anyMatch { compra: Compra? -> compra?.pacote?.id === pacote.id }
+        val comprou = compraRepository.findAllByUsuarioId(usuario.id)?.any {
+                compra -> compra?.pacote?.id == pacote.id
+        } ?: false
 
         if (!comprou) {
             throw RuntimeException("Você não pode avaliar um pacote que não comprou.")
         }
 
-        // 2. Verifica se a viagem já aconteceu (Opcional, mas recomendado)
-        if (pacote.fim.isAfter(LocalDate.now())) {
-            // throw new RuntimeException("Você só pode avaliar após o término da viagem.");
-        }
-
         // 3. Verifica duplicidade (criação)
-        if (avaliacaoRepository.findByUsuarioAndPacote(usuario, pacote)!!.isPresent()) {
+        if (avaliacaoRepository.findByUsuarioAndPacote(usuario, pacote)?.isPresent == true) {
             throw RuntimeException("Você já avaliou este pacote. Use a função de editar.")
         }
 
@@ -54,7 +51,7 @@ class AvaliacaoService(
             data = Date()
         )
 
-        return avaliacaoRepository.save<Avaliacao?>(avaliacao)!!
+        return avaliacaoRepository.save(avaliacao)
     }
 
     @Transactional
@@ -69,9 +66,9 @@ class AvaliacaoService(
 
         avaliacao.nota = validarNota(dto.nota)
         avaliacao.comentario = dto.comentario
-        avaliacao.data = Date() // Atualiza data para a da edição
+        avaliacao.data = Date()
 
-        return avaliacaoRepository.save<Avaliacao?>(avaliacao)!!
+        return avaliacaoRepository.save(avaliacao)!!
     }
 
     @Transactional
@@ -87,8 +84,6 @@ class AvaliacaoService(
     }
 
     private fun validarNota(nota: Int): Int {
-        if (nota < 1) return 1
-        if (nota > 5) return 5
-        return nota
+        return nota.coerceIn(1, 5)
     }
 }

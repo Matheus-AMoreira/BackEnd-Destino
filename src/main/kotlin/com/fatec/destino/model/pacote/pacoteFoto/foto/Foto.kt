@@ -20,4 +20,5 @@ class Foto (
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "FOT_ID", nullable = false)
     var id: Long? = null
+
 }

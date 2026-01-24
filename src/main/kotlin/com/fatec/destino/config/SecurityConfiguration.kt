@@ -31,33 +31,44 @@ class SecurityConfiguration(
 
     @Bean
     fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
+        http.authorizeHttpRequests {
+            it.requestMatchers("/v3/api-docs/**", "/swagger-ui/**").permitAll()
+        }
         http {
             cors { configurationSource = corsConfigurationSource() }
             csrf { disable() }
             sessionManagement { sessionCreationPolicy = SessionCreationPolicy.STATELESS }
             formLogin { disable() }
 
+            // Adiciona o filtro JWT antes do filtro de autenticação básica
             addFilterBefore<BasicAuthenticationFilter>(jwtAuthenticationFilter)
 
             authorizeHttpRequests {
-                // Swagger
-                authorize("/swagger-ui/**", permitAll)
+                // 1. Swagger (Sempre primeiro)
                 authorize("/v3/api-docs/**", permitAll)
+                authorize("/v3/api-docs.yaml", permitAll)
+                authorize("/swagger-ui/**", permitAll)
+                authorize("/swagger-ui.html", permitAll)
+                authorize("/swagger-resources/**", permitAll)
+                authorize("/webjars/**", permitAll)
 
-                // Endpoints Públicos
-                authorize("/api/compra/**", permitAll)
-                authorize("/api/test/publico/**", permitAll)
-                authorize("/api/publico/pacote/**", permitAll)
-
-                // AuthController
+                // 2. AuthController (Rotas públicas de autenticação)
                 authorize("/api/auth/cadastrar", permitAll)
                 authorize("/api/auth/entrar", permitAll)
                 authorize("/api/auth/renovar-token", permitAll)
                 authorize("/api/auth/sair", permitAll)
 
-                // Roles Específicas
+                // 3. Endpoints Públicos de Negócio
+                authorize("/api/test/publico/**", permitAll)
+                authorize("/api/publico/pacote/**", permitAll)
+
+                // Nota: Removi /api/compra/** do permitAll pois você a definiu
+                // logo abaixo como restrita ao ROLE_USUARIO
+
+                // 4. Roles Específicas
                 authorize("/api/compra/**", hasRole("USUARIO"))
 
+                // 5. Rotas para funcionários (Hierarquia)
                 listOf(
                     "/api/pacote/**",
                     "/api/pacote/{id}",
@@ -69,10 +80,11 @@ class SecurityConfiguration(
                     "/api/pacote-foto/**"
                 ).forEach { path -> authorize(path, hasRole("FUNCIONARIO")) }
 
-                // Endpoints Protegidos
+                // 6. Endpoints Protegidos Genéricos
                 authorize("/api/usuario/**", authenticated)
                 authorize("/api/test/privado/**", authenticated)
 
+                // 7. Qualquer outra requisição
                 authorize(anyRequest, authenticated)
             }
         }
@@ -105,8 +117,7 @@ class SecurityConfiguration(
 
     @Bean
     fun userDetailsService(): UserDetailsService = UserDetailsService { email ->
-        userRepository.findByEmail(email)
-            .orElseThrow { UsernameNotFoundException("Email não encontrado: $email") }
+        userRepository.findByEmail(email) ?: throw RuntimeException("Usuário não encontrado")
     }
 
     @Bean

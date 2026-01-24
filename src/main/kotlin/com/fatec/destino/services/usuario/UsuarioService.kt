@@ -5,43 +5,45 @@ import com.fatec.destino.dto.usuario.UsuarioDTO
 import com.fatec.destino.model.usuario.Usuario
 import com.fatec.destino.repository.usuario.UsuarioRepository
 import jakarta.transaction.Transactional
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 import java.util.*
 
 @Service
 class UsuarioService(private val userRepository: UsuarioRepository) {
-    fun buscarUsuarios(): Iterable<Usuario?> {
-        return userRepository.findAll()
+    fun buscarUsuarios(): List<Usuario?> {
+        return userRepository.findAll().orEmpty()
     }
 
-    fun inValidUsers(): ResponseEntity<MutableList<UsuarioDTO?>?> {
-        val usuarios = userRepository.findByValidoFalse()
-        val users = usuarios!!.stream().map<UsuarioDTO?> { usuario: Usuario? ->
+    fun inValidUsers(): ResponseEntity<List<UsuarioDTO>> {
+        val usuarios = userRepository.findByValidoFalse() ?: emptyList()
+
+        val dtos = usuarios.filterNotNull().map { u ->
             UsuarioDTO(
-                usuario!!.id.toString(),
-                usuario.nome + " " + usuario.sobreNome,
-                usuario.cpf.getValorFormatado(),
-                usuario.email,
-                usuario.telefone!!.valorFormatado,
-                usuario.perfil.name,
-                if (usuario.valido == true) "Sim" else "Não",
-                usuario.cadastro
+                u.id.toString(),
+                "${u.nome} ${u.sobreNome}",
+                u.cpf.getvalorFormatado(),
+                u.email,
+                u.telefone?.valorFormatado,
+                u.perfil.name,
+                if (u.valido) "Sim" else "Não",
+                u.cadastro
             )
-        }.toList()
-        return ResponseEntity.ok().body<MutableList<UsuarioDTO?>?>(users)
+        }
+        return ResponseEntity.ok(dtos)
     }
 
     @Transactional
-    fun validar(id: UUID?): ResponseEntity<ValidarResponseDTO?> {
+    fun validar(id: UUID): ResponseEntity<ValidarResponseDTO> {
         val linhasAfetadas = userRepository.validarUsuario(id)
 
         if (linhasAfetadas == 0) {
             return ResponseEntity.ok()
-                .body<ValidarResponseDTO?>(ValidarResponseDTO(true, "Não existe usuario com id: " + id))
+                .body(ValidarResponseDTO(true, "Não existe usuario com id: $id"))
         }
 
         return ResponseEntity.ok()
-            .body<ValidarResponseDTO?>(ValidarResponseDTO(false, "Usuário atualizado com sucesso!"))
+            .body(ValidarResponseDTO(false, "Usuário atualizado com sucesso!"))
     }
 }

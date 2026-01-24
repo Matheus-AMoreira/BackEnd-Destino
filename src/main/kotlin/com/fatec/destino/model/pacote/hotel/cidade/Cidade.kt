@@ -14,12 +14,12 @@ import jakarta.validation.constraints.NotNull
 class Cidade (
     @Id
     @Column(name = "cid_id", nullable = false)
-    var id: Long? = null,
+    var id: Long,
 
     @Column(name = "cid_nome", length = 40, nullable = false)
-    var nome: String? = null,
+    var nome: String,
 
     @ManyToOne
     @JoinColumn(name = "est_id", nullable = false)
-    var estado: @NotNull Estado? = null
-) { }
+    var estado: Estado
+)

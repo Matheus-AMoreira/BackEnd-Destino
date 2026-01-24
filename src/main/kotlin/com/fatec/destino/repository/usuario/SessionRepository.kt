@@ -11,7 +11,7 @@ import java.util.*
 
 @Repository
 interface SessionRepository : JpaRepository<SessionToken, String> {
-    fun findByToken(token: String?): Optional<SessionToken?>?
+    fun findByToken(token: String?): SessionToken?
 
     @Modifying
     @Transactional

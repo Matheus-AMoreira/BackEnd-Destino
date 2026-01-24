@@ -1,12 +1,12 @@
 package com.fatec.destino.services.auth
 
 import com.fatec.destino.dto.auth.login.LoginResponseDTO
-import com.fatec.destino.dto.auth.login.LoginUsuarioDto
+import com.fatec.destino.dto.auth.login.LoginUsuarioDTO
 import com.fatec.destino.dto.auth.registro.UsuarioRegistrationResponseDto
 import com.fatec.destino.dto.auth.registro.UsuarioRegistroDTO
 import com.fatec.destino.model.usuario.SessionToken
 import com.fatec.destino.model.usuario.Usuario
-import com.fatec.destino.repository.auth.SessionRepository
+import com.fatec.destino.repository.usuario.SessionRepository
 import com.fatec.destino.repository.usuario.UsuarioRepository
 import com.fatec.destino.util.model.usuario.senha.SenhaValidator
 import jakarta.servlet.http.HttpServletResponse
@@ -69,7 +69,7 @@ class AuthenticationService(
         }
     }
 
-    fun realizarLogin(dadosLogin: LoginUsuarioDto, response: HttpServletResponse): LoginResponseDTO {
+    fun realizarLogin(dadosLogin: LoginUsuarioDTO, response: HttpServletResponse): LoginResponseDTO {
         try {
             val authentication: Authentication = authenticationManager.authenticate(
                 UsernamePasswordAuthenticationToken(dadosLogin.email, dadosLogin.senha)
@@ -181,12 +181,11 @@ class AuthenticationService(
 
     @Transactional
     fun realizarLogout(tokenSessao: String, response: HttpServletResponse) {
+        val session = sessionRepository.findByToken(tokenSessao)
 
-        val session  = sessionRepository.findByToken(tokenSessao)
-        if (session  == null){
-            sessionRepository.deleteUserSessionToken(session )
+        if (session != null) {
+            sessionRepository.deleteUserSessionToken(session.usuario.id)
         }
-
         limparCookie(response)
     }
 }

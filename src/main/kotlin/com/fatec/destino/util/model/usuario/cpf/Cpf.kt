@@ -4,34 +4,39 @@ import java.io.Serializable
 
 class Cpf(dbData: String) : Serializable {
 
-    private var Valor: String? = null
+    private var valor: String? = null
+
+    init {
+        require(isCpfvalido(dbData)) { "CPF fornecido é inválido." }
+        this.valor = dbData
+    }
 
     fun Cpf(cpf: String) {
-        require(isCpfValido(cpf)) { "CPF fornecido é inválido." }
+        require(isCpfvalido(cpf)) { "CPF fornecido é inválido." }
 
-        Valor = cpf
+        valor = cpf
     }
 
-    fun getValorPuro(): String? {
-        return Valor
+    fun getvalorPuro(): String? {
+        return valor
     }
 
-    fun getValorFormatado(): String? {
-        if (Valor == null || Valor!!.length != 11) {
-            return Valor
+    fun getvalorFormatado(): String? {
+        if (valor == null || valor!!.length != 11) {
+            return valor
         }
-        return Valor!!.substring(0, 3) + "." +
-                Valor!!.substring(3, 6) + "." +
-                Valor!!.substring(6, 9) + "-" +
-                Valor!!.substring(9, 11)
+        return valor!!.substring(0, 3) + "." +
+                valor!!.substring(3, 6) + "." +
+                valor!!.substring(6, 9) + "-" +
+                valor!!.substring(9, 11)
     }
 
-    private fun isCpfValido(cpf: String): Boolean {
+    private fun isCpfvalido(cpf: String): Boolean {
         if (cpf.length != 11) {
             return false
         }
 
-        // Verifica sequências repetidas
+        // verifica sequências repetidas
         if (isSequenciaRepetida(cpf)) {
             return false
         }
@@ -69,8 +74,8 @@ class Cpf(dbData: String) : Serializable {
             peso--
         }
 
-        val digitoVerificador = 11 - (soma % 11)
+        val digitoverificador = 11 - (soma % 11)
 
-        return if (digitoVerificador >= 10) 0 else digitoVerificador
+        return if (digitoverificador >= 10) 0 else digitoverificador
     }
 }

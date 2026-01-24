@@ -19,5 +19,5 @@ interface UsuarioRepository : JpaRepository<Usuario, UUID> {
 
     @Modifying
     @Query("UPDATE Usuario u SET u.valido = true WHERE u.id = :id")
-    fun validarUsuario(@Param("id") id: UUID): Int
+    fun validarUsuario(@Param("id") id: UUID?): Int
 }

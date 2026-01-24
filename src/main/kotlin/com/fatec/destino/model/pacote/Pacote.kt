@@ -34,7 +34,7 @@ class Pacote (
 
     @Column(name = "PAC_ITENS")
     @Convert(converter = StringListConverter::class)
-    var tags: ArrayList<String>? = null,
+    var tags: List<String>? = emptyList(),
 
     @Column(name = "PAC_PRECO", precision = 10, scale = 2, nullable = false)
     var preco: BigDecimal,

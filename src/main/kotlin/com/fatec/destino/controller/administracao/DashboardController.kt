@@ -16,28 +16,25 @@ import java.time.LocalDate
 class DashboardController(
     private val dashboardService: DashboardService
 ) {
-    @get:GetMapping("/status-viagem")
-    val statusViagem: ResponseEntity<MutableList<ChartDataDTO?>?>
-        get() = ResponseEntity.ok<MutableList<ChartDataDTO?>?>(dashboardService.getTransporteDistribution() as MutableList<ChartDataDTO?>?)
+    @GetMapping("/status-viagem")
+    fun statusViagem(): ResponseEntity<List<ChartDataDTO>> {
+        return ResponseEntity.ok(dashboardService.getStatusDistribution())
+    }
 
-    @get:GetMapping("/transporte-stats")
-    val transporteStats: ResponseEntity<MutableList<ChartDataDTO?>?>
-        get() = ResponseEntity.ok<MutableList<ChartDataDTO?>?>(dashboardService.getTransporteDistribution() as MutableList<ChartDataDTO?>?)
+    @GetMapping("/transporte-stats")
+    fun transporteStats(): ResponseEntity<List<ChartDataDTO>> {
+        return ResponseEntity.ok(dashboardService.getTransporteDistribution())
+    }
 
     @GetMapping("/viagens/mensais")
-    fun getViagensMensais(
-        @RequestParam(name = "ano", required = false) ano: Int?
-    ): ResponseEntity<MutableList<ChartDataDTO?>?> {
-        // Se não vier ano na requisição, usa o ano atual do servidor
-        val anoFiltro = if (ano != null) ano else LocalDate.now().getYear()
-        return ResponseEntity.ok<MutableList<ChartDataDTO?>?>(dashboardService.getViagensConcluidasPorMes(anoFiltro) as MutableList<ChartDataDTO?>?)
+    fun getViagensMensais(@RequestParam(name = "ano", required = false) ano: Int?): ResponseEntity<List<ChartDataDTO>> {
+        val anoFiltro = ano ?: LocalDate.now().year
+        return ResponseEntity.ok(dashboardService.getViagensConcluidasPorMes(anoFiltro))
     }
 
     @GetMapping("/viagens/vendidos")
-    fun getComprasMensais(
-        @RequestParam(name = "ano", required = false) ano: Int?
-    ): ResponseEntity<MutableList<ChartDataDTO?>?> {
-        val anoFiltro = if (ano != null) ano else LocalDate.now().getYear()
-        return ResponseEntity.ok<MutableList<ChartDataDTO?>?>(dashboardService.getComprasPorMes(anoFiltro) as MutableList<ChartDataDTO?>?)
+    fun getComprasMensais(@RequestParam(name = "ano", required = false) ano: Int?): ResponseEntity<List<ChartDataDTO>> {
+        val anoFiltro = ano ?: LocalDate.now().year
+        return ResponseEntity.ok(dashboardService.getComprasPorMes(anoFiltro))
     }
 }

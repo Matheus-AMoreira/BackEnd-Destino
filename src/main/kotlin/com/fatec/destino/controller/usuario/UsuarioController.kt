@@ -20,17 +20,20 @@ class UsuarioController(
     private val usuarioService: UsuarioService
 ) {
     @GetMapping("/invalidos")
-    fun inValiduser(): ResponseEntity<MutableList<UsuarioDTO?>?> {
+    fun inValiduser(): ResponseEntity<List<UsuarioDTO>> {
         return usuarioService.inValidUsers()
     }
 
     @PatchMapping("/validar/{id}")
-    fun validUser(@PathVariable id: UUID?): ResponseEntity<ValidarResponseDTO?> {
+    fun validUser(@PathVariable id: UUID?): ResponseEntity<ValidarResponseDTO> {
+        if (id == null) {
+            return ResponseEntity.badRequest().body(ValidarResponseDTO(true, "Precisa enviar um id"))
+        }
         return usuarioService.validar(id)
     }
 
     @GetMapping
-    fun buscarUsuarios(): ResponseEntity<Iterable<Usuario?>?> {
-        return ResponseEntity.ok().body<Iterable<Usuario?>?>(usuarioService.buscarUsuarios())
+    fun buscarUsuarios(): ResponseEntity<List<Usuario?>> {
+        return ResponseEntity.ok().body(usuarioService.buscarUsuarios())
     }
 }

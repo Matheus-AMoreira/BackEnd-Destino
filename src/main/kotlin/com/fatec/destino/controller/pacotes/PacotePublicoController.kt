@@ -15,49 +15,43 @@ import org.springframework.web.bind.annotation.RestController
 import java.math.BigDecimal
 import java.net.URLDecoder
 import java.nio.charset.StandardCharsets
+import kotlin.collections.emptyList
 
 @RestController
 @RequestMapping("/api/publico/pacote")
 class PacotePublicoController(private val pacoteService: PacoteService) {
+
     @GetMapping
     fun getPacotes(
         @RequestParam(required = false) nome: String?,
         @RequestParam(required = false) precoMax: BigDecimal?,
         @PageableDefault(page = 0, size = 12) pageable: Pageable
-    ): ResponseEntity<Page<PacoteResponseDTO?>?> {
-        return ResponseEntity.ok<Page<PacoteResponseDTO?>?>(
-            pacoteService.buscarPacotesComFiltros(
-                nome,
-                precoMax,
-                pageable
-            ) as Page<PacoteResponseDTO?>?
+    ): ResponseEntity<Page<PacoteResponseDTO>> { // Removido ? extras
+        return ResponseEntity.ok(
+            pacoteService.buscarPacotesComFiltros(nome, precoMax, pageable)
         )
     }
 
-    @get:GetMapping("/mais-vendidos")
-    val pacotesMaisVendidos: ResponseEntity<MutableList<PacoteResponseDTO?>?>
-        // Top Destinos (baseado em vendas)
-        get() {
-            val pacotes: MutableList<PacoteResponseDTO?> = pacoteService.pacotesMaisvendidos() as MutableList<PacoteResponseDTO?>
-            return ResponseEntity.ok().body<MutableList<PacoteResponseDTO?>?>(pacotes)
-        }
+    @GetMapping("/mais-vendidos")
+    fun pacotesMaisVendidos(): ResponseEntity<List<PacoteResponseDTO>> {
+        return ResponseEntity.ok(pacoteService.pacotesMaisvendidos())
+    }
 
     @GetMapping("/detalhes/{nome}")
-    fun getPacotePorNomeUrl(@PathVariable nome: String): ResponseEntity<Pacote?>? {
-        // Decodifica caso venha com caracteres especiais (espaço, acentos)
+    fun getPacotePorNomeUrl(@PathVariable nome: String): ResponseEntity<Pacote> {
         val nomeDecodificado = URLDecoder.decode(nome, StandardCharsets.UTF_8)
-        return pacoteService.pegarPacotePorNomeExato(nomeDecodificado) as ResponseEntity<Pacote?>?
+        val pacote = pacoteService.pegarPacotePorNomeExato(nomeDecodificado)
+        return if (pacote != null) ResponseEntity.ok(pacote) else ResponseEntity.notFound().build()
     }
 
     @GetMapping("/buscar/{nome}")
-    fun getPacoteName(@PathVariable nome: String): ResponseEntity<MutableList<PacoteResponseDTO?>?> {
+    fun getPacoteName(@PathVariable nome: String): ResponseEntity<List<PacoteResponseDTO>> {
         val nomeDecodificado = URLDecoder.decode(nome, StandardCharsets.UTF_8)
-        return ResponseEntity.ok()
-            .body<MutableList<PacoteResponseDTO?>?>(pacoteService.pegarPacotesPorNome(nomeDecodificado) as MutableList<PacoteResponseDTO?>?)
+        return ResponseEntity.ok(pacoteService.pegarPacotesPorNome(nomeDecodificado))
     }
 
     @GetMapping("/{id}")
-    fun getPacotePorId(@PathVariable id: Long): ResponseEntity<Pacote?> {
-        return pacoteService.pegarPacotePorId(id) as ResponseEntity<Pacote?>
+    fun getPacotePorId(@PathVariable id: Long): ResponseEntity<Pacote> {
+        return pacoteService.pegarPacotePorId(id)
     }
 }

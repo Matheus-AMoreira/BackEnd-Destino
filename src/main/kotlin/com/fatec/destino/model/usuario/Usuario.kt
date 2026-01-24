@@ -44,7 +44,7 @@ class Usuario (
 
     @JsonIgnoreProperties
     @Column(nullable = false, name = "USU_SENHA", length = 100)
-    var senha: String,
+    var senha: String?,
 
     @Column(nullable = false, name = "USU_PERFIL")
     @Enumerated(EnumType.STRING)
@@ -69,7 +69,7 @@ class Usuario (
 
     override fun getAuthorities(): Collection<GrantedAuthority> = listOfNotNull(perfil)
 
-    override fun getPassword(): String = senha
+    override fun getPassword(): String? = senha
 
     override fun getUsername(): String = email
 

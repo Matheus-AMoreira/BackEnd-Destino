@@ -19,22 +19,29 @@ interface PacoteRepository : JpaRepository<Pacote, Long> {
     fun encontrePacotes(pageable: Pageable): Page<Pacote>
 
     @Query("""
-        SELECT new com.seuprojeto.dto.PacoteResponseDTO(
-            p.id, p.nome, p.descricao, p.tags, p.preco, p.inicio, p.fim, 
-            p.disponibilidade, p.status, p.hotel, p.transporte, p.fotosDoPacote
-        ) 
+        SELECT new com.fatec.destino.dto.pacote.PacoteResponseDTO(
+        p.id, 
+        p.nome, 
+        CAST(p.preco AS int), 
+        p.hotel.nome, 
+        p.transporte.empresa
+    ) 
         FROM Pacote p WHERE p.nome = :nome
     """)
     fun procurePeloNome(nome: String): List<PacoteResponseDTO>
 
     @Query("""
-        SELECT new com.seuprojeto.dto.PacoteResponseDTO(
-            c.pacote.id, c.pacote.nome, c.pacote.descricao, c.pacote.tags, c.pacote.preco, 
-            c.pacote.inicio, c.pacote.fim, c.pacote.disponibilidade, c.pacote.status, 
-            c.pacote.hotel, c.pacote.transporte, c.pacote.fotosDoPacote
-        ) 
-        FROM Compra c GROUP BY c.pacote ORDER BY COUNT(c.pacote) DESC
-    """)
+    SELECT new com.fatec.destino.dto.pacote.PacoteResponseDTO(
+        c.pacote.id, 
+        c.pacote.nome, 
+        CAST(c.pacote.preco AS int), 
+        c.pacote.hotel.nome, 
+        c.pacote.transporte.empresa
+    ) 
+    FROM Compra c 
+    GROUP BY c.pacote.id, c.pacote.nome, c.pacote.preco, c.pacote.hotel.nome, c.pacote.transporte.empresa 
+    ORDER BY COUNT(c.pacote) DESC
+""")
     fun procuraPacotesMaisVendidos(): List<PacoteResponseDTO>
 
     @Query("SELECT p FROM Pacote p WHERE p.status IN ('EMANDAMENTO', 'CONCLUIDO') ORDER BY p.status DESC, p.inicio DESC")
