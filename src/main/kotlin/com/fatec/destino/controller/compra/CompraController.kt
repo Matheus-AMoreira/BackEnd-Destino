@@ -2,8 +2,7 @@ package com.fatec.destino.controller.compra
 
 import com.fatec.destino.dto.compra.CompraRequestDTO
 import com.fatec.destino.dto.compra.CompraResponseDTO
-import com.fatec.destino.dto.viagem.ViagemDetalhadaDTO
-import com.fatec.destino.dto.viagem.ViagemResumoDTO
+import com.fatec.destino.dto.viagem.ViagemDTO
 import com.fatec.destino.services.compra.CompraService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -20,21 +19,21 @@ import org.springframework.web.bind.annotation.RestController
 class CompraController(private val compraService: CompraService) {
 
     @GetMapping("/andamento")
-    fun listarViagensEmAndamento(): ResponseEntity<List<ViagemResumoDTO>> {
+    fun listarViagensEmAndamento(): ResponseEntity<List<ViagemDTO>> {
         val email = getEmailAutenticado() ?: return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build()
 
         return ResponseEntity.ok(compraService.listarViagensEmAndamentoDoUsuario(email))
     }
 
     @GetMapping("/concluidas")
-    fun listarViagensConcluidas(): ResponseEntity<List<ViagemResumoDTO>> {
+    fun listarViagensConcluidas(): ResponseEntity<List<ViagemDTO>> {
         val email = getEmailAutenticado() ?: return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build()
 
         return ResponseEntity.ok(compraService.listarViagensConcluidasDoUsuarios(email))
     }
 
     @GetMapping("/{id}")
-    fun detalharViagem(@PathVariable id: Long): ResponseEntity<ViagemDetalhadaDTO> {
+    fun detalharViagem(@PathVariable id: Long): ResponseEntity<ViagemDTO> {
         val email = getEmailAutenticado() ?: return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build()
 
         return try {
@@ -44,6 +43,7 @@ class CompraController(private val compraService: CompraService) {
             ResponseEntity.notFound().build()
         }
     }
+
 
     @PostMapping
     fun realizarCompra(@RequestBody dto: CompraRequestDTO): ResponseEntity<CompraResponseDTO> {

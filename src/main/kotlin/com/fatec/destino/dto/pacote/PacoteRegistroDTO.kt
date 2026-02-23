@@ -9,11 +9,9 @@ data class PacoteRegistroDTO(
     val descricao: String,
     val tags: List<String>,
     val preco: Int,
-    val inicio: LocalDate,
-    val fim: LocalDate,
-    val disponibilidade: Int,
     val transporte: Long,
     val hotel: Long,
     val pacoteFoto: Long,
     val funcionario : UUID
 )
+

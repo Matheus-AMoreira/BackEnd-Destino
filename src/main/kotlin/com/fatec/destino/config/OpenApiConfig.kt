@@ -14,9 +14,7 @@ class OpenApiConfig {
         return OpenAPI()
             .info(Info().title("Destino API").version("1.0"))
             .servers(listOf(
-                // Priorize a porta 8080 se for a que você está usando no momento
-                Server().url("http://localhost:8080").description("Servidor Local"),
-                Server().url("https://localhost:8443").description("Servidor Seguro")
+                Server().url("https://localhost:8080/swagger-ui.html").description("Servidor Local")
             ))
     }
 }

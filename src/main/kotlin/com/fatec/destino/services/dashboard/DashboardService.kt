@@ -1,10 +1,8 @@
 package com.fatec.destino.services.dashboard
 
 import com.fatec.destino.dto.dashboard.ChartDataDTO
-import com.fatec.destino.repository.pacote.PacoteRepository
+import com.fatec.destino.repository.viagem.ViagemRepository
 import com.fatec.destino.repository.usuario.CompraRepository
-import com.fatec.destino.util.model.pacote.PacoteStatus
-import com.fatec.destino.util.model.transporte.Meio
 import org.springframework.stereotype.Service
 import java.time.Month
 import java.time.format.TextStyle
@@ -12,18 +10,18 @@ import java.util.*
 
 @Service
 class DashboardService(
-    private val pacoteRepository: PacoteRepository,
+    private val viagemRepository: ViagemRepository,
     private val compraRepository: CompraRepository
 ) {
 
     fun getStatusDistribution(): List<ChartDataDTO> {
-        return pacoteRepository.countPacotesByStatus().map { result ->
+        return viagemRepository.countViagensByStatus().map { result ->
             ChartDataDTO(result.status.exibicao, result.total)
         }
     }
 
     fun getTransporteDistribution(): List<ChartDataDTO> {
-        return pacoteRepository.countPacotesByTransporteMeio().map { result ->
+        return viagemRepository.countViagensByTransporteMeio().map { result ->
             val meio = result.meio
             val count = result.total
 
@@ -32,7 +30,7 @@ class DashboardService(
     }
 
     fun getViagensConcluidasPorMes(ano: Int): List<ChartDataDTO> {
-        return pacoteRepository.countViagensConcluidasByMonth(ano).map { it ->
+        return viagemRepository.countViagensConcluidasByMonth(ano).map { it ->
             ChartDataDTO(it.mes.toString(),it.total)
         }
     }

@@ -8,6 +8,8 @@ import com.fatec.destino.repository.pacote.PacoteRepository
 import com.fatec.destino.repository.pacote.hotel.HotelRepository
 import com.fatec.destino.repository.pacote.transporte.TransporteRepository
 import com.fatec.destino.repository.usuario.UsuarioRepository
+import com.fatec.destino.model.pacote.tag.Tag
+import com.fatec.destino.repository.pacote.tag.TagRepository
 import jakarta.transaction.Transactional
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -22,13 +24,13 @@ class PacoteService(
     private val hotelRepository: HotelRepository,
     private val transporteRepository: TransporteRepository,
     private val usuarioRepository: UsuarioRepository,
-    private val pacoteFotoRepository: PacoteFotoRepository
+    private val pacoteFotoRepository: PacoteFotoRepository,
+    private val tagRepository: TagRepository
 ) {
 
     fun pegarPacotesAgrupadosPorLocal(): ResponseEntity<Map<String, List<Pacote>>> {
         val todosPacotes = pacoteRepository.findAll()
 
-        // Em Kotlin usamos agrupamento nativo de coleções, muito mais simples que Collectors
         val agrupado = todosPacotes.groupBy { p ->
             "${p.hotel.cidade?.nome} - ${p.hotel.cidade?.estado?.sigla}"
         }
@@ -37,15 +39,7 @@ class PacoteService(
     }
 
     fun pegarPacotes(pageable: Pageable): Page<PacoteResponseDTO> {
-        val pacotes = pacoteRepository.encontrePacotes(pageable)
-        return pacotes.map { it.toResponseDTO() }
-    }
-
-    fun buscarPacotesComFiltros(nome: String?, precoMax: BigDecimal?, pageable: Pageable): Page<PacoteResponseDTO> {
-        val termo = if (!nome.isNullOrBlank()) nome else null
-
-        return pacoteRepository.buscarComFiltros(termo, precoMax, pageable)
-            .map { it.toResponseDTO() }
+        return pacoteRepository.findAll(pageable).map { it.toResponseDTO() }
     }
 
     fun pegarPacotePorNomeExato(nome: String): Pacote? {
@@ -58,43 +52,42 @@ class PacoteService(
 
     @Transactional
     fun salvarOuAtualizar(dto: PacoteRegistroDTO, id: Long?): ResponseEntity<String> {
-        // 1. Resolvemos a entidade (Ou buscamos no banco ou criamos uma nova)
+        val hotel = hotelRepository.findById(dto.hotel).orElseThrow { NoSuchElementException("Hotel não encontrado") }
+        val transporte = transporteRepository.findById(dto.transporte).orElseThrow { NoSuchElementException("Transporte não encontrado") }
+        val funcionario = usuarioRepository.findById(dto.funcionario).orElseThrow { NoSuchElementException("Funcionário não encontrado") }
+        val foto = dto.pacoteFoto.let { pacoteFotoRepository.findById(it).orElse(null) }
+        
+        val tags = processarTags(dto.tags)
+
         val pacote = if (id != null) {
             pacoteRepository.findById(id).orElseThrow {
                 NoSuchElementException("Pacote com ID $id não encontrado")
             }
         } else {
-            // Se o ID for nulo, instanciamos um pacote novo com dados iniciais obrigatórios
-            // Aqui você precisará buscar as referências de Hotel, Transporte, etc., via ID do DTO
             Pacote(
                 nome = dto.nome,
                 descricao = dto.descricao,
                 preco = dto.preco.toBigDecimal(),
-                inicio = dto.inicio,
-                fim = dto.fim,
-                transporte = transporteRepository.findById(dto.transporte).get(),
-                hotel = hotelRepository.findById(dto.hotel).get(),
-                funcionario = usuarioRepository.findById(dto.funcionario).get()
+                transporte = transporte,
+                hotel = hotel,
+                funcionario = funcionario,
+                tags = tags
             )
         }
 
-        // 2. Se for uma atualização (ID != null), chamamos seu método de negócio
         if (id != null) {
-            // Busque as dependências necessárias para o método atualizarDados
-            val hotel = hotelRepository.findById(dto.hotel).get()
-            val transporte = transporteRepository.findById(dto.transporte).get()
-            val funcionario = usuarioRepository.findById(dto.funcionario).get()
-            val foto = dto.pacoteFoto.let { pacoteFotoRepository.findById(it).orElse(null) }
-
-            // Chama a lógica que você já criou dentro da Entity
-            pacote.atualizarDados(dto, hotel, transporte, funcionario, foto)
+            pacote.atualizarDados(dto, hotel, transporte, funcionario, foto, tags)
         }
 
-        // 3. Salva no banco.
-        // Se o objeto 'pacote' veio do findById, ele já tem o ID preenchido e o Hibernate fará UPDATE.
         pacoteRepository.save(pacote)
 
         return ResponseEntity.ok("Pacote ${if (id == null) "criado" else "atualizado"} com sucesso!")
+    }
+
+    private fun processarTags(nomesTags: List<String>): Set<Tag> {
+        return nomesTags.map { nome ->
+            tagRepository.findByNome(nome) ?: tagRepository.save(Tag(nome))
+        }.toSet()
     }
 
     fun pegarPacotePorId(id: Long): ResponseEntity<Pacote> {
@@ -108,6 +101,7 @@ class PacoteService(
     }
 
     private fun Pacote.toResponseDTO() = PacoteResponseDTO(
-        id, nome, preco.toInt(), hotel.cidade.nome, transporte.empresa.toString()
+        id, nome, preco.toInt(), hotel.cidade.nome, transporte.empresa.toString(), tags.map { it.nome }
     )
+
 }

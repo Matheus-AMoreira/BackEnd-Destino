@@ -46,7 +46,6 @@ import java.time.LocalDate
 import java.util.*
 import java.util.concurrent.ThreadLocalRandom
 
-@Component
 class DataInitializer(
     // Services (Lógica de Negócio)
     private val authenticationService: AuthenticationService,
@@ -238,9 +237,6 @@ class DataInitializer(
             descricao = desc,
             tags = tags,
             preco = precoEstimado,
-            inicio = inicio,
-            fim = fim,
-            disponibilidade = 10 + random.nextInt(20),
             transporte = transporteId,
             hotel = hotelId,
             pacoteFoto = fotoId,

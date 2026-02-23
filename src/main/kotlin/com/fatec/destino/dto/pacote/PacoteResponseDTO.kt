@@ -6,4 +6,6 @@ data class PacoteResponseDTO(
     val preco: Int,
     val hotel: String,
     val transporte: String,
+    val tags: List<String>? = emptyList()
 )
+

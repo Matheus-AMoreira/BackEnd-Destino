@@ -2,11 +2,10 @@ package com.fatec.destino.services.compra
 
 import com.fatec.destino.dto.compra.CompraRequestDTO
 import com.fatec.destino.dto.compra.CompraResponseDTO
-import com.fatec.destino.dto.viagem.ViagemDetalhadaDTO
-import com.fatec.destino.dto.viagem.ViagemResumoDTO
+import com.fatec.destino.dto.viagem.ViagemDTO
 import com.fatec.destino.model.Compra
 import com.fatec.destino.model.pacote.pacoteFoto.foto.Foto
-import com.fatec.destino.repository.pacote.PacoteRepository
+import com.fatec.destino.repository.viagem.ViagemRepository
 import com.fatec.destino.repository.usuario.CompraRepository
 import com.fatec.destino.repository.usuario.UsuarioRepository
 import com.fatec.destino.util.model.compra.Metodo
@@ -15,7 +14,6 @@ import com.fatec.destino.util.model.compra.StatusCompra
 import com.fatec.destino.util.model.pacote.PacoteStatus
 import jakarta.transaction.Transactional
 import org.springframework.data.repository.findByIdOrNull
-import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
 import java.util.*
@@ -24,39 +22,35 @@ import java.util.*
 class CompraService(
     private val compraRepository : CompraRepository,
     private val usuarioRepository : UsuarioRepository,
-    private val pacoteRepository : PacoteRepository
+    private val viagemRepository : ViagemRepository
 ) {
     @Transactional
     fun processarCompra(dto: CompraRequestDTO): CompraResponseDTO {
-        // 1. Buscar Usuário e Pacote (Correção: findByIdOrNull)
         val usuario = usuarioRepository.findByIdOrNull(dto.usuarioId)
             ?: throw RuntimeException("Usuário não encontrado")
 
-        val pacote = pacoteRepository.findByIdOrNull(dto.pacoteId)
-            ?: throw RuntimeException("Pacote não encontrado")
+        val viagem = viagemRepository.findByIdOrNull(dto.viagemId)
+            ?: throw RuntimeException("Viagem não encontrada")
 
-        // 2. Validar Disponibilidade
-        if (pacote.disponibilidade <= 0) {
+        if (viagem.disponibilidade <= 0) {
             return CompraResponseDTO(
-                "Pacote esgotado!",
+                "Viagem esgotada!",
                 compra = null
             )
         }
 
-        // 3. Regras de Pagamento (PIX vs Cartão)
-        var valorFinal = pacote.preco
+        var valorFinal = viagem.pacote.preco
         var parcelasFinais = dto.parcelas
         var metodoFinal = dto.metodo
 
         if (dto.processador == Processador.PIX) {
-            valorFinal = valorFinal.multiply(BigDecimal.valueOf(0.95)) // 5% desconto
+            valorFinal = valorFinal.multiply(BigDecimal.valueOf(0.95))
             parcelasFinais = 1
             metodoFinal = Metodo.VISTA
         } else if (parcelasFinais > 1) {
             metodoFinal = Metodo.PARCELADO
         }
 
-        // 4. Criar a Compra
         val compra = Compra(
             dataCompra = Date(),
             metodo = metodoFinal,
@@ -64,50 +58,31 @@ class CompraService(
             parcelas = parcelasFinais,
             valorFinal = valorFinal,
             usuario = usuario,
-            pacote = pacote
+            viagem = viagem
         )
 
         compra.statusCompra = StatusCompra.ACEITO
 
-        // 5. Atualizar Estoque e Salvar
-        pacote.disponibilidade -= 1
-        pacoteRepository.save(pacote)
+        viagem.disponibilidade -= 1
+        viagemRepository.save(viagem)
 
         val compraRealizada = compraRepository.save(compra)
 
         return CompraResponseDTO("Compra realizada com sucesso", compraRealizada)
     }
 
-    // Retorna List imutável e não nula
-    fun listarViagensEmAndamentoDoUsuario(emailUsuario: String): List<ViagemResumoDTO> {
+    fun listarViagensEmAndamentoDoUsuario(emailUsuario: String): List<ViagemDTO> {
         val usuario = usuarioRepository.findByEmail(emailUsuario) ?: return emptyList()
 
-        // Assumindo que o repositório retorna List<Compra> (ajuste se retornar null)
         val compras = compraRepository.findAllByUsuarioIdWhereStatusEmAdamento(
             usuario.id,
             PacoteStatus.EMANDAMENTO
         ) ?: emptyList()
 
-        return compras.mapNotNull { compra -> // mapNotNull ignora nulos se houver
-            compra?.let {
-                ViagemResumoDTO(
-                    id = it.id,
-                    pacoteId = it.pacote.id,
-                    nomePacote = it.pacote.nome,
-                    descricao = it.pacote.descricao,
-                    valor = it.valorFinal,
-                    statusCompra = it.statusCompra,
-                    dataPartida = it.pacote.inicio,
-                    dataRetorno = it.pacote.fim,
-                    imagemCapa = it.pacote.fotosDoPacote?.fotoDoPacote, // Nullable seguro
-                    cidade = it.pacote.hotel.cidade,
-                    estado = it.pacote.hotel.cidade.estado.sigla
-                )
-            }
-        }
+        return compras.mapNotNull { it?.toDTO() }
     }
 
-    fun listarViagensConcluidasDoUsuarios(emailUsuario: String): List<ViagemResumoDTO> {
+    fun listarViagensConcluidasDoUsuarios(emailUsuario: String): List<ViagemDTO> {
         val usuario = usuarioRepository.findByEmail(emailUsuario) ?: return emptyList()
 
         val compras = compraRepository.findAllByUsuarioIdWhereStatusConcluido(
@@ -115,46 +90,42 @@ class CompraService(
             PacoteStatus.CONCLUIDO
         ) ?: emptyList()
 
-        return compras.mapNotNull { compra ->
-            compra?.let {
-                ViagemResumoDTO(
-                    id = it.id,
-                    pacoteId = it.pacote.id,
-                    nomePacote = it.pacote.nome,
-                    descricao = it.pacote.descricao,
-                    valor = it.valorFinal,
-                    statusCompra = it.statusCompra,
-                    dataPartida = it.pacote.inicio,
-                    dataRetorno = it.pacote.fim,
-                    imagemCapa = it.pacote.fotosDoPacote?.fotoDoPacote,
-                    cidade = it.pacote.hotel.cidade,
-                    estado = it.pacote.hotel.cidade.estado.sigla
-                )
-            }
-        }
+        return compras.mapNotNull { it?.toDTO() }
     }
 
-    fun buscarDetalhesViagem(compraId: Long, emailUsuario: String): ViagemDetalhadaDTO {
-        // FindBy retorna Compra? (nullable) ou Optional? Ajustado para nullable (estilo Kotlin)
-        // Se seu repo retorna Optional, use .orElse(null) antes do elvis ?:
+    fun buscarDetalhesViagem(compraId: Long, emailUsuario: String): ViagemDTO {
         val compra = compraRepository.findByIdAndUsuarioEmail(compraId, emailUsuario)
             ?: throw RuntimeException("Viagem não encontrada ou acesso negado")
 
-        return ViagemDetalhadaDTO(
+        return ViagemDTO(
             id = compra.id,
-            nomePacote = compra.pacote.nome,
-            descricao = compra.pacote.descricao,
+            nome = compra.viagem.pacote.nome,
+            descricao = compra.viagem.pacote.descricao,
             valor = compra.valorFinal,
-            statusCompra = compra.statusCompra.toString(),
-            dataPartida = compra.pacote.inicio,
-            dataRetorno = compra.pacote.fim,
+            statusCompra = compra.statusCompra,
+            inicio = compra.viagem.inicio,
+            fim = compra.viagem.fim,
             dataCompra = compra.dataCompra,
             numeroReserva = "RES-${compra.id}",
-            imagemPrincipal = compra.pacote.fotosDoPacote?.fotoDoPacote,
-            galeria = compra.pacote.fotosDoPacote?.fotos as List<Foto?>?,
-            inclusoes = compra.pacote.tags,
-            nomeHotel = compra.pacote.hotel.nome,
-            tipoTransporte = compra.pacote.transporte.meio
+            imagemCapa = compra.viagem.pacote.fotosDoPacote?.fotoDoPacote,
+            galeria = compra.viagem.pacote.fotosDoPacote?.fotos as List<Foto?>?,
+            tags = compra.viagem.pacote.tags.map { it.nome },
+            hotel = compra.viagem.pacote.hotel.nome,
+            transporte = compra.viagem.pacote.transporte.meio
         )
     }
+
+    private fun Compra.toDTO() = ViagemDTO(
+        id = id,
+        pacoteId = viagem.pacote.id,
+        nome = viagem.pacote.nome,
+        descricao = viagem.pacote.descricao,
+        valor = valorFinal,
+        statusCompra = statusCompra,
+        inicio = viagem.inicio,
+        fim = viagem.fim,
+        imagemCapa = viagem.pacote.fotosDoPacote?.fotoDoPacote,
+        cidade = viagem.pacote.hotel.cidade,
+        estado = viagem.pacote.hotel.cidade.estado.sigla
+    )
 }

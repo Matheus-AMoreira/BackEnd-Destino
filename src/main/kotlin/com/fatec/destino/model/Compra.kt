@@ -1,7 +1,7 @@
 package com.fatec.destino.model
 
 import com.fasterxml.jackson.annotation.JsonFormat
-import com.fatec.destino.model.pacote.Pacote
+import com.fatec.destino.model.viagem.Viagem
 import com.fatec.destino.model.usuario.Usuario
 import com.fatec.destino.util.model.compra.Metodo
 import com.fatec.destino.util.model.compra.Processador
@@ -50,8 +50,8 @@ class Compra (
     val usuario: Usuario,
 
     @ManyToOne
-    @JoinColumn(name = "PAC_ID", referencedColumnName = "PAC_ID", nullable = false)
-    val pacote: Pacote
+    @JoinColumn(name = "VIA_ID", referencedColumnName = "VIA_ID", nullable = false)
+    val viagem: Viagem
 ) {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

@@ -6,8 +6,9 @@ import java.util.UUID
 
 data class CompraRequestDTO(
     var usuarioId : UUID,
-    var pacoteId: Long,
+    var viagemId: Long,
     var metodo: Metodo,
     var processador : Processador,
     var parcelas : Int
 )
+

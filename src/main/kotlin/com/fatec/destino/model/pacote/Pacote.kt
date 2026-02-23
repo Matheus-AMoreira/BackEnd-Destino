@@ -8,6 +8,9 @@ import com.fatec.destino.model.pacote.transporte.Transporte
 import com.fatec.destino.model.usuario.Usuario
 import com.fatec.destino.util.model.pacote.PacoteStatus
 import com.fatec.destino.util.model.pacote.StringListConverter
+import com.fatec.destino.model.pacote.tag.Tag
+import com.fatec.destino.model.viagem.Viagem
+import jakarta.persistence.CascadeType
 import jakarta.persistence.Column
 import jakarta.persistence.Convert
 import jakarta.persistence.Entity
@@ -17,7 +20,10 @@ import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
+import jakarta.persistence.JoinTable
+import jakarta.persistence.ManyToMany
 import jakarta.persistence.ManyToOne
+import jakarta.persistence.OneToMany
 import jakarta.persistence.Table
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -32,29 +38,17 @@ class Pacote (
     @Column(name = "PAC_DESCRICAO", nullable = false, columnDefinition = "TEXT")
     var descricao: String,
 
-    @Column(name = "PAC_ITENS")
-    @Convert(converter = StringListConverter::class)
-    var tags: List<String>? = emptyList(),
+    @ManyToMany
+    @JoinTable(
+        name = "pac_pacote_tag",
+        joinColumns = [JoinColumn(name = "PAC_ID")],
+        inverseJoinColumns = [JoinColumn(name = "TAG_ID")]
+    )
+    var tags: Set<Tag> = emptySet(),
 
     @Column(name = "PAC_PRECO", precision = 10, scale = 2, nullable = false)
     var preco: BigDecimal,
 
-    @JsonFormat(pattern = "dd-MM-yyyy")
-    @Column(name = "PAC_DATA_INICIO_VIAGEM", nullable = false)
-    var inicio: LocalDate,
-
-    @JsonFormat(pattern = "dd-MM-yyyy")
-    @Column(name = "PAC_DATA_FIM_VIAGEM", nullable = false)
-    var fim: LocalDate,
-
-    @Column(name = "PAC_DISPONIBILIDADE", nullable = false)
-    var disponibilidade: Int = 0,
-
-    @Column(name = "PAC_STATUS", nullable = false)
-    @Enumerated(EnumType.STRING)
-    var status: PacoteStatus = PacoteStatus.EMANDAMENTO,
-
-    // Relacionamentos
     @ManyToOne
     @JoinColumn(name = "TRA_ID", referencedColumnName = "TRA_ID", nullable = false)
     var transporte: Transporte,
@@ -76,42 +70,25 @@ class Pacote (
     @Column(name = "PAC_ID", nullable = false)
     var id: Long? = null
 
+    @OneToMany(mappedBy = "pacote", cascade = [CascadeType.ALL], orphanRemoval = true)
+    var viagens: Set<Viagem> = emptySet()
+
     fun atualizarDados(
         dto: PacoteRegistroDTO,
         hotel: Hotel,
         transporte: Transporte,
         funcionario: Usuario,
-        foto: PacoteFoto?
+        foto: PacoteFoto?,
+        tags: Set<Tag>
     ) {
-        // Regra de Negócio: Validar preço antes de atribuir
-        val dias = ChronoUnit.DAYS.between(dto.inicio, dto.fim).coerceAtLeast(1).toBigDecimal()
-        val custoMinimo = (hotel.diaria.toBigDecimal() * dias) + transporte.preco.toBigDecimal()
-
-        if (dto.preco.toBigDecimal() < custoMinimo) {
-            throw IllegalArgumentException("Preço insuficiente! O custo base é $custoMinimo")
-        }
-
-        // Se passar na validação, atribui os valores
         this.nome = dto.nome
         this.descricao = dto.descricao
         this.preco = dto.preco.toBigDecimal()
-        this.inicio = dto.inicio
-        this.fim = dto.fim
         this.hotel = hotel
         this.transporte = transporte
         this.funcionario = funcionario
         this.fotosDoPacote = foto
-
-        // A própria classe decide o status
-        recalcularStatus()
-    }
-
-    private fun recalcularStatus() {
-        this.status = when {
-            this.status == PacoteStatus.CANCELADO -> PacoteStatus.CANCELADO
-            this.fim.isBefore(LocalDate.now()) -> PacoteStatus.CONCLUIDO
-            else -> PacoteStatus.EMANDAMENTO
-        }
+        this.tags = tags
     }
 
     val precoFormatado: String

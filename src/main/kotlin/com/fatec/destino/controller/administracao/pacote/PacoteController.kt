@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.RestController
 class PacoteController(
     private val pacoteService: PacoteService
 ) {
-    // Correção: Adicionado chaves { } e corrigido tipo de retorno para bater com o Service
     @GetMapping("/agrupado-admin")
     fun pacotesAdmin() : ResponseEntity<Map<String, List<Pacote>>> {
         return pacoteService.pegarPacotesAgrupadosPorLocal()
@@ -28,13 +27,12 @@ class PacoteController(
 
     @PostMapping
     fun registrarPacote(@RequestBody pacoteRegistroDTO: PacoteRegistroDTO?): ResponseEntity<String> {
-        // Removido ? de String? pois o service retorna String
         return pacoteService.salvarOuAtualizar(pacoteRegistroDTO!!, null)
     }
 
     @PutMapping("/{id}")
     fun atualizarPacote(
-        @PathVariable id: Long, // Correção: Int -> Long
+        @PathVariable id: Long,
         @RequestBody pacoteRegistroDTO: PacoteRegistroDTO?
     ): ResponseEntity<String> {
         return pacoteService.salvarOuAtualizar(pacoteRegistroDTO!!, id)

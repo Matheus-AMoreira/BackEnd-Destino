@@ -2,7 +2,7 @@ plugins {
 	kotlin("jvm") version "2.3.0"
 	kotlin("plugin.spring") version "2.3.0"
 	kotlin("plugin.jpa") version "2.3.0"
-	id("org.springframework.boot") version "4.1.0-SNAPSHOT"
+	id("org.springframework.boot") version "4.1.0-M2"
 	id("io.spring.dependency-management") version "1.1.7"
     id ("io.swagger.core.v3.swagger-gradle-plugin") version "2.2.41"
 }
@@ -36,6 +36,7 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-webmvc")
     implementation("org.springdoc:springdoc-openapi-ui:1.6.14")
     implementation("io.jsonwebtoken:jjwt-api:0.13.0")
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
     runtimeOnly("io.jsonwebtoken:jjwt-impl:0.13.0")
     runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.13.0")
 	runtimeOnly("com.mysql:mysql-connector-j")
