@@ -1,6 +1,7 @@
 package com.fatec.destino.model;
 
 import com.fatec.destino.model.pacote.Pacote;
+import com.fatec.destino.model.pacote.oferta.Oferta;
 import com.fatec.destino.model.usuario.Usuario;
 import com.fatec.destino.util.model.compra.Metodo;
 import com.fatec.destino.util.model.compra.Processador;
@@ -30,7 +31,7 @@ import java.util.UUID;
 public class Compra {
 
     @Id
-    @GeneratedValue( strategy = GenerationType.UUID )
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "COM_ID", nullable = false)
     private UUID id;
 
@@ -63,7 +64,7 @@ public class Compra {
     private Usuario usuario;
 
     @ManyToOne
-    @JoinColumn(name = "PAC_ID", referencedColumnName = "PAC_ID", nullable = false)
-    private Pacote pacote;
+    @JoinColumn(name = "OFE_ID", referencedColumnName = "id", nullable = false)
+    private Oferta oferta;
 
 }

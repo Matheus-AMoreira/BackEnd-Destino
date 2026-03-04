@@ -6,32 +6,25 @@ import com.fatec.destino.util.model.usuario.Telefone.Telefone;
 import com.fatec.destino.util.model.usuario.Telefone.TelefoneConverter;
 import com.fatec.destino.util.model.usuario.perfil.UserRole;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import jakarta.persistence.Column;
-import jakarta.persistence.Convert;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import com.fatec.destino.util.model.usuario.perfil.UsuarioAuthority;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Entity
 @Getter
 @Setter
-@Table(name = "usu_usuario")
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@Table(name = "USU_USUARIO")
 public class Usuario implements UserDetails {
 
     @Id
@@ -61,12 +54,16 @@ public class Usuario implements UserDetails {
     @Column(nullable = false, name = "USU_SENHA", length = 100)
     private String senha;
 
-    @Column(nullable = false, name = "USU_PERFIL")
-    @Enumerated(EnumType.STRING)
-    private UserRole perfil;
-
     @Column(nullable = false, name = "USU_VALIDO")
     private Boolean valido;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "USU_ROLE")
+    private UserRole role;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "USU_AUTHORITY")
+    private List<UsuarioAuthority> authorities;
 
     @UpdateTimestamp
     @Column(updatable = false, name = "USU_DATA_ATUALIZACAO")
@@ -76,24 +73,48 @@ public class Usuario implements UserDetails {
     @Column(nullable = false, name = "USU_DATA_CADASTRO")
     private Date cadastro;
 
-    public Usuario() {
-
-    }
-
-    public Usuario(String nome, String sobreNome, String cpf, String email, String telefone, String senha, UserRole perfil, Boolean valido) {
+    public Usuario(
+            String nome,
+            String sobreNome,
+            String cpf,
+            String email,
+            String telefone,
+            String senha,
+            Boolean valido,
+            UserRole role,
+            List<UsuarioAuthority> authority
+            ) {
         this.nome = nome;
         this.sobreNome = sobreNome;
         this.cpf = new Cpf(cpf);
         this.email = email;
         this.telefone = new Telefone(telefone);
         this.senha = senha;
-        this.perfil = perfil;
         this.valido = valido;
+        this.role = role;
+        this.authorities = authority;
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of();
+        Set<SimpleGrantedAuthority> authoritiesSet = new HashSet<>();
+
+        // 1. Adiciona a Role (ex: ROLE_ADMIN)
+        authoritiesSet.add(new SimpleGrantedAuthority("ROLE_" + this.role.name()));
+
+        // 2. Pega as permissões padrão da "Árvore" do Enum
+        this.role.getAuthorities().forEach(authName -> {
+            authoritiesSet.add(new SimpleGrantedAuthority(authName.name()));
+        });
+
+        // 3. Adiciona as permissões exclusivas (se houver na tabela USU_AUTHORITIES)
+        if (this.authorities != null) {
+            this.authorities.forEach(auth -> {
+                authoritiesSet.add(new SimpleGrantedAuthority(auth.name()));
+            });
+        }
+
+        return authoritiesSet;
     }
 
     @Override

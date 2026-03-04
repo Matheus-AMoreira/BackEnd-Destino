@@ -32,7 +32,7 @@ public class UsuarioService {
                 usuario.getCpf().getValorFormatado(),
                 usuario.getEmail(),
                 usuario.getTelefone().getValorFormatado(),
-                usuario.getPerfil().name(),
+                usuario.getRole().name(),
                 usuario.getValido() == true ? "Sim" : "Não",
                 usuario.getCadastro()
         )).toList();

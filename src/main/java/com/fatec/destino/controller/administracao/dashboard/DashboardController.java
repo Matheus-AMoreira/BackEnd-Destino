@@ -1,4 +1,4 @@
-package com.fatec.destino.controller.administracao;
+package com.fatec.destino.controller.administracao.dashboard;
 
 import com.fatec.destino.dto.dashboard.ChartDataDTO;
 import com.fatec.destino.services.dashboard.DashboardService;

@@ -1,4 +1,4 @@
-package com.fatec.destino.controller.usuario;
+package com.fatec.destino.controller.administracao.usuario;
 
 import com.fatec.destino.dto.usuario.UsuarioDTO;
 import com.fatec.destino.dto.auth.validar.ValidarResponseDTO;

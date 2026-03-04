@@ -6,16 +6,11 @@ import java.util.ArrayList;
 import java.util.UUID;
 
 public record PacoteRegistroDTO(
-        String nome,
-        String descricao,
-        ArrayList<String> tags,
-        BigDecimal preco,
-        LocalDate inicio,
-        LocalDate fim,
-        int disponibilidade,
-        long transporte,
-        long hotel,
-        long pacoteFoto,
-        UUID funcionario
-) {
+                String nome,
+                String descricao,
+                ArrayList<String> tags,
+                long transporte,
+                long hotel,
+                long pacoteFoto,
+                UUID funcionario) {
 }

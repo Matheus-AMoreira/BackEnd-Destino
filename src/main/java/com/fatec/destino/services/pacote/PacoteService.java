@@ -11,8 +11,10 @@ import com.fatec.destino.repository.pacote.PacoteFotoRepository;
 import com.fatec.destino.repository.pacote.PacoteRepository;
 import com.fatec.destino.repository.pacote.TransporteRepository;
 import com.fatec.destino.repository.pacote.hotel.HotelRepository;
+import com.fatec.destino.repository.pacote.tag.TagRepository;
 import com.fatec.destino.repository.usuario.UsuarioRepository;
-import com.fatec.destino.util.model.pacote.PacoteStatus;
+import com.fatec.destino.model.pacote.tag.Tag;
+import com.fatec.destino.util.model.pacote.OfertaStatus;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -22,8 +24,10 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.temporal.ChronoUnit;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -35,13 +39,14 @@ public class PacoteService {
     private final TransporteRepository transporteRepository;
     private final UsuarioRepository usuarioRepository;
     private final PacoteFotoRepository pacoteFotoRepository;
+    private final TagRepository tagRepository;
 
     public ResponseEntity<Map<String, List<Pacote>>> pegarPacotesAgrupadosPorLocal() {
         List<Pacote> todosPacotes = pacoteRepository.findAll();
 
         Map<String, List<Pacote>> agrupado = todosPacotes.stream()
                 .collect(Collectors.groupingBy(p -> {
-                        return p.getHotel().getCidade().getNome() + " - " + p.getHotel().getCidade().getEstado().getSigla();
+                    return p.getHotel().getCidade().getNome() + " - " + p.getHotel().getCidade().getEstado().getSigla();
                 }));
 
         return ResponseEntity.ok(agrupado);
@@ -49,21 +54,7 @@ public class PacoteService {
 
     // Retorna pacotes com paginação
     public Page<PacoteResponseDTO> pegarPacotes(Pageable pageable) {
-        Page<Pacote> pacotes = pacoteRepository.encontrePacotes(pageable);
-        return pacotes.map(pacote -> new PacoteResponseDTO(
-                pacote.getId(),
-                pacote.getNome(),
-                pacote.getDescricao(),
-                pacote.getTags(),
-                pacote.getPreco(),
-                pacote.getInicio(),
-                pacote.getFim(),
-                pacote.getDisponibilidade(),
-                pacote.getStatus(),
-                pacote.getHotel(),
-                pacote.getTransporte(),
-                pacote.getFotosDoPacote()
-        ));
+        return pacoteRepository.encontrePacotes(pageable).map(this::converterParaResponseDTO);
     }
 
     public Page<PacoteResponseDTO> buscarPacotesComFiltros(String nome, BigDecimal precoMax, Pageable pageable) {
@@ -71,20 +62,19 @@ public class PacoteService {
         String termo = (nome != null && !nome.isBlank()) ? nome : null;
 
         return pacoteRepository.buscarComFiltros(termo, precoMax, pageable)
-                .map(pacote -> new PacoteResponseDTO(
-                        pacote.getId(),
-                        pacote.getNome(),
-                        pacote.getDescricao(),
-                        pacote.getTags(),
-                        pacote.getPreco(),
-                        pacote.getInicio(),
-                        pacote.getFim(),
-                        pacote.getDisponibilidade(),
-                        pacote.getStatus(),
-                        pacote.getHotel(),
-                        pacote.getTransporte(),
-                        pacote.getFotosDoPacote()
-                ));
+                .map(this::converterParaResponseDTO);
+    }
+
+    private PacoteResponseDTO converterParaResponseDTO(Pacote pacote) {
+        return new PacoteResponseDTO(
+                pacote.getId(),
+                pacote.getNome(),
+                pacote.getDescricao(),
+                pacote.getTags().stream().toList(),
+                pacote.getOfertas(),
+                pacote.getHotel(),
+                pacote.getTransporte(),
+                pacote.getFotosDoPacote());
     }
 
     public ResponseEntity<Pacote> pegarPacotePorNomeExato(String nome) {
@@ -95,7 +85,9 @@ public class PacoteService {
 
     // Retorna os destinos mais vendidos (Top N)
     public List<PacoteResponseDTO> pacotesMaisvendidos() {
-        return pacoteRepository.procuraPacotesMaisVendidos();
+        return pacoteRepository.procuraPacotesMaisVendidos().stream()
+                .map(this::converterParaResponseDTO)
+                .collect(Collectors.toList());
     }
 
     @Transactional
@@ -124,36 +116,8 @@ public class PacoteService {
 
         PacoteFoto pacoteFoto = pacoteFotoRepository.findById(dto.pacoteFoto()).orElse(null);
 
-        long diasViagem = ChronoUnit.DAYS.between(dto.inicio(), dto.fim());
-
-        BigDecimal valorDiaria = BigDecimal.valueOf(hotel.getDiaria());
-        BigDecimal dias = BigDecimal.valueOf(diasViagem);
-        BigDecimal valorTransporte = BigDecimal.valueOf(transporte.getPreco());
-
-        // Regra de Negócio: Preço deve cobrir os custos
-        BigDecimal precoMinimo = valorDiaria.multiply(dias).add(valorTransporte);
-
-        if (dto.preco().compareTo(precoMinimo) < 0) {
-            return ResponseEntity.badRequest().body("Preço do pacote não cobre os custos! Mínimo: " + precoMinimo);
-        }
-
-        // --- Lógica de Status Automático ---
-        PacoteStatus novoStatus;
-        // Se o DTO já vier como CANCELADO (num update manual), respeitamos
-        if (isUpdate && pacote.getStatus() == PacoteStatus.CANCELADO) {
-            novoStatus = PacoteStatus.CANCELADO;
-        } else {
-            // Calcula baseado nas datas
-            java.time.LocalDate hoje = java.time.LocalDate.now();
-
-            if (dto.fim().isBefore(hoje)) {
-                novoStatus = PacoteStatus.CONCLUIDO;
-            } else {
-                // Assume EMANDAMENTO para pacotes futuros ou ocorrendo agora
-                novoStatus = PacoteStatus.EMANDAMENTO;
-            }
-        }
-        // -----------------------------------
+        // Preço e datas agora são gerenciados via Oferta.
+        // O Pacote atua como o cabeçalho/base para várias ofertas.
 
         // Atualiza os dados do objeto
         pacote.setNome(dto.nome());
@@ -162,12 +126,20 @@ public class PacoteService {
         pacote.setTransporte(transporte);
         pacote.setFotosDoPacote(pacoteFoto);
         pacote.setDescricao(dto.descricao());
-        pacote.setTags(dto.tags());
-        pacote.setPreco(dto.preco());
-        pacote.setInicio(dto.inicio());
-        pacote.setFim(dto.fim());
-        pacote.setDisponibilidade(dto.disponibilidade());
-        pacote.setStatus(novoStatus); // Aplica o status calculado
+
+        // Processamento de Tags
+        Set<Tag> tags = new HashSet<>();
+        if (dto.tags() != null) {
+            for (String tagNome : dto.tags()) {
+                Tag tag = tagRepository.findByNome(tagNome)
+                        .orElseGet(() -> {
+                            Tag novaTag = Tag.builder().nome(tagNome).build();
+                            return tagRepository.save(novaTag);
+                        });
+                tags.add(tag);
+            }
+        }
+        pacote.setTags(tags);
 
         pacoteRepository.save(pacote);
 
@@ -181,6 +153,8 @@ public class PacoteService {
     }
 
     public List<PacoteResponseDTO> pegarPacotesPorNome(String nome) {
-        return pacoteRepository.procurePeloNome(nome);
+        return pacoteRepository.procurePeloNome(nome).stream()
+                .map(this::converterParaResponseDTO)
+                .collect(Collectors.toList());
     }
 }

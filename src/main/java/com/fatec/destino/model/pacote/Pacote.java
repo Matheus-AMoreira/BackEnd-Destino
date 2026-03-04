@@ -1,35 +1,24 @@
 package com.fatec.destino.model.pacote;
 
 import com.fatec.destino.model.pacote.hotel.Hotel;
+import com.fatec.destino.model.pacote.oferta.Oferta;
 import com.fatec.destino.model.pacote.pacoteFoto.PacoteFoto;
+import com.fatec.destino.model.pacote.tag.Tag;
 import com.fatec.destino.model.pacote.transporte.Transporte;
 import com.fatec.destino.model.usuario.Usuario;
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fatec.destino.util.model.pacote.PacoteStatus;
-import com.fatec.destino.util.model.pacote.StringListConverter;
-import jakarta.persistence.Column;
-import jakarta.persistence.Convert;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import jakarta.persistence.*;
+import lombok.*;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "pac_pacote")
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class Pacote {
 
@@ -44,29 +33,19 @@ public class Pacote {
     @Column(name = "PAC_DESCRICAO", nullable = false, columnDefinition = "TEXT")
     private String descricao;
 
-    @Column(name = "PAC_ITENS")
-    @Convert(converter = StringListConverter.class)
-    private ArrayList<String> tags;
-
-    @Column(name = "PAC_PRECO", precision = 10, scale = 2, nullable = false)
-    private BigDecimal preco;
-
-    @JsonFormat(pattern = "dd-MM-yyyy")
-    @Column(name = "PAC_DATA_INICIO_VIAGEM", nullable = false)
-    private LocalDate inicio;
-
-    @JsonFormat(pattern = "dd-MM-yyyy")
-    @Column(name = "PAC_DATA_FIM_VIAGEM", nullable = false)
-    private LocalDate fim;
-
-    @Column(name = "PAC_DISPONIBILIDADE", nullable = false)
-    private int disponibilidade;
-
-    @Column(name = "PAC_STATUS", nullable = false)
-    @Enumerated(EnumType.STRING)
-    private PacoteStatus status;
-
     // Relacionamentos
+
+    @ManyToMany
+    @JoinTable(
+            name = "PAC_PACOTE_TAGS",
+            joinColumns = @JoinColumn(name = "PAC_ID"),
+            inverseJoinColumns = @JoinColumn(name = "TAG_ID")
+    )
+    private Set<Tag> tags;
+
+    @OneToMany(mappedBy = "pacote", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Oferta> ofertas = new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name = "TRA_ID", referencedColumnName = "TRA_ID", nullable = false)
@@ -84,26 +63,4 @@ public class Pacote {
     @JoinColumn(name = "pcf_id", referencedColumnName = "pcf_id", nullable = true)
     private PacoteFoto fotosDoPacote;
 
-    public Pacote() {
-    }
-
-    public Pacote(long id, String nome, String descricao, ArrayList<String> tags, BigDecimal preco, LocalDate inicio, LocalDate fim, int disponibilidade, PacoteStatus status, Transporte transporte, Hotel hotel, Usuario funcionario, PacoteFoto fotosDoPacote) {
-        this.id = id;
-        this.nome = nome;
-        this.descricao = descricao;
-        this.tags = tags;
-        this.preco = preco;
-        this.inicio = inicio;
-        this.fim = fim;
-        this.disponibilidade = disponibilidade;
-        this.status = status;
-        this.transporte = transporte;
-        this.hotel = hotel;
-        this.funcionario = funcionario;
-        this.fotosDoPacote = fotosDoPacote;
-    }
-
-    public String getPrecoFormatado() {
-        return String.format("%.2f", preco);
-    }
 }

@@ -28,6 +28,7 @@ import java.security.SecureRandom;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Base64;
+import java.util.Collections;
 import java.util.Optional;
 
 @Service
@@ -49,7 +50,7 @@ public class AuthenticationService {
             return new RegistrationResponseDto(true, "A senha não atende aos requisitos de segurança.");
         }
 
-        if (userRepository.findByCpf(new Cpf(dados.cpf())).isPresent()) {
+        if (userRepository.findByCpf(dados.cpf()).isPresent()) {
             return new RegistrationResponseDto(true, "Erro: CPF já cadastrado.");
         }
 
@@ -58,16 +59,17 @@ public class AuthenticationService {
         }
 
         try {
-            Usuario novoUsuario = new Usuario(
-                    dados.nome(),
-                    dados.sobreNome(),
-                    dados.cpf(),
-                    dados.email(),
-                    dados.telefone(),
-                    passwordEncoder.encode(dados.senha()),
-                    UserRole.USUARIO,
-                    false
-            );
+            Usuario novoUsuario = Usuario.builder()
+                    .nome(dados.nome())
+                    .sobreNome(dados.sobreNome())
+                    .cpf(dados.cpf())
+                    .email(dados.email())
+                    .telefone(dados.telefone())
+                    .senha(dados.senha())
+                    .valido(false)
+                    .role(UserRole.USUARIO)
+                    .authorities(Collections.emptyList())
+                    .build();
 
             userRepository.save(novoUsuario);
             return new RegistrationResponseDto(false, "Usuário cadastrado com sucesso!");
@@ -101,7 +103,7 @@ public class AuthenticationService {
                             usuario.getId(),
                             usuario.getNome() + " " + usuario.getSobreNome(),
                             usuario.getEmail(),
-                            usuario.getPerfil().toString(),
+                            usuario.getRole().name(),
                             jwtToken,
                             JWT_EXPIRATION_MS / 1000
                     )
@@ -171,7 +173,7 @@ public class AuthenticationService {
                         usuario.getId(),
                         usuario.getNome() + " " + usuario.getSobreNome(),
                         usuario.getEmail(),
-                        usuario.getPerfil().toString(),
+                        usuario.getRole().name(),
                         novoJwt,
                         JWT_EXPIRATION_MS / 1000
                 )

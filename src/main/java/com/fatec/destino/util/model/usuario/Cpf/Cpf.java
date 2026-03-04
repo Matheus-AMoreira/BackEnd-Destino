@@ -2,39 +2,34 @@ package com.fatec.destino.util.model.usuario.Cpf;
 
 import java.io.Serializable;
 
-public class Cpf implements Serializable {
+public record Cpf(String valor) implements Serializable {
 
-    private final String Valor;
-
-    public Cpf(String cpf) {
-
-        if (!isCpfValido(cpf)) {
+    public Cpf {
+        if (valor == null || !isCpfvalido(valor)) {
             throw new IllegalArgumentException("CPF fornecido é inválido.");
         }
-
-        this.Valor = cpf;
     }
 
     public String getValorPuro() {
-        return this.Valor;
+        return this.valor;
     }
 
     public String getValorFormatado() {
-        if (Valor == null || Valor.length() != 11) {
-            return Valor;
+        if (valor == null || valor.length() != 11) {
+            return valor;
         }
-        return Valor.substring(0, 3) + "." +
-                Valor.substring(3, 6) + "." +
-                Valor.substring(6, 9) + "-" +
-                Valor.substring(9, 11);
+        return valor.substring(0, 3) + "." +
+                valor.substring(3, 6) + "." +
+                valor.substring(6, 9) + "-" +
+                valor.substring(9, 11);
     }
 
-    private boolean isCpfValido(String cpf) {
+    private boolean isCpfvalido(String cpf) {
         if (cpf.length() != 11) {
             return false;
         }
 
-        // Verifica sequências repetidas
+        // verifica sequências repetidas
         if (isSequenciaRepetida(cpf)) {
             return false;
         }
@@ -47,11 +42,7 @@ public class Cpf implements Serializable {
 
         // Calcula o 2º dígito verificador
         int digito2 = calcularDigito(cpf.substring(0, 10), 11);
-        if (digito2 != Integer.parseInt(cpf.substring(10, 11))) {
-            return false;
-        }
-
-        return true;
+        return digito2 == Integer.parseInt(cpf.substring(10, 11));
     }
 
     private static boolean isSequenciaRepetida(String cpf) {
@@ -72,8 +63,8 @@ public class Cpf implements Serializable {
             peso--;
         }
 
-        int digitoVerificador = 11 - (soma % 11);
+        int digitoverificador = 11 - (soma % 11);
 
-        return (digitoVerificador >= 10) ? 0 : digitoVerificador;
+        return (digitoverificador >= 10) ? 0 : digitoverificador;
     }
 }

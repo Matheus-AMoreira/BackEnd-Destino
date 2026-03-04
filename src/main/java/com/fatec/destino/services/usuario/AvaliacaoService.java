@@ -23,7 +23,8 @@ public class AvaliacaoService {
     private final PacoteRepository pacoteRepository;
     private final CompraRepository compraRepository;
 
-    public AvaliacaoService(AvaliacaoRepository avaliacaoRepository, UsuarioRepository usuarioRepository, PacoteRepository pacoteRepository, CompraRepository compraRepository) {
+    public AvaliacaoService(AvaliacaoRepository avaliacaoRepository, UsuarioRepository usuarioRepository,
+            PacoteRepository pacoteRepository, CompraRepository compraRepository) {
         this.avaliacaoRepository = avaliacaoRepository;
         this.usuarioRepository = usuarioRepository;
         this.pacoteRepository = pacoteRepository;
@@ -38,18 +39,19 @@ public class AvaliacaoService {
         Pacote pacote = pacoteRepository.findById(dto.pacoteId())
                 .orElseThrow(() -> new RuntimeException("Pacote não encontrado"));
 
-        // 1. Verifica se o usuário comprou o pacote
+        // 1. Verifica se o usuário comprou o pacote (através de qualquer uma de suas
+        // ofertas)
         boolean comprou = compraRepository.findAllByUsuarioId(usuario.getId()).stream()
-                .anyMatch(compra -> compra.getPacote().getId() == pacote.getId());
+                .anyMatch(compra -> compra.getOferta().getPacote().getId() == pacote.getId());
 
         if (!comprou) {
             throw new RuntimeException("Você não pode avaliar um pacote que não comprou.");
         }
 
         // 2. Verifica se a viagem já aconteceu (Opcional, mas recomendado)
-        if (pacote.getFim().isAfter(LocalDate.now())) {
-            // throw new RuntimeException("Você só pode avaliar após o término da viagem.");
-        }
+        // Como o pacote pode ter várias ofertas, poderíamos verificar se existe pelo
+        // menos uma oferta concluída comprada pelo usuário.
+        // Simplificando por enquanto para não bloquear.
 
         // 3. Verifica duplicidade (criação)
         if (avaliacaoRepository.findByUsuarioAndPacote(usuario, pacote).isPresent()) {
@@ -96,8 +98,10 @@ public class AvaliacaoService {
     }
 
     private int validarNota(int nota) {
-        if (nota < 1) return 1;
-        if (nota > 5) return 5;
+        if (nota < 1)
+            return 1;
+        if (nota > 5)
+            return 5;
         return nota;
     }
 }

@@ -8,13 +8,14 @@ import com.fatec.destino.model.Compra;
 import com.fatec.destino.model.pacote.Pacote;
 import com.fatec.destino.model.pacote.pacoteFoto.foto.Foto;
 import com.fatec.destino.model.usuario.Usuario;
-import com.fatec.destino.repository.pacote.PacoteRepository;
+import com.fatec.destino.model.pacote.oferta.Oferta;
+import com.fatec.destino.repository.pacote.oferta.OfertaRepository;
 import com.fatec.destino.repository.usuario.CompraRepository;
 import com.fatec.destino.repository.usuario.UsuarioRepository;
 import com.fatec.destino.util.model.compra.Metodo;
 import com.fatec.destino.util.model.compra.Processador;
 import com.fatec.destino.util.model.compra.StatusCompra;
-import com.fatec.destino.util.model.pacote.PacoteStatus;
+import com.fatec.destino.util.model.pacote.OfertaStatus;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
@@ -32,30 +33,31 @@ public class CompraService {
 
     private final CompraRepository compraRepository;
     private final UsuarioRepository usuarioRepository;
-    private final PacoteRepository pacoteRepository;
+    private final OfertaRepository ofertaRepository;
 
-    public CompraService(CompraRepository compraRepository, UsuarioRepository usuarioRepository, PacoteRepository pacoteRepository) {
+    public CompraService(CompraRepository compraRepository, UsuarioRepository usuarioRepository,
+            OfertaRepository ofertaRepository) {
         this.compraRepository = compraRepository;
         this.usuarioRepository = usuarioRepository;
-        this.pacoteRepository = pacoteRepository;
+        this.ofertaRepository = ofertaRepository;
     }
 
     @Transactional
     public CompraResponseDTO processarCompra(CompraRequestDTO dto) {
-        // 1. Buscar Usuário e Pacote
+        // 1. Buscar Usuário e Oferta
         Usuario usuario = usuarioRepository.findById(dto.usuarioId())
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
 
-        Pacote pacote = pacoteRepository.findById(dto.pacoteId())
-                .orElseThrow(() -> new RuntimeException("Pacote não encontrado"));
+        Oferta oferta = ofertaRepository.findById(dto.ofertaId())
+                .orElseThrow(() -> new RuntimeException("Oferta não encontrada"));
 
         // 2. Validar Disponibilidade
-        if (pacote.getDisponibilidade() <= 0) {
-            return new CompraResponseDTO("Pacote esgotado!", Optional.empty());
+        if (oferta.getDisponibilidade() <= 0) {
+            return new CompraResponseDTO("Oferta esgotada!", Optional.empty());
         }
 
         // 3. Regras de Pagamento (PIX vs Cartão)
-        BigDecimal valorFinal = pacote.getPreco();
+        BigDecimal valorFinal = oferta.getPreco();
         int parcelasfinais = dto.parcelas();
         Metodo metodoFinal = dto.metodo();
 
@@ -72,7 +74,7 @@ public class CompraService {
         // 4. Criar a Compra
         Compra compra = new Compra();
         compra.setUsuario(usuario);
-        compra.setPacote(pacote);
+        compra.setOferta(oferta);
         compra.setDataCompra(new Date());
         compra.setMetodo(metodoFinal);
         compra.setProcessadorPagamento(dto.processador());
@@ -82,9 +84,9 @@ public class CompraService {
         // Simulação: Aprovação imediata
         compra.setStatus(StatusCompra.ACEITO);
 
-        // 5. Atualizar Estoque do Pacote
-        pacote.setDisponibilidade(pacote.getDisponibilidade() - 1);
-        pacoteRepository.save(pacote);
+        // 5. Atualizar Estoque da Oferta
+        oferta.setDisponibilidade(oferta.getDisponibilidade() - 1);
+        ofertaRepository.save(oferta);
 
         var compraRealizada = compraRepository.save(compra);
 
@@ -95,7 +97,8 @@ public class CompraService {
         var usuario = usuarioRepository.findByEmail(emailUsuario)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
 
-        List<Compra> compras = compraRepository.findAllByUsuarioIdWhereStatusEmAdamento(usuario.getId(), PacoteStatus.EMANDAMENTO);
+        List<Compra> compras = compraRepository.findAllByUsuarioIdWhereStatusEmAdamento(usuario.getId(),
+                OfertaStatus.EMANDAMENTO);
 
         return compras.stream().map(this::converterParaResumoDTO).collect(Collectors.toList());
     }
@@ -104,7 +107,8 @@ public class CompraService {
         var usuario = usuarioRepository.findByEmail(emailUsuario)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
 
-        List<Compra> compras = compraRepository.findAllByUsuarioIdWhereStatusConcluido(usuario.getId(), PacoteStatus.CONCLUIDO);
+        List<Compra> compras = compraRepository.findAllByUsuarioIdWhereStatusConcluido(usuario.getId(),
+                OfertaStatus.CONCLUIDO);
 
         return compras.stream().map(this::converterParaResumoDTO).collect(Collectors.toList());
     }
@@ -119,27 +123,28 @@ public class CompraService {
 
     private ViagemResumoDTO converterParaResumoDTO(Compra compra) {
         String imagem = "";
-        if (compra.getPacote().getFotosDoPacote() != null && !compra.getPacote().getFotosDoPacote().getFotos().isEmpty()) {
-            imagem = compra.getPacote().getFotosDoPacote().getFotos().iterator().next().getUrl();
+        Pacote pacote = compra.getOferta().getPacote();
+        if (pacote.getFotosDoPacote() != null && !pacote.getFotosDoPacote().getFotos().isEmpty()) {
+            imagem = pacote.getFotosDoPacote().getFotos().iterator().next().getUrl();
         }
 
         return new ViagemResumoDTO(
                 compra.getId(),
-                compra.getPacote().getId(),
-                compra.getPacote().getNome(),
-                compra.getPacote().getDescricao(),
+                pacote.getId(),
+                pacote.getNome(),
+                pacote.getDescricao(),
                 compra.getValorFinal(),
                 compra.getStatus().name(),
-                compra.getPacote().getInicio(),
-                compra.getPacote().getFim(),
+                compra.getOferta().getInicio(),
+                compra.getOferta().getFim(),
                 imagem,
-                compra.getPacote().getHotel().getCidade().getNome(),
-                compra.getPacote().getHotel().getCidade().getEstado().getSigla()
-        );
+                pacote.getHotel().getCidade().getNome(),
+                pacote.getHotel().getCidade().getEstado().getSigla());
     }
 
     private ViagemDetalhadaDTO converterParaDetalhadoDTO(Compra compra) {
-        var pacote = compra.getPacote();
+        var oferta = compra.getOferta();
+        var pacote = oferta.getPacote();
 
         List<String> galeria = new ArrayList<>();
         String imagemPrincipal = "";
@@ -147,7 +152,8 @@ public class CompraService {
         if (pacote.getFotosDoPacote() != null) {
             galeria = pacote.getFotosDoPacote().getFotos().stream()
                     .map(Foto::getUrl).collect(Collectors.toList());
-            if (!galeria.isEmpty()) imagemPrincipal = galeria.getFirst();
+            if (!galeria.isEmpty())
+                imagemPrincipal = galeria.getFirst();
         }
 
         // Convertendo Date para LocalDate para consistência, caso dataCompra seja Date
@@ -159,15 +165,15 @@ public class CompraService {
                 pacote.getDescricao(),
                 compra.getValorFinal(),
                 compra.getStatus().name(),
-                pacote.getInicio(),
-                pacote.getFim(),
+                oferta.getInicio(),
+                oferta.getFim(),
                 dataCompra,
                 "RES-" + compra.getId(), // Exemplo de número de reserva
                 imagemPrincipal,
                 galeria,
-                pacote.getTags(),
+                pacote.getTags().stream().map(Object::toString)
+                        .collect(Collectors.toList()),
                 pacote.getHotel().getNome(),
-                pacote.getTransporte().getMeio().toString()
-        );
+                pacote.getTransporte().getMeio().toString());
     }
 }

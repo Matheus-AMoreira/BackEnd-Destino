@@ -20,11 +20,11 @@ public interface HotelRepository extends JpaRepository<Hotel, Long> {
     int findDiariaPorId(@Param("id") long id);
 
     @Query("SELECT h FROM Hotel h WHERE h.cidade.estado.id = :estadoId")
-    List<Hotel> findByEstadoId(Long estadoId);
+    List<Hotel> findByEstadoId(@Param("estadoId") Long estadoId);
 
     @Query("SELECT h FROM Hotel h WHERE h.cidade.estado.regiao.id = :regiaoId")
-    List<Hotel> findByRegiaoId(Long regiaoId);
+    List<Hotel> findByRegiaoId(@Param("regiaoId") Long regiaoId);
 
     @Query("SELECT h FROM Hotel h WHERE h.cidade.estado.regiao.nome = :regiaoNome")
-    List<Hotel> findByCidadeEstadoRegiaoNome(String regiao);
+    List<Hotel> findByCidadeEstadoRegiaoNome(@Param("regiaoNome") String regiao);
 }

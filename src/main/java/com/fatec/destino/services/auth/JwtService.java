@@ -14,6 +14,7 @@ import java.security.Key;
 import java.util.Base64;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class JwtService {
@@ -36,20 +37,20 @@ public class JwtService {
         }
     }
 
-    public String generateToken(
-            Usuario usuario,
-            long expiration
-    ) {
-        List<String> authorities = usuario.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
+    public String generateToken(Usuario usuario, long expiration) {
+        // Extrai os nomes das permissões em uma lista de Strings
+        List<String> claimsAuthorities = usuario.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority).filter(Objects::nonNull)
+                .filter(auth -> !auth.startsWith("ROLE_"))
                 .toList();
 
-        return Jwts
-                .builder()
+        String roleName = "ROLE_" + usuario.getNome();
+
+        return Jwts.builder()
                 .header().add("typ", "JWT").and()
                 .subject(usuario.getUsername())
-                .claim("role", "ROLE_" + usuario.getAuthorities())
-                .claim("authorities", authorities)
+                .claim("role", roleName)
+                .claim("authorities", claimsAuthorities)
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(secretKey)
