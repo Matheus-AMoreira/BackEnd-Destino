@@ -1,6 +1,5 @@
-Coleção_chamada_api/
-
-src/main/resources/
-
-!src/main/resources/application.properties
-!src/main/resources/data.sql
+*
+!build/*-runner
+!build/*-runner.jar
+!build/lib/*
+!build/quarkus-app/*

@@ -1,0 +1,70 @@
+> Task :processResources UP-TO-DATE
+> Task :quarkusGenerateAppModel UP-TO-DATE
+> Task :quarkusGenerateCode UP-TO-DATE
+
+> Task :compileJava FAILED
+/home/matheus/WorkSpace/GitHub/Teste/destino/src/main/java/org/tech6/services/pacote/PacoteService.java:128: error: incompatible types: UUID cannot be converted to Long
+        Usuario funcionario = usuarioRepository.findById(dto.funcionario());
+                                                                        ^
+/home/matheus/WorkSpace/GitHub/Teste/destino/src/main/java/org/tech6/services/compra/CompraService.java:48: error: incompatible types: UUID cannot be converted to Long
+        Usuario usuario = usuarioRepository.findById(dto.usuarioId());
+                                                                  ^
+/home/matheus/WorkSpace/GitHub/Teste/destino/src/main/java/org/tech6/services/compra/CompraService.java:99: error: incompatible types: Optional<Usuario> cannot be converted to Usuario
+        Usuario usuario = usuarioRepository.findByEmail(emailUsuario);
+                                                       ^
+/home/matheus/WorkSpace/GitHub/Teste/destino/src/main/java/org/tech6/services/compra/CompraService.java:110: error: incompatible types: Optional<Usuario> cannot be converted to Usuario
+        Usuario usuario = usuarioRepository.findByEmail(emailUsuario);
+                                                       ^
+/home/matheus/WorkSpace/GitHub/Teste/destino/src/main/java/org/tech6/services/auth/AuthenticationService.java:66: error: incompatible types: Cpf cannot be converted to String
+                    dados.cpf(),
+                             ^
+/home/matheus/WorkSpace/GitHub/Teste/destino/src/main/java/org/tech6/services/usuario/AvaliacaoService.java:35: error: incompatible types: UUID cannot be converted to Long
+        Usuario usuario = usuarioRepository.findById(dto.usuarioId());
+                                                                  ^
+/home/matheus/WorkSpace/GitHub/Teste/destino/src/main/java/org/tech6/services/usuario/AvaliacaoService.java:48: error: long cannot be dereferenced
+                .anyMatch(compra -> compra.oferta.pacote.id.equals(pacote.id));
+                                                           ^
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+Note: Some messages have been simplified; recompile with -Xdiags:verbose to get full output
+7 errors
+
+[Incubating] Problems report is available at: file:///home/matheus/WorkSpace/GitHub/Teste/destino/build/reports/problems/problems-report.html
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':compileJava'.
+> Compilation failed; see the compiler output below.
+  Note: Recompile with -Xlint:deprecation for details.
+  /home/matheus/WorkSpace/GitHub/Teste/destino/src/main/java/org/tech6/services/pacote/PacoteService.java:128: error: incompatible types: UUID cannot be converted to Long
+          Usuario funcionario = usuarioRepository.findById(dto.funcionario());
+                                                                          ^
+  /home/matheus/WorkSpace/GitHub/Teste/destino/src/main/java/org/tech6/services/compra/CompraService.java:48: error: incompatible types: UUID cannot be converted to Long
+          Usuario usuario = usuarioRepository.findById(dto.usuarioId());
+                                                                    ^
+  /home/matheus/WorkSpace/GitHub/Teste/destino/src/main/java/org/tech6/services/compra/CompraService.java:99: error: incompatible types: Optional<Usuario> cannot be converted to Usuario
+          Usuario usuario = usuarioRepository.findByEmail(emailUsuario);
+                                                         ^
+  /home/matheus/WorkSpace/GitHub/Teste/destino/src/main/java/org/tech6/services/compra/CompraService.java:110: error: incompatible types: Optional<Usuario> cannot be converted to Usuario
+          Usuario usuario = usuarioRepository.findByEmail(emailUsuario);
+                                                         ^
+  /home/matheus/WorkSpace/GitHub/Teste/destino/src/main/java/org/tech6/services/auth/AuthenticationService.java:66: error: incompatible types: Cpf cannot be converted to String
+                      dados.cpf(),
+                               ^
+  /home/matheus/WorkSpace/GitHub/Teste/destino/src/main/java/org/tech6/services/usuario/AvaliacaoService.java:35: error: incompatible types: UUID cannot be converted to Long
+          Usuario usuario = usuarioRepository.findById(dto.usuarioId());
+                                                                    ^
+  /home/matheus/WorkSpace/GitHub/Teste/destino/src/main/java/org/tech6/services/usuario/AvaliacaoService.java:48: error: long cannot be dereferenced
+                  .anyMatch(compra -> compra.oferta.pacote.id.equals(pacote.id));
+                                                             ^
+  Note: Some input files use or override a deprecated API.
+  Note: Some messages have been simplified; recompile with -Xdiags:verbose to get full output
+  7 errors
+
+* Try:
+> Check your code and dependencies to fix the compilation error(s)
+> Run with --scan to get full insights from a Build Scan (powered by Develocity).
+
+BUILD FAILED in 749ms
+4 actionable tasks: 1 executed, 3 up-to-date
