@@ -1,6 +1,5 @@
 package org.tech6.controller.administracao.dashboard;
 
-import org.tech6.dto.dashboard.ChartDataDTO;
 import org.tech6.services.dashboard.DashboardService;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.ws.rs.*;
@@ -8,12 +7,11 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
 import java.time.LocalDate;
-import java.util.List;
 
 @Path("/api/dashboard")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-@RolesAllowed("ROLE_FUNCIONARIO")
+@RolesAllowed({"ROLE_FUNCIONARIO", "ROLE_ADMINISTRADOR"})
 public class DashboardController {
 
     private final DashboardService dashboardService;

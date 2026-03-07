@@ -50,7 +50,7 @@ public class Usuario extends PanacheEntityBase {
     public Boolean valido;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "USU_ROLE")
+    @Column(name = "USU_ROLE", nullable = false)
     public UserRole role;
 
     @Enumerated(EnumType.STRING)

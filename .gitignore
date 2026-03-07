@@ -1,6 +1,6 @@
 # Resources
 resources*
-!resources/application.properties
+!application.properties
 
 # Gradle
 .gradle/

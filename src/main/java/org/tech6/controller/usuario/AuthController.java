@@ -1,5 +1,6 @@
 package org.tech6.controller.usuario;
 
+import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
 import org.tech6.dto.auth.login.LoginResponseDTO;
 import org.tech6.dto.auth.login.LoginUsuarioDto;
 import org.tech6.dto.auth.registro.RegistrationResponseDto;

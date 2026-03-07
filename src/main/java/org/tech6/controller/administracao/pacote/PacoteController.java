@@ -24,20 +24,20 @@ public class PacoteController {
 
     @GET
     @Path("/agrupado-admin")
-    @RolesAllowed("ROLE_FUNCIONARIO")
+    @RolesAllowed({"ROLE_FUNCIONARIO", "ROLE_ADMINISTRADOR"})
     public Response getPacotesAdmin() {
         return Response.ok(pacoteService.pegarPacotesAgrupadosPorLocal()).build();
     }
 
     @POST
-    @RolesAllowed("ROLE_FUNCIONARIO")
+    @RolesAllowed({"ROLE_FUNCIONARIO", "ROLE_ADMINISTRADOR"})
     public Response registrarPacote(PacoteRegistroDTO pacoteRegistroDTO) {
         return Response.ok(pacoteService.criarPacote(pacoteRegistroDTO)).build();
     }
 
     @PUT
     @Path("/{id}")
-    @RolesAllowed("ROLE_FUNCIONARIO")
+    @RolesAllowed({"ROLE_FUNCIONARIO", "ROLE_ADMINISTRADOR"})
     public Response atualizarPacote(@PathParam("id") int id, PacoteRegistroDTO pacoteRegistroDTO) {
         return Response.ok(pacoteService.atualizarPacote(id, pacoteRegistroDTO)).build();
     }

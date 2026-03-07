@@ -13,7 +13,7 @@ import java.util.List;
 @Path("/api/pacote-foto")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-@RolesAllowed("ROLE_FUNCIONARIO")
+@RolesAllowed({"ROLE_FUNCIONARIO", "ROLE_ADMINISTRADOR"})
 public class PacoteFotoController {
 
     private final PacoteFotoService service;

@@ -16,7 +16,7 @@ import java.util.List;
 @Path("/api/hotel")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-@RolesAllowed("FUNCIONARIO")
+@RolesAllowed({"ROLE_FUNCIONARIO", "ROLE_ADMINISTRADOR"})
 public class HotelController {
 
     private final HotelService hotelService;

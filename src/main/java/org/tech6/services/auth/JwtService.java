@@ -24,7 +24,7 @@ public class JwtService {
                 .collect(Collectors.toSet());
         groups.addAll(authorities);
 
-        return Jwt.issuer("https://seu-dominio.com")
+        return Jwt.issuer("https://localhost")
                 .upn(usuario.email)
                 .groups(groups)
                 .expiresIn(expirationInSeconds)

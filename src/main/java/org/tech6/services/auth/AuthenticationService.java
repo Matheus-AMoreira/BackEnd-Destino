@@ -27,7 +27,7 @@ import java.util.Optional;
 public class AuthenticationService {
 
     private static final String COOKIE_NAME = "session_token";
-    private static final long JWT_EXPIRATION_MS = 20 * 60 * 1000; // 20 minutos
+    private static final long JWT_EXPIRATION_MS = 10 * 60 * 1000; // 10 minutos
     private static final int REFRESH_TOKEN_DAYS = 30; // 30 dias
 
     private final UsuarioRepository userRepository;

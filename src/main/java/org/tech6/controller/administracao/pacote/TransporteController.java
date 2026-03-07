@@ -13,7 +13,7 @@ import java.util.List;
 @Path("/api/transporte")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-@RolesAllowed("FUNCIONARIO")
+@RolesAllowed({"ROLE_FUNCIONARIO", "ROLE_ADMINISTRADOR"})
 public class TransporteController {
     private final TransporteService transporteService;
 

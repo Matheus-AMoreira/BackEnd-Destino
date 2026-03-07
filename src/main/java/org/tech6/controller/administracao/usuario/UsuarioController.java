@@ -15,7 +15,7 @@ import java.util.UUID;
 @Path("/api/usuario")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-@RolesAllowed("ROLE_FUNCIONARIO")
+@RolesAllowed({"ROLE_FUNCIONARIO", "ROLE_ADMINISTRADOR"})
 public class UsuarioController {
 
     private final UsuarioService usuarioService;
