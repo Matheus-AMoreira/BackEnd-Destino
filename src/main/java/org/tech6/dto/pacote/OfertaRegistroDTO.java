@@ -8,6 +8,8 @@ public record OfertaRegistroDTO(
     LocalDate inicio,
     LocalDate fim,
     int disponibilidade,
-    long pacoteId
+    long pacoteId,
+    long transporteId,
+    long hotelId
 ) {
 }

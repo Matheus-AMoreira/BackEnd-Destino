@@ -38,7 +38,7 @@ public class CompraRepository implements PanacheRepository<Compra> {
         }
 
         // Busca compra específica garantindo que pertence ao usuario (segurança)
-        public Compra findByIdAndUsuarioEmail(Long compraId, String emailUsuario) {
+        public Compra findByIdAndUsuarioEmail(UUID compraId, String emailUsuario) {
                 return find("id = ?1 AND usuario.email = ?2", compraId, emailUsuario).firstResult();
         }
 

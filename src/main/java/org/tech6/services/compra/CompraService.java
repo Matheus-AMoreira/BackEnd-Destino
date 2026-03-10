@@ -7,6 +7,7 @@ import org.tech6.dto.compra.ViagemResumoDTO;
 import org.tech6.model.Compra;
 import org.tech6.model.pacote.Pacote;
 import org.tech6.model.pacote.pacoteFoto.foto.Foto;
+import org.tech6.model.pacote.tag.Tag;
 import org.tech6.model.usuario.Usuario;
 import org.tech6.model.pacote.oferta.Oferta;
 import org.tech6.repository.pacote.oferta.OfertaRepository;
@@ -22,10 +23,7 @@ import jakarta.transaction.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @ApplicationScoped
@@ -55,7 +53,7 @@ public class CompraService {
 
         // 2. Validar Disponibilidade
         if (oferta.disponibilidade <= 0) {
-            return new CompraResponseDTO("Oferta esgotada!", Optional.empty());
+            return new CompraResponseDTO("Oferta esgotada!", null);
         }
 
         // 3. Regras de Pagamento (PIX vs Cartão)
@@ -92,7 +90,7 @@ public class CompraService {
 
         compraRepository.persist(compra);
 
-        return new CompraResponseDTO("Compra realizada com sucesso", Optional.of(compra));
+        return new CompraResponseDTO("Compra realizada com sucesso", compra);
     }
 
     public List<ViagemResumoDTO> listarViagensEmAndamentoDoUsuario(String emailUsuario) {
@@ -117,7 +115,7 @@ public class CompraService {
         return compras.stream().map(this::converterParaResumoDTO).collect(Collectors.toList());
     }
 
-    public ViagemDetalhadaDTO buscarDetalhesViagem(Long compraId, String emailUsuario) {
+    public ViagemDetalhadaDTO buscarDetalhesViagem(UUID compraId, String emailUsuario) {
         Compra compra = compraRepository.findByIdAndUsuarioEmail(compraId, emailUsuario);
         if (compra == null) {
             throw new RuntimeException("Viagem não encontrada ou acesso negado");
@@ -128,7 +126,9 @@ public class CompraService {
     private ViagemResumoDTO converterParaResumoDTO(Compra compra) {
         String imagem = "";
         Pacote pacote = compra.oferta.pacote;
-        if (pacote.fotosDoPacote != null && !pacote.fotosDoPacote.fotos.isEmpty()) {
+        if (pacote.fotosDoPacote != null && pacote.fotosDoPacote.fotoDoPacote != null && !pacote.fotosDoPacote.fotoDoPacote.isEmpty()) {
+            imagem = pacote.fotosDoPacote.fotoDoPacote;
+        } else if (pacote.fotosDoPacote != null && pacote.fotosDoPacote.fotos != null && !pacote.fotosDoPacote.fotos.isEmpty()) {
             imagem = pacote.fotosDoPacote.fotos.iterator().next().url;
         }
 
@@ -142,8 +142,8 @@ public class CompraService {
                 compra.oferta.inicio,
                 compra.oferta.fim,
                 imagem,
-                pacote.hotel.cidade.nome,
-                pacote.hotel.cidade.estado.sigla);
+                compra.oferta.hotel.cidade.nome,
+                compra.oferta.hotel.cidade.estado.sigla);
     }
 
     private ViagemDetalhadaDTO converterParaDetalhadoDTO(Compra compra) {
@@ -154,10 +154,16 @@ public class CompraService {
         String imagemPrincipal = "";
 
         if (pacote.fotosDoPacote != null) {
-            galeria = pacote.fotosDoPacote.fotos.stream()
-                    .map(foto -> foto.url).collect(Collectors.toList());
-            if (!galeria.isEmpty())
-                imagemPrincipal = galeria.get(0);
+            if (pacote.fotosDoPacote.fotoDoPacote != null && !pacote.fotosDoPacote.fotoDoPacote.isEmpty()) {
+                imagemPrincipal = pacote.fotosDoPacote.fotoDoPacote;
+            }
+            if (pacote.fotosDoPacote.fotos != null) {
+                galeria = pacote.fotosDoPacote.fotos.stream()
+                        .map(foto -> foto.url).collect(Collectors.toList());
+                if (imagemPrincipal.isEmpty() && !galeria.isEmpty()) {
+                    imagemPrincipal = galeria.getFirst();
+                }
+            }
         }
 
         // Convertendo Date para LocalDate para consistência, caso dataCompra seja Date
@@ -172,12 +178,12 @@ public class CompraService {
                 oferta.inicio,
                 oferta.fim,
                 dataCompra,
-                "RES-" + compra.id, // Exemplo de número de reserva
+                "RES-" + compra.id,
                 imagemPrincipal,
                 galeria,
-                pacote.tags.stream().map(Object::toString)
+                pacote.tags.stream().map(Tag::getNome)
                         .collect(Collectors.toList()),
-                pacote.hotel.nome,
-                pacote.transporte.meio.toString());
+                oferta.hotel.nome,
+                oferta.transporte.meio.toString());
     }
 }

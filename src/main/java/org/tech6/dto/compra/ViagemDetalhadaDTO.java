@@ -1,6 +1,7 @@
 package org.tech6.dto.compra;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import org.tech6.model.pacote.tag.Tag;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -22,7 +23,7 @@ public record ViagemDetalhadaDTO(
         String numeroReserva,
         String imagemPrincipal,
         List<String> galeria,
-        List<String> inclusoes,
+        List<String> tags,
         String nomeHotel,
         String tipoTransporte
 ) {}

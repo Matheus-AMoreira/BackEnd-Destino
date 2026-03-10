@@ -13,9 +13,7 @@ public record PacoteResponseDTO(
                 long id,
                 String nome,
                 String descricao,
-                List<Tag> tags,
+                List<String> tags,
                 List<Oferta> ofertas,
-                Hotel hotel,
-                Transporte transporte,
                 PacoteFoto fotosDoPacote) {
 }

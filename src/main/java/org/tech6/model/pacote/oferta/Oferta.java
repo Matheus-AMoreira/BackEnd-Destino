@@ -1,7 +1,10 @@
 package org.tech6.model.pacote.oferta;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.tech6.model.pacote.Pacote;
+import org.tech6.model.pacote.hotel.Hotel;
+import org.tech6.model.pacote.transporte.Transporte;
 import org.tech6.util.model.pacote.OfertaStatus;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.*;
@@ -30,18 +33,22 @@ public class Oferta extends PanacheEntityBase {
     @Column(name = "PAC_DISPONIBILIDADE", nullable = false)
     public int disponibilidade;
 
-    @Column(name = "PAC_STATUS", nullable = false)
+    @Column(name = "OFE_STATUS", nullable = false)
     @Enumerated(EnumType.STRING)
     public OfertaStatus status;
 
-    // Relações
-
     @ManyToOne
-    @JoinColumn(name = "PAC_ID")
+    @JoinColumn(name = "PAC_ID", referencedColumnName = "PAC_ID", nullable = false)
+    @JsonIgnore
     public Pacote pacote;
 
-    public Oferta() {
-    }
+    @ManyToOne
+    @JoinColumn(name = "HOT_ID", referencedColumnName = "HOT_ID", nullable = false)
+    public Hotel hotel;
+
+    @ManyToOne
+    @JoinColumn(name = "TRA_ID", referencedColumnName = "TRA_ID", nullable = false)
+    public Transporte transporte;
 
     public String getPrecoFormatado() {
         return String.format("%.2f", preco);

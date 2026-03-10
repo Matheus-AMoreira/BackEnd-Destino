@@ -13,6 +13,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
 import java.util.List;
+import java.util.UUID;
 
 @Path("/api/compra")
 @Produces(MediaType.APPLICATION_JSON)
@@ -45,7 +46,7 @@ public class CompraController {
 
     @GET
     @Path("/{id}")
-    public Response detalharViagem(@PathParam("id") Long id) {
+    public Response detalharViagem(@PathParam("id") UUID id) {
         String email = jwt.getName();
         return Response.ok(compraService.buscarDetalhesViagem(id, email)).build();
     }

@@ -3,12 +3,15 @@ package org.tech6.util.model.usuario.Telefone;
 import jakarta.validation.constraints.Size;
 
 import java.io.Serializable;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 
 public class Telefone implements Serializable {
 
     @Size(min = 10, max = 11, message = "Número de telefone é fixo ou movel com 10 ou 11 digitos")
     private final String numeroPuro;
 
+    @JsonCreator
     public Telefone(String telefonePuro) {
         if (!isTelefoneValido(telefonePuro)) {
             throw new IllegalArgumentException("Número de telefone inválido. Deve conter 10 ou 11 dígitos.");
@@ -27,6 +30,7 @@ public class Telefone implements Serializable {
         return true;
     }
 
+    @JsonValue
     public String getValorPuro() {
         return this.numeroPuro;
     }

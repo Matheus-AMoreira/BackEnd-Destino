@@ -9,8 +9,6 @@ public record PacoteRegistroDTO(
                 String nome,
                 String descricao,
                 ArrayList<String> tags,
-                long transporte,
-                long hotel,
-                long pacoteFoto,
-                UUID funcionario) {
+        long pacoteFoto,
+        UUID funcionario) {
 }

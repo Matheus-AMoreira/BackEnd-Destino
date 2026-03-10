@@ -41,4 +41,15 @@ public class PacoteController {
     public Response atualizarPacote(@PathParam("id") int id, PacoteRegistroDTO pacoteRegistroDTO) {
         return Response.ok(pacoteService.atualizarPacote(id, pacoteRegistroDTO)).build();
     }
+
+    @DELETE
+    @Path("/{id}")
+    @RolesAllowed({"ROLE_FUNCIONARIO", "ROLE_ADMINISTRADOR"})
+    public Response deletarPacote(@PathParam("id") long id) {
+        try {
+            return Response.ok(pacoteService.deletarPacote(id)).build();
+        } catch (RuntimeException e) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+        }
+    }
 }

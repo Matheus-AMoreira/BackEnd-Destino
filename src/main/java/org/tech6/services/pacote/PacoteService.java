@@ -9,8 +9,6 @@ import org.tech6.model.pacote.transporte.Transporte;
 import org.tech6.model.usuario.Usuario;
 import org.tech6.repository.pacote.PacoteFotoRepository;
 import org.tech6.repository.pacote.PacoteRepository;
-import org.tech6.repository.pacote.TransporteRepository;
-import org.tech6.repository.pacote.hotel.HotelRepository;
 import org.tech6.repository.pacote.tag.TagRepository;
 import org.tech6.repository.usuario.UsuarioRepository;
 import org.tech6.model.pacote.tag.Tag;
@@ -29,36 +27,38 @@ import java.util.stream.Collectors;
 public class PacoteService {
 
     private final PacoteRepository pacoteRepository;
-    private final HotelRepository hotelRepository;
-    private final TransporteRepository transporteRepository;
     private final UsuarioRepository usuarioRepository;
     private final PacoteFotoRepository pacoteFotoRepository;
     private final TagRepository tagRepository;
 
-    public PacoteService(PacoteRepository pacoteRepository, HotelRepository hotelRepository,
-            TransporteRepository transporteRepository, UsuarioRepository usuarioRepository,
+    public PacoteService(PacoteRepository pacoteRepository, UsuarioRepository usuarioRepository,
             PacoteFotoRepository pacoteFotoRepository, TagRepository tagRepository) {
         this.pacoteRepository = pacoteRepository;
-        this.hotelRepository = hotelRepository;
-        this.transporteRepository = transporteRepository;
         this.usuarioRepository = usuarioRepository;
         this.pacoteFotoRepository = pacoteFotoRepository;
         this.tagRepository = tagRepository;
     }
 
-    public Map<String, List<Pacote>> pegarPacotesAgrupadosPorLocal() {
+    public Map<String, List<PacoteResponseDTO>> pegarPacotesAgrupadosPorLocal() {
         List<Pacote> todosPacotes = pacoteRepository.listAll();
 
         return todosPacotes.stream()
-                .collect(Collectors.groupingBy(p -> {
-                    return p.hotel.cidade.nome + " - " + p.hotel.cidade.estado.sigla;
+                .map(this::converterParaResponseDTO)
+                .collect(Collectors.groupingBy(dto -> {
+                    if (dto.ofertas() != null && !dto.ofertas().isEmpty()) {
+                        var h = dto.ofertas().getFirst().hotel;
+                        if (h != null && h.cidade != null && h.cidade.estado != null) {
+                            return h.cidade.nome + " - " + h.cidade.estado.sigla;
+                        }
+                    }
+                    return "Sem Local Definido";
                 }));
     }
 
-    // Retorna pacotes com paginação
     public List<PacoteResponseDTO> pegarPacotes(int page, int size) {
         return pacoteRepository.encontrePacotes()
                 .page(page, size)
+                .list()
                 .stream()
                 .map(this::converterParaResponseDTO)
                 .collect(Collectors.toList());
@@ -70,6 +70,7 @@ public class PacoteService {
 
         return pacoteRepository.buscarComFiltros(termo, precoMax)
                 .page(page, size)
+                .list()
                 .stream()
                 .map(this::converterParaResponseDTO)
                 .collect(Collectors.toList());
@@ -80,10 +81,8 @@ public class PacoteService {
                 pacote.id,
                 pacote.nome,
                 pacote.descricao,
-                pacote.tags.stream().toList(),
+                pacote.tags.stream().map(tag -> tag.nome).collect(Collectors.toList()),
                 pacote.ofertas,
-                pacote.hotel,
-                pacote.transporte,
                 pacote.fotosDoPacote);
     }
 
@@ -115,16 +114,6 @@ public class PacoteService {
     }
 
     private String salvarOuAtualizarPacote(Pacote pacote, PacoteRegistroDTO dto, boolean isUpdate) {
-        Hotel hotel = hotelRepository.findById(dto.hotel());
-        if (hotel == null) {
-            throw new RuntimeException("Hotel não encontrado");
-        }
-
-        Transporte transporte = transporteRepository.findById(dto.transporte());
-        if (transporte == null) {
-            throw new RuntimeException("Transporte não encontrado");
-        }
-
         Usuario funcionario = usuarioRepository.findById(dto.funcionario());
         if (funcionario == null) {
             throw new RuntimeException("Funcionário não encontrado");
@@ -138,8 +127,6 @@ public class PacoteService {
         // Atualiza os dados do objeto
         pacote.nome = dto.nome();
         pacote.funcionario = funcionario;
-        pacote.hotel = hotel;
-        pacote.transporte = transporte;
         pacote.fotosDoPacote = pacoteFoto;
         pacote.descricao = dto.descricao();
 
@@ -176,5 +163,19 @@ public class PacoteService {
         return pacoteRepository.procurePeloNome(nome).stream()
                 .map(this::converterParaResponseDTO)
                 .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public String deletarPacote(long id) {
+        Pacote pacote = pacoteRepository.findById(id);
+        if (pacote == null) {
+            throw new RuntimeException("Pacote não encontrado");
+        }
+        if (pacote.ofertas != null && !pacote.ofertas.isEmpty()) {
+            throw new RuntimeException(
+                    "Não é possível deletar um pacote que possui ofertas ativas. Exclua as ofertas primeiro.");
+        }
+        pacoteRepository.deleteById(id);
+        return "Pacote deletado com sucesso!";
     }
 }

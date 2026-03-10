@@ -60,11 +60,11 @@ public class PacoteRepository implements PanacheRepository<Pacote> {
 
         // --- Métodos de Verificação de Integridade ---
         public boolean existsByHotelId(long id) {
-                return count("hotel.id", id) > 0;
+                return count("from Pacote p join p.ofertas o where o.hotel.id = ?1", id) > 0;
         }
 
         public boolean existsByTransporteId(long id) {
-                return count("transporte.id", id) > 0;
+                return count("from Pacote p join p.ofertas o where o.transporte.id = ?1", id) > 0;
         }
 
         // --- Dashboard ---
@@ -77,7 +77,7 @@ public class PacoteRepository implements PanacheRepository<Pacote> {
 
         public List<Object[]> countPacotesByTransporteMeio() {
                 return getEntityManager()
-                                .createQuery("SELECT t.meio, COUNT(p) FROM Pacote p JOIN p.transporte t GROUP BY t.meio",
+                                .createQuery("SELECT t.meio, COUNT(p) FROM Pacote p JOIN p.ofertas o JOIN o.transporte t GROUP BY t.meio",
                                                 Object[].class)
                                 .getResultList();
         }

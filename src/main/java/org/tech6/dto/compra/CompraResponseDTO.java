@@ -6,6 +6,6 @@ import java.util.Optional;
 
 public record CompraResponseDTO(
         String mensagem,
-        Optional<Compra> compra
+        Compra compra
 ) {
 }

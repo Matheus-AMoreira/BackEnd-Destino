@@ -18,13 +18,14 @@ public class Tag extends PanacheEntityBase {
     @Column(name = "TAG_NOME", nullable = false)
     public String nome;
 
-    @ManyToMany(mappedBy = "tags")
-    public Set<Pacote> pacotes;
-
     public Tag() {
     }
 
     public Tag(String nome) {
         this.nome = nome;
+    }
+
+    public String getNome() {
+        return nome;
     }
 }

@@ -1,15 +1,20 @@
 package org.tech6.util.model.usuario.Cpf;
 
 import java.io.Serializable;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 
 public record Cpf(String valor) implements Serializable {
 
-    public Cpf {
+    @JsonCreator
+    public Cpf(String valor) {
         if (valor == null || !isCpfvalido(valor)) {
             throw new IllegalArgumentException("CPF fornecido é inválido.");
         }
+        this.valor = valor;
     }
 
+    @JsonValue
     public String getValorPuro() {
         return this.valor;
     }

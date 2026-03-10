@@ -29,7 +29,7 @@ public class AuthController {
 
     @POST
     @Path("/cadastrar")
-    public RestResponse<RegistrationResponseDto> cadastrar(@Valid RegistroDto usuario) {
+    public RestResponse<RegistrationResponseDto> cadastrar(@Valid @RequestBody RegistroDto usuario) {
         RegistrationResponseDto resposta = authenticationService.cadastrarUsuario(usuario);
 
         if (resposta.erro()) {

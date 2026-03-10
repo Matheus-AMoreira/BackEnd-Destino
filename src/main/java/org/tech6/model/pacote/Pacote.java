@@ -1,10 +1,8 @@
 package org.tech6.model.pacote;
 
-import org.tech6.model.pacote.hotel.Hotel;
 import org.tech6.model.pacote.oferta.Oferta;
 import org.tech6.model.pacote.pacoteFoto.PacoteFoto;
 import org.tech6.model.pacote.tag.Tag;
-import org.tech6.model.pacote.transporte.Transporte;
 import org.tech6.model.usuario.Usuario;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.*;
@@ -38,14 +36,6 @@ public class Pacote extends PanacheEntityBase {
     public List<Oferta> ofertas = new ArrayList<>();
 
     @ManyToOne
-    @JoinColumn(name = "TRA_ID", referencedColumnName = "TRA_ID", nullable = false)
-    public Transporte transporte;
-
-    @ManyToOne
-    @JoinColumn(name = "HOT_ID", referencedColumnName = "HOT_ID", nullable = false)
-    public Hotel hotel;
-
-    @ManyToOne
     @JoinColumn(name = "USU_ID", referencedColumnName = "USU_ID", nullable = false)
     public Usuario funcionario;
 
@@ -53,6 +43,4 @@ public class Pacote extends PanacheEntityBase {
     @JoinColumn(name = "pcf_id", referencedColumnName = "pcf_id", nullable = true)
     public PacoteFoto fotosDoPacote;
 
-    public Pacote() {
-    }
 }
