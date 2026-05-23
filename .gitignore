@@ -1,45 +1,29 @@
-# Resources
-resources*
-!application.properties
-
-# Gradle
-.gradle/
-build/
-
-# Eclipse
-.project
-.classpath
-.settings/
+# .NET Core / Visual Studio standard ignore patterns
 bin/
+obj/
+[Dd]ebug/
+[Rr]elease/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
 
-# IntelliJ
-.idea
-*.ipr
-*.iml
-*.iws
-
-# NetBeans
-nb-configuration.xml
-
-# Visual Studio Code
-.vscode
-.factorypath
-
-# OSX
-.DS_Store
-
-# Vim
-*.swp
-*.swo
-
-# patch
-*.orig
-*.rej
-
-# Local environment
+# Environment files (never commit secrets)
 .env
+.env.local
+.env.development
+.env.production
+.env.test
 
-# Plugin directory
-/.quarkus/cli/plugins/
-# TLS Certificates
-.certs/
+# IDE and Editor configs
+.vscode/
+.vs/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln.docstates
+
+# OS files
+.DS_Store
+Thumbs.db
